@@ -46,6 +46,9 @@ let cancelRequestEnrichmentGetOverlayPlot = () => {};
 let cancelRequestEnrichmentGetOverlayMultiPlot = () => {};
 const cacheGetEnrichmentsNetwork = {};
 
+// maximum fraction of viewport width for frozen first column (45vw)
+const FROZEN_FIRST_COL_MAX_VW = 0.35;
+
 class Enrichment extends Component {
   storedEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
@@ -1532,10 +1535,26 @@ class Enrichment extends Component {
     if (!firstHeaderCell) return;
 
     const rect = firstHeaderCell.getBoundingClientRect();
-    const width = Math.ceil(rect.width);
-    if (!width || width <= 0) return;
+    const measuredWidth = Math.ceil(rect.width);
+    if (!measuredWidth || measuredWidth <= 0) return;
 
-    wrapper.style.setProperty('--frozen-first-column-width', `${width}px`);
+    // Cap frozen first column at configured fraction of viewport width
+    const maxPx = Math.ceil(window.innerWidth * FROZEN_FIRST_COL_MAX_VW);
+    const appliedWidth = measuredWidth > maxPx ? maxPx : measuredWidth;
+
+    wrapper.style.setProperty(
+      '--frozen-first-column-width',
+      `${appliedWidth}px`,
+    );
+
+    if (table.classList.contains('frozen-first-col-capped')) {
+      table.classList.remove('frozen-first-col-capped');
+    }
+    // Toggle class so we can apply additional styles (like max-width on the
+    // first column cell) when the measured width exceeds the 45vw cap.
+    if (measuredWidth > maxPx) {
+      table.classList.add('frozen-first-col-capped');
+    }
   };
 
   /**
@@ -1580,7 +1599,19 @@ class Enrichment extends Component {
       });
     };
 
-    this.frozenColumnMutationObserver = new MutationObserver(() => schedule());
+    this.frozenColumnMutationObserver = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        // Ignore mutations caused by toggling the `class` attribute on the
+        // wrapper (we intentionally add/remove a class). Observing class
+        // changes causes a feedback loop that retriggers measurements.
+        if (m.type === 'attributes' && m.attributeName === 'class') {
+          continue;
+        }
+        // For other mutation types/attributes, schedule an update once.
+        schedule();
+        break;
+      }
+    });
     this.frozenColumnMutationObserver.observe(wrapper, {
       childList: true,
       subtree: true,
