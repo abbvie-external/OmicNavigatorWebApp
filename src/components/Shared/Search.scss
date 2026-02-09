@@ -11,6 +11,24 @@
 
   .SearchContainer {
     padding: 20px 20px 5px 20px !important;
+
+    // Ellipsis for dropdown selected value text
+    .ui.selection.dropdown > .text {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      width: calc(100% - 2em) !important;
+      display: block !important;
+    }
+
+    // Ellipsis for custom tooltip span inside menu items
+    .dropdown-ellipsis-item {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      display: block !important;
+      max-width: 100% !important;
+    }
   }
 
   .FilterStudyContainer {

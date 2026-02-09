@@ -115,6 +115,9 @@ class DifferentialSearch extends Component {
     uDataP: [],
     isFilteredSearch: false,
     isSmallScreen: true,
+    studyDropdownOpen: false,
+    modelDropdownOpen: false,
+    testDropdownOpen: false,
   };
 
   componentDidMount() {
@@ -180,6 +183,14 @@ class DifferentialSearch extends Component {
     () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
     300,
   );
+
+  handleDropdownOpen = (dropdownName) => () => {
+    this.setState({ [`${dropdownName}DropdownOpen`]: true });
+  };
+
+  handleDropdownClose = (dropdownName) => () => {
+    this.setState({ [`${dropdownName}DropdownOpen`]: false });
+  };
 
   getResultsStudies = () => {
     omicNavigatorService
@@ -1035,6 +1046,7 @@ class DifferentialSearch extends Component {
       differentialStudyHrefVisible,
       differentialModels,
       differentialModelTooltip,
+      differentialModelTooltips,
       differentialTests,
       differentialTestTooltip,
       differentialStudiesDisabled,
@@ -1044,6 +1056,9 @@ class DifferentialSearch extends Component {
       differentialStudyReportTooltip,
       isFilteredSearch,
       isSmallScreen,
+      studyDropdownOpen,
+      modelDropdownOpen,
+      testDropdownOpen,
     } = this.state;
 
     const {
@@ -1352,13 +1367,17 @@ class DifferentialSearch extends Component {
                 width={13}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={this.handleDropdownOpen('study')}
+                onClose={this.handleDropdownClose('study')}
               />
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
             inverted
+            on="hover"
+            open={studyDropdownOpen ? false : undefined}
             position="bottom right"
-            content={differentialStudyTooltip}
+            content={studyDropdownOpen ? null : differentialStudyTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
@@ -1382,14 +1401,18 @@ class DifferentialSearch extends Component {
                 searchInput={{ id: 'form-select-control-pmodel' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={this.handleDropdownOpen('model')}
+                onClose={this.handleDropdownClose('model')}
               />
             }
             style={StudyPopupStyle}
             disabled={!differentialStudy}
             className="CustomTooltip"
             inverted
+            on="hover"
+            open={modelDropdownOpen ? false : undefined}
             position="bottom right"
-            content={differentialModelTooltip}
+            content={modelDropdownOpen ? null : differentialModelTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
@@ -1411,14 +1434,18 @@ class DifferentialSearch extends Component {
                 searchInput={{ id: 'form-select-control-ptest' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={this.handleDropdownOpen('test')}
+                onClose={this.handleDropdownClose('test')}
               />
             }
             style={StudyPopupStyle}
             disabled={differentialTestTooltip === ''}
             className="CustomTooltip"
             inverted
+            on="hover"
+            open={testDropdownOpen ? false : undefined}
             position="bottom right"
-            content={differentialTestTooltip}
+            content={testDropdownOpen ? null : differentialTestTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
