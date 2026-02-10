@@ -1602,8 +1602,8 @@ class Enrichment extends Component {
     this.frozenColumnMutationObserver = new MutationObserver((mutations) => {
       for (const m of mutations) {
         // Ignore mutations caused by toggling the `class` attribute on the
-        // wrapper (we intentionally add/remove a class). Observing class
-        // changes causes a feedback loop that retriggers measurements.
+        // wrapper (we intentionally add/remove a class). Observing class will
+        // causes a feedback loop that retriggers measurements.
         if (m.type === 'attributes' && m.attributeName === 'class') {
           continue;
         }

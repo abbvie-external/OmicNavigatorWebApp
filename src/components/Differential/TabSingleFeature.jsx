@@ -103,7 +103,10 @@ class TabSingleFeature extends Component {
 
         // If we are going to render an error/instructions pane, consider it render-ready.
         const willRenderErrorPane = !!errorMessagePlotlySingleFeature;
-        if (willRenderErrorPane && typeof this.props.onActivePlotRenderReady === 'function') {
+        if (
+          willRenderErrorPane &&
+          typeof this.props.onActivePlotRenderReady === 'function'
+        ) {
           this.props.onActivePlotRenderReady(cacheStringArg);
         }
         const svgPanes = {
@@ -127,8 +130,10 @@ class TabSingleFeature extends Component {
                     errorMessagePlotlySingleFeature={
                       errorMessagePlotlySingleFeature
                     }
-                                      onRenderReady={() => {
-                      if (typeof this.props.onActivePlotRenderReady === 'function') {
+                    onRenderReady={() => {
+                      if (
+                        typeof this.props.onActivePlotRenderReady === 'function'
+                      ) {
                         this.props.onActivePlotRenderReady(cacheStringArg);
                       }
                     }}
@@ -141,13 +146,17 @@ class TabSingleFeature extends Component {
                     uniqueHash={`a1f8d1-${cacheStringArg}`}
                     uniquifyIDs={true}
                     onLoad={() => {
-                      if (typeof this.props.onActivePlotRenderReady === 'function') {
+                      if (
+                        typeof this.props.onActivePlotRenderReady === 'function'
+                      ) {
                         this.props.onActivePlotRenderReady(cacheStringArg);
                       }
                     }}
                     onError={() => {
                       // Avoid stuck loader if the SVG fails to load.
-                      if (typeof this.props.onActivePlotRenderReady === 'function') {
+                      if (
+                        typeof this.props.onActivePlotRenderReady === 'function'
+                      ) {
                         this.props.onActivePlotRenderReady(cacheStringArg);
                       }
                     }}
@@ -165,7 +174,7 @@ class TabSingleFeature extends Component {
         };
         panes = panes.concat(svgPanes);
       } else {
-        // Safety: if the pane data is unexpectedly missing, avoid a stuck loader.
+        // if the pane data is unexpectedly missing, avoid a stuck loader.
         if (typeof this.props.onActivePlotRenderReady === 'function') {
           this.props.onActivePlotRenderReady(cacheStringArg);
         }
