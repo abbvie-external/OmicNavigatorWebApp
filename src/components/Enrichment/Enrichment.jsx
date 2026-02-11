@@ -1620,7 +1620,7 @@ class Enrichment extends Component {
 
       // Toggle capped class efficiently
       const isCapped = measuredWidth > maxPx;
-      wrapper.classList.toggle('frozen-first-col-capped', isCapped);
+      table.classList.toggle('frozen-first-col-capped', isCapped);
     });
   };
 
