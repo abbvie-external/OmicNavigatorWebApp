@@ -1,4 +1,4 @@
-import _, { filter } from 'lodash-es';
+import _, { filter, debounce } from 'lodash-es';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
@@ -46,13 +46,6 @@ let cancelRequestEnrichmentGetOverlayPlot = () => {};
 let cancelRequestEnrichmentGetOverlayMultiPlot = () => {};
 const cacheGetEnrichmentsNetwork = {};
 
-frozenColumnResizeObserver = null;
-frozenColumnMutationObserver = null;
-frozenColumnIntersectionObserver = null;
-frozenColumnObservedElement = null;
-frozenColumnWrapperRef = null;
-isResizing = false;
-
 // maximum fraction of viewport width for frozen first column (35 vw)
 const FROZEN_FIRST_COL_MAX_VW = 0.35;
 
@@ -64,6 +57,8 @@ class Enrichment extends Component {
   frozenColumnMutationObserver = null;
   frozenColumnObservedElement = null;
   frozenColumnWrapperRef = null;
+  frozenColumnIntersectionObserver = null;
+  isResizing = false;
 
   enrichmentColumnsConfigured = false;
   state = {
@@ -1625,7 +1620,7 @@ class Enrichment extends Component {
 
       // Toggle capped class efficiently
       const isCapped = measuredWidth > maxPx;
-      table.classList.toggle('frozen-first-col-capped', isCapped);
+      wrapper.classList.toggle('frozen-first-col-capped', isCapped);
     });
   };
 
@@ -1711,13 +1706,8 @@ class Enrichment extends Component {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Table visible, ensure observers active
-            if (!this.frozenColumnResizeObserver.observe) {
-              this.frozenColumnResizeObserver.observe(wrapper);
-            }
-          } else {
-            // Table not visible, can pause observations
-            // Note: ResizeObserver has no explicit pause, but this signals visibility
+            // Table visible; schedule a width sync
+            debouncedUpdate();
           }
         });
       },
