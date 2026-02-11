@@ -32,6 +32,16 @@
       left: var(--frozen-first-column-width);
     }
 
+    // When the first column is capped (measured > 35vw), constrain its
+    // rendered width so it doesn't push non-frozen columns off-screen.
+    &.frozen-first-col-capped {
+      :is(thead, tbody) tr :is(th, td):nth-child(1) {
+        max-width: var(--frozen-first-column-width);
+        overflow: hidden;
+        white-space: normal;
+      }
+    }
+
     // Header-specific styles
     thead tr th:nth-child(-n + 2) {
       z-index: 6; // Higher z-index to appear above body cells

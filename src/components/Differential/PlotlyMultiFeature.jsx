@@ -13,6 +13,8 @@ const PopupStyle = {
 };
 
 export default class PlotlyMultiFeature extends Component {
+  hasSignaledRenderReady = false;
+
   state = {
     json: {
       data: null,
@@ -33,9 +35,19 @@ export default class PlotlyMultiFeature extends Component {
       clickDownload(this.props.parentNode);
     }
     if (this.props.cacheString !== prevProps.cacheString) {
+      this.hasSignaledRenderReady = false;
+
       this.getJson();
     }
   }
+
+  signalRenderReady = () => {
+    if (this.hasSignaledRenderReady) return;
+    this.hasSignaledRenderReady = true;
+    if (typeof this.props.onRenderReady === 'function') {
+      this.props.onRenderReady();
+    }
+  };
 
   getJson = () => {
     const {
@@ -46,7 +58,17 @@ export default class PlotlyMultiFeature extends Component {
       errorMessagePlotlyMultiFeature,
     } = this.props;
     if (!errorMessagePlotlyMultiFeature) {
-      const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
+      let parsedData = null;
+      if (plotlyData) {
+        try {
+          parsedData = JSON.parse(plotlyData);
+        } catch (err) {
+          // Ensure parent knows this render is finished to avoid a stuck loader.
+          this.signalRenderReady();
+          this.setState({ loading: false, json: { data: null, layout: null } });
+          return;
+        }
+      }
       const data = parsedData?.data || null;
       let layout = parsedData?.layout || null;
       if (layout) {
@@ -88,6 +110,11 @@ export default class PlotlyMultiFeature extends Component {
       plotlyExportType,
       errorMessagePlotlyMultiFeature,
     } = this.props;
+
+    if (errorMessagePlotlyMultiFeature) {
+      this.signalRenderReady();
+    }
+
     const { plotlyInteractive } = this.state;
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
@@ -134,6 +161,8 @@ export default class PlotlyMultiFeature extends Component {
               onClick={this.handleClick}
               onClickAnnotation={this.handleClickAnnotation}
               onSelected={this.handleSelected}
+              onInitialized={this.signalRenderReady}
+              onUpdate={this.signalRenderReady}
             />
           </>
         ) : (
