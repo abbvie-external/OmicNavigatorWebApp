@@ -34,6 +34,10 @@ class PlotsMultiFeature extends Component {
 
   differentialDetailPlotsMultiFeatureRef = React.createRef();
 
+  // Synchronous source of truth for the current render cycle key.
+  // Using state alone can drop a "ready" signal due to async setState timing.
+  activePlotRenderKeySync = null;
+
   handleTabChangeMultiFeature = (e, { activeTabIndexPlotsMultiFeature }) => {
     if (
       activeTabIndexPlotsMultiFeature !==
@@ -243,6 +247,7 @@ class PlotsMultiFeature extends Component {
 
 
   handleActivePlotRenderStart = (renderKey) => {
+    this.activePlotRenderKeySync = renderKey || null;
     this.setState({
       activePlotRenderKey: renderKey || null,
       activePlotRenderReady: false,
@@ -250,7 +255,7 @@ class PlotsMultiFeature extends Component {
   };
 
   handleActivePlotRenderReady = (renderKey) => {
-    if (renderKey && this.state.activePlotRenderKey !== renderKey) return;
+    if (renderKey && this.activePlotRenderKeySync !== renderKey) return;
     if (!this.state.activePlotRenderReady) {
       this.setState({ activePlotRenderReady: true });
     }

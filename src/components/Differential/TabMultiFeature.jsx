@@ -132,8 +132,11 @@ class TabMultiFeature extends Component {
                       errorMessagePlotlyMultiFeature={
                         errorMessagePlotlyMultiFeature
                       }
-                                          onRenderReady={() => {
-                        if (typeof this.props.onActivePlotRenderReady === 'function') {
+                      onRenderReady={() => {
+                        if (
+                          typeof this.props.onActivePlotRenderReady ===
+                          'function'
+                        ) {
                           this.props.onActivePlotRenderReady(cacheStringArg);
                         }
                       }}

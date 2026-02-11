@@ -1547,14 +1547,11 @@ class Enrichment extends Component {
       `${appliedWidth}px`,
     );
 
-    if (table.classList.contains('frozen-first-col-capped')) {
-      table.classList.remove('frozen-first-col-capped');
-    }
     // Toggle class so we can apply additional styles (like max-width on the
-    // first column cell) when the measured width exceeds the 45vw cap.
-    if (measuredWidth > maxPx) {
-      table.classList.add('frozen-first-col-capped');
-    }
+    // first column cell) when the measured width exceeds the 35vw cap.
+    // Use `toggle(..., force)` to avoid churn (remove+add) which can trigger
+    // extra MutationObserver callbacks.
+    table.classList.toggle('frozen-first-col-capped', measuredWidth > maxPx);
   };
 
   /**
@@ -1601,9 +1598,9 @@ class Enrichment extends Component {
 
     this.frozenColumnMutationObserver = new MutationObserver((mutations) => {
       for (const m of mutations) {
-        // Ignore mutations caused by toggling the `class` attribute on the
-        // wrapper (we intentionally add/remove a class). Observing class will
-        // causes a feedback loop that retriggers measurements.
+        // Ignore `class` attribute mutations in the observed subtree that can
+        // be caused by our own `frozen-first-col-capped` toggling. Observing
+        // class changes can create a feedback loop that retriggers measurements.
         if (m.type === 'attributes' && m.attributeName === 'class') {
           continue;
         }
