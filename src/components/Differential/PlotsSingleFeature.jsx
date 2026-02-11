@@ -30,6 +30,10 @@ class PlotsSingleFeature extends Component {
   differentialDetailPlotsSingleFeatureRef = React.createRef();
   metafeaturesTableDynamicRef = React.createRef();
 
+  // Synchronous source of truth for the current render cycle key.
+  // Using state alone can drop a "ready" signal due to async setState timing.
+  activePlotRenderKeySync = null;
+
   componentDidMount() {
     this.setButtonVisibility();
   }
@@ -106,6 +110,7 @@ class PlotsSingleFeature extends Component {
   handleActivePlotRenderStart = (renderKey) => {
     // Called when the active plot pane is about to render (e.g., new feature/tab/size).
     // Keep loader visible until the render completion callback fires for the same key.
+    this.activePlotRenderKeySync = renderKey || null;
     this.setState({
       activePlotRenderKey: renderKey || null,
       activePlotRenderReady: false,
@@ -114,7 +119,7 @@ class PlotsSingleFeature extends Component {
 
   handleActivePlotRenderReady = (renderKey) => {
     // Only accept readiness signal for the current renderKey to avoid races.
-    if (renderKey && this.state.activePlotRenderKey !== renderKey) return;
+    if (renderKey && this.activePlotRenderKeySync !== renderKey) return;
     if (!this.state.activePlotRenderReady) {
       this.setState({ activePlotRenderReady: true });
     }
