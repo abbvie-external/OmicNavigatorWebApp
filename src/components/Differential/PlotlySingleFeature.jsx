@@ -4,6 +4,8 @@ import { reviseLayout, clickDownload, loadingDimmer } from '../Shared/helpers';
 import '../Shared/PlotlyOverrides.scss';
 
 export default class PlotlySingleFeature extends Component {
+  hasSignaledRenderReady = false;
+
   state = {
     json: {
       data: null,
@@ -23,15 +25,34 @@ export default class PlotlySingleFeature extends Component {
       clickDownload(this.props.parentNode);
     }
     if (this.props.cacheString !== prevProps.cacheString) {
+      this.hasSignaledRenderReady = false;
+
       this.getJson();
     }
   }
+
+  signalRenderReady = () => {
+    if (this.hasSignaledRenderReady) return;
+    this.hasSignaledRenderReady = true;
+    if (typeof this.props.onRenderReady === 'function') {
+      this.props.onRenderReady();
+    }
+  };
 
   getJson = () => {
     const { plotlyData, width, height, errorMessagePlotlySingleFeature } =
       this.props;
     if (!errorMessagePlotlySingleFeature) {
-      const parsedData = plotlyData ? JSON.parse(plotlyData) : null;
+      let parsedData = null;
+      if (plotlyData) {
+        try {
+          parsedData = JSON.parse(plotlyData);
+        } catch (err) {
+          this.signalRenderReady();
+          this.setState({ loading: false, json: { data: null, layout: null } });
+          return;
+        }
+      }
       const data = parsedData?.data || null;
       let layout = parsedData?.layout || null;
       if (layout) {
@@ -56,6 +77,10 @@ export default class PlotlySingleFeature extends Component {
       plotlyExportType,
       errorMessagePlotlySingleFeature,
     } = this.props;
+
+    if (errorMessagePlotlySingleFeature) {
+      this.signalRenderReady();
+    }
     const config = {
       modeBarButtonsToRemove: ['sendDataToCloud'],
       displayModeBar: true,
@@ -75,6 +100,8 @@ export default class PlotlySingleFeature extends Component {
             data={this.state.json.data}
             layout={this.state.json.layout}
             config={config}
+            onInitialized={this.signalRenderReady}
+            onUpdate={this.signalRenderReady}
           />
         ) : (
           <div className="PlotInstructions">

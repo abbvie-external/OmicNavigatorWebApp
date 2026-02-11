@@ -1,4 +1,4 @@
-import _, { filter } from 'lodash-es';
+import _, { filter, debounce } from 'lodash-es';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { CancelToken } from 'axios';
@@ -46,6 +46,9 @@ let cancelRequestEnrichmentGetOverlayPlot = () => {};
 let cancelRequestEnrichmentGetOverlayMultiPlot = () => {};
 const cacheGetEnrichmentsNetwork = {};
 
+// maximum fraction of viewport width for frozen first column (35 vw)
+const FROZEN_FIRST_COL_MAX_VW = 0.35;
+
 class Enrichment extends Component {
   storedEnrichmentActiveIndex =
     parseInt(sessionStorage.getItem('enrichmentViewTab'), 10) || 0;
@@ -54,6 +57,8 @@ class Enrichment extends Component {
   frozenColumnMutationObserver = null;
   frozenColumnObservedElement = null;
   frozenColumnWrapperRef = null;
+  frozenColumnIntersectionObserver = null;
+  isResizing = false;
 
   enrichmentColumnsConfigured = false;
   state = {
@@ -245,14 +250,18 @@ class Enrichment extends Component {
 
   componentDidMount() {
     this.getTableHelpers(this.testSelectedTransition, this.showBarcodePlot);
-    // let resizedFn;
-    // window.addEventListener('resize', () => {
-    //   clearTimeout(resizedFn);
-    //   resizedFn = setTimeout(() => {
-    //     this.windowResized();
-    //   }, 200);
-    // });
     this._isMountedEnrichment = true;
+
+    // Add debounced resize handler
+    this.debouncedWindowResize = debounce(
+      () => {
+        this.handleWindowResize();
+      },
+      150,
+      { leading: false, trailing: true },
+    );
+
+    window.addEventListener('resize', this.debouncedWindowResize);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -292,7 +301,53 @@ class Enrichment extends Component {
 
   componentWillUnmount() {
     this._isMountedEnrichment = false;
+
+    // Cleanup resize handler
+    if (this.debouncedWindowResize) {
+      this.debouncedWindowResize.cancel();
+      window.removeEventListener('resize', this.debouncedWindowResize);
+    }
+
+    // Cleanup all observers
+    if (this.frozenColumnResizeObserver) {
+      this.frozenColumnResizeObserver.disconnect();
+      this.frozenColumnResizeObserver = null;
+    }
+    if (this.frozenColumnMutationObserver) {
+      this.frozenColumnMutationObserver.disconnect();
+      this.frozenColumnMutationObserver = null;
+    }
+    if (this.frozenColumnIntersectionObserver) {
+      this.frozenColumnIntersectionObserver.disconnect();
+      this.frozenColumnIntersectionObserver = null;
+    }
+
+    this.frozenColumnObservedElement = null;
+    this.frozenColumnWrapperRef = null;
   }
+
+  handleWindowResize = () => {
+    if (!this.frozenColumnWrapperRef) return;
+
+    const wrapper =
+      this.frozenColumnWrapperRef.closest?.('.two-col-sticky') ||
+      this.frozenColumnWrapperRef;
+
+    // Mark as resizing
+    this.isResizing = true;
+    wrapper?.classList?.add('resizing');
+
+    // Update width after resize
+    requestAnimationFrame(() => {
+      this.updateFrozenFirstColWidth();
+
+      // Remove resizing class after a brief delay
+      setTimeout(() => {
+        this.isResizing = false;
+        wrapper?.classList?.remove('resizing');
+      }, 100);
+    });
+  };
 
   // windowResized = () => {
   //   this.setState({
@@ -1514,8 +1569,8 @@ class Enrichment extends Component {
     const inner = this.frozenColumnWrapperRef;
     if (!inner) return;
 
-    const wrapper =
-      (inner.closest && inner.closest('.two-col-sticky')) || inner;
+    const wrapper = inner.closest?.('.two-col-sticky') || inner;
+    if (!wrapper) return;
 
     const table =
       wrapper.querySelector('table.QHGrid--body') ||
@@ -1523,19 +1578,50 @@ class Enrichment extends Component {
 
     if (!table) return;
 
-    let firstHeaderCell = table.querySelector('thead tr th:first-child');
-    if (!firstHeaderCell) {
-      firstHeaderCell = table.querySelector(
-        'div[role="columnheader"]:first-child',
-      );
-    }
+    let firstHeaderCell =
+      table.querySelector('thead tr th:first-child') ||
+      table.querySelector('div[role="columnheader"]:first-child');
+
     if (!firstHeaderCell) return;
 
+    // Batch DOM reads
     const rect = firstHeaderCell.getBoundingClientRect();
-    const width = Math.ceil(rect.width);
-    if (!width || width <= 0) return;
+    const measuredWidth = Math.ceil(rect.width);
 
-    wrapper.style.setProperty('--frozen-first-column-width', `${width}px`);
+    if (!measuredWidth || measuredWidth <= 0) return;
+
+    // Calculate max with current viewport width
+    const viewportWidth = window.innerWidth;
+    const maxPx = Math.ceil(viewportWidth * FROZEN_FIRST_COL_MAX_VW);
+
+    // Get current width to avoid micro-updates
+    const currentWidthStr =
+      wrapper.style.getPropertyValue('--frozen-first-column-width') || '0';
+    const currentWidth = parseInt(currentWidthStr, 10);
+
+    // Apply width with clamping
+    const appliedWidth = measuredWidth > maxPx ? maxPx : measuredWidth;
+
+    // Transition buffer to prevent jank from tiny changes
+    const TRANSITION_BUFFER = 3; // px
+    if (
+      Math.abs(appliedWidth - currentWidth) < TRANSITION_BUFFER &&
+      !this.isResizing
+    ) {
+      return;
+    }
+
+    // Batch DOM writes in RAF
+    requestAnimationFrame(() => {
+      wrapper.style.setProperty(
+        '--frozen-first-column-width',
+        `${appliedWidth}px`,
+      );
+
+      // Toggle capped class efficiently
+      const isCapped = measuredWidth > maxPx;
+      table.classList.toggle('frozen-first-col-capped', isCapped);
+    });
   };
 
   /**
@@ -1544,7 +1630,7 @@ class Enrichment extends Component {
    * (e.g., col 2 covering col 3/4) after sorting/filtering or grid re-renders.
    */
   setupFrozenColumnResizeObserver = () => {
-    // Clean up any existing observers first
+    // Clean up any existing observers
     if (this.frozenColumnResizeObserver) {
       this.frozenColumnResizeObserver.disconnect();
       this.frozenColumnResizeObserver = null;
@@ -1554,38 +1640,80 @@ class Enrichment extends Component {
       this.frozenColumnMutationObserver.disconnect();
       this.frozenColumnMutationObserver = null;
     }
+    if (this.frozenColumnIntersectionObserver) {
+      this.frozenColumnIntersectionObserver.disconnect();
+      this.frozenColumnIntersectionObserver = null;
+    }
 
     const inner = this.frozenColumnWrapperRef;
     if (!inner) return;
 
-    const wrapper =
-      (inner.closest && inner.closest('.two-col-sticky')) || inner;
+    const wrapper = inner.closest?.('.two-col-sticky') || inner;
+    if (!wrapper) return;
 
+    // Initial measurement
     this.updateFrozenFirstColWidth();
-    requestAnimationFrame(this.updateFrozenFirstColWidth);
+    requestAnimationFrame(() => this.updateFrozenFirstColWidth());
 
-    // Resize: split panes, window resize, etc.
+    // Create debounced update function
+    const debouncedUpdate = debounce(
+      () => {
+        requestAnimationFrame(() => {
+          this.updateFrozenFirstColWidth();
+        });
+      },
+      100,
+      { leading: false, trailing: true },
+    );
+
+    // ResizeObserver for wrapper size changes
     this.frozenColumnResizeObserver = new ResizeObserver(() => {
-      this.updateFrozenFirstColWidth();
+      if (!this.isResizing) {
+        debouncedUpdate();
+      }
     });
     this.frozenColumnResizeObserver.observe(wrapper);
     this.frozenColumnObservedElement = wrapper;
 
+    // MutationObserver for DOM changes
     let rafId = 0;
-    const schedule = () => {
+    const scheduleUpdate = () => {
       if (rafId) return;
       rafId = requestAnimationFrame(() => {
         rafId = 0;
-        this.updateFrozenFirstColWidth();
+        debouncedUpdate();
       });
     };
 
-    this.frozenColumnMutationObserver = new MutationObserver(() => schedule());
+    this.frozenColumnMutationObserver = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        // Ignore class attribute changes to prevent feedback loops
+        if (m.type === 'attributes' && m.attributeName === 'class') {
+          continue;
+        }
+        scheduleUpdate();
+        break;
+      }
+    });
     this.frozenColumnMutationObserver.observe(wrapper, {
       childList: true,
       subtree: true,
       attributes: true,
     });
+
+    // IntersectionObserver to pause when not visible (optional optimization)
+    this.frozenColumnIntersectionObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Table visible; schedule a width sync
+            debouncedUpdate();
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+    this.frozenColumnIntersectionObserver.observe(wrapper);
   };
 
   removeNetworkSVG = () => {

@@ -22,6 +22,21 @@
       z-index: 3;
     }
 
+    .QHGrid--body {
+      th:first-child,
+      td:first-child {
+        transition: max-width 0.15s ease-out, width 0.15s ease-out;
+        will-change: width, max-width;
+      }
+    }
+
+    &.resizing {
+      th:first-child,
+      td:first-child {
+        transition: none !important;
+      }
+    }
+
     // Position first column
     :is(thead, tbody) tr :is(th, td):nth-child(1) {
       left: 0;
@@ -30,6 +45,16 @@
     // Position second column
     :is(thead, tbody) tr :is(th, td):nth-child(2) {
       left: var(--frozen-first-column-width);
+    }
+
+    // When the first column is capped (measured > 35vw), constrain its
+    // rendered width so it doesn't push non-frozen columns off-screen.
+    &.frozen-first-col-capped {
+      :is(thead, tbody) tr :is(th, td):nth-child(1) {
+        max-width: var(--frozen-first-column-width);
+        overflow: hidden;
+        white-space: normal;
+      }
     }
 
     // Header-specific styles
