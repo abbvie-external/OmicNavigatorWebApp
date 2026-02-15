@@ -5,6 +5,10 @@ import './BarcodePlot.scss';
 import * as d3 from 'd3';
 
 class BarcodePlot extends Component {
+  _isMounted = false;
+  _resizeTimer = null;
+  _onWindowResize = null;
+
   state = {
     switch: 0,
     barcodeWidth: 0,
@@ -43,14 +47,16 @@ class BarcodePlot extends Component {
   barcodeSVGRef = React.createRef();
 
   componentDidMount() {
+    this._isMounted = true;
     this.setWidth(true, false);
     let resizedFn;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizedFn);
-      resizedFn = setTimeout(() => {
-        this.windowResized();
+    this._onWindowResize = () => {
+      clearTimeout(this._resizeTimer);
+      this._resizeTimer = setTimeout(() => {
+        if (this._isMounted) this.windowResized();
       }, 200);
-    });
+    };
+    window.addEventListener('resize', this._onWindowResize);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -601,6 +607,18 @@ class BarcodePlot extends Component {
       displayElementTextBarcode: !prevState.displayElementTextBarcode,
     }));
   };
+  componentWillUnmount() {
+    this._isMounted = false;
+
+    if (this._onWindowResize) {
+      window.removeEventListener('resize', this._onWindowResize);
+      this._onWindowResize = null;
+    }
+    if (this._resizeTimer) {
+      clearTimeout(this._resizeTimer);
+      this._resizeTimer = null;
+    }
+  }
 
   render() {
     const {

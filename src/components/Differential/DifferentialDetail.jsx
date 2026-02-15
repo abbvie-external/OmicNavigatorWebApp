@@ -211,6 +211,13 @@ class DifferentialDetail extends Component {
   }
 
   componentWillUnmount() {
+    // Cancel pending debounced work to prevent setState after unmount
+    if (this.reloadMultifeaturePlot?.cancel) {
+      this.reloadMultifeaturePlot.cancel();
+    }
+    if (this.handleSingleFeatureSearchTextChange?.cancel) {
+      this.handleSingleFeatureSearchTextChange.cancel();
+    }
     this.abortController?.abort();
     this._firstHeaderEl = null;
 

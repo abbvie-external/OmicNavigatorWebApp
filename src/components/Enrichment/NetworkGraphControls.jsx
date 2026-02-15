@@ -165,6 +165,7 @@ const SortableContainer = sortableContainer(({ children }) => {
 });
 
 class NetworkGraphControls extends Component {
+  _isMounted = false;
   state = {
     showNetworkLabels: true,
     networkSearchResults: [],
@@ -188,6 +189,7 @@ class NetworkGraphControls extends Component {
   };
 
   componentDidMount() {
+    this._isMounted = true;
     if (!this.props.networkGraphReady) {
       d3.select('div.tooltip-pieSlice').remove();
       d3.select('tooltipLink').remove();
@@ -201,6 +203,17 @@ class NetworkGraphControls extends Component {
       this.props.networkData !== prevProps.networkData
     ) {
       this.props.onCreateLegend();
+    }
+  }
+  componentWillUnmount() {
+    this._isMounted = false;
+
+    // Cancel any pending debounced callbacks to avoid setState/prop calls after unmount.
+    if (this.actuallyHandleNodeCutoffInputChange?.cancel) {
+      this.actuallyHandleNodeCutoffInputChange.cancel();
+    }
+    if (this.actuallyHandleLinkCutoffInputChange?.cancel) {
+      this.actuallyHandleLinkCutoffInputChange.cancel();
     }
   }
 
@@ -260,6 +273,7 @@ class NetworkGraphControls extends Component {
   };
 
   setupNetworkSearch = (filteredNodes) => {
+    if (!this._isMounted) return;
     const networkDataNodeDescriptions = filteredNodes.map((r) => ({
       description: r.description?.toLowerCase(),
       termid: r.termID,

@@ -127,6 +127,14 @@ class Differential extends Component {
     return nextProps.tab === 'differential';
   }
 
+  componentWillUnmount() {
+    // Prevent debounced setState from firing after unmount
+    if (this.handleSVG?.cancel) {
+      this.handleSVG.cancel();
+    }
+  }
+
+
   // componentWillUnmount() {
   //   window.removeEventListener('resize', this.debouncedResizeListener);
   // }

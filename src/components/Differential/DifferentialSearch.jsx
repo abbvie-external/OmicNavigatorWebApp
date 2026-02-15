@@ -177,6 +177,9 @@ class DifferentialSearch extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.setScreen);
+    if (this.setScreen?.cancel) {
+      this.setScreen.cancel();
+    }
   }
 
   setScreen = _.debounce(
