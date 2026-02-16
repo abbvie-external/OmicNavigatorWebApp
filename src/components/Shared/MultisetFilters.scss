@@ -47,3 +47,39 @@ svg:not(:root) {
 .CursorNotAllowed {
   cursor: not-allowed !important;
 }
+
+/*
+ * SVG wrappers for Multiset/Test filters
+ * - Enables horizontal scrolling only when SVG content exceeds sidebar width
+ * - Keeps scrollbars thin and unobtrusive
+ */
+.SidebarSvgScrollX {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent; /* Firefox */
+}
+
+.SidebarSvgScrollX::-webkit-scrollbar {
+  height: 8px;
+}
+
+.SidebarSvgScrollX::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.SidebarSvgScrollX::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.SidebarSvgScrollX::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.38);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
