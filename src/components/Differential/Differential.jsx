@@ -111,16 +111,107 @@ class Differential extends Component {
       multisetFiltersVisibleParentRef: false,
       multisetButttonActiveDifferential: false,
       multisetQueriedDifferential: false,
+
+      //cap sidebar height to match the right content (table) height
+      differentialSidebarMaxHeight: null,
     };
   }
 
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
+  //s idebar height sync (right content -> sidebar cap) ----
+  _differentialSidebarResizeObserver = null;
+  _differentialSidebarRaf = null;
+  _differentialSidebarMaxHeightLast = null;
+
+  getDifferentialViewportMinHeight = () => {
+    // Align with Search.scss header offset (57px)
+    const HEADER_OFFSET_PX = 57;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
+    return Math.max(0, vh - HEADER_OFFSET_PX);
+  };
+
+  scheduleDifferentialSidebarHeightUpdate = () => {
+    if (this._differentialSidebarRaf) return;
+    this._differentialSidebarRaf = requestAnimationFrame(() => {
+      this._differentialSidebarRaf = null;
+      this.updateDifferentialSidebarMaxHeight();
+    });
+  };
+
+  updateDifferentialSidebarMaxHeight = () => {
+    const node = this.differentialViewContainerRef?.current;
+    const minHeight = this.getDifferentialViewportMinHeight();
+    if (!node) {
+      // Still enforce a sane minimum to avoid sidebar infinite growth
+      if (this._differentialSidebarMaxHeightLast !== minHeight) {
+        this._differentialSidebarMaxHeightLast = minHeight;
+        this.setState({ differentialSidebarMaxHeight: minHeight });
+      }
+      return;
+    }
+
+    const measured = Math.ceil(node.getBoundingClientRect().height || 0);
+    const next = Math.max(minHeight, measured);
+
+    // Avoid render loops / churn from tiny sub-pixel changes
+    if (
+      this._differentialSidebarMaxHeightLast !== null &&
+      Math.abs(this._differentialSidebarMaxHeightLast - next) <= 2
+    ) {
+      return;
+    }
+
+    this._differentialSidebarMaxHeightLast = next;
+    this.setState({ differentialSidebarMaxHeight: next });
+  };
+
+  initDifferentialSidebarHeightSync = () => {
+    // 1) Initial cap
+    this.updateDifferentialSidebarMaxHeight();
+
+    // 2) Observe right content growth/shrink (table streaming, layout changes)
+    if (typeof ResizeObserver !== 'undefined') {
+      this._differentialSidebarResizeObserver = new ResizeObserver(() => {
+        this.scheduleDifferentialSidebarHeightUpdate();
+      });
+
+      const node = this.differentialViewContainerRef?.current;
+      if (node) {
+        this._differentialSidebarResizeObserver.observe(node);
+      }
+    }
+
+    // 3) Recompute on viewport resize
+    window.addEventListener(
+      'resize',
+      this.scheduleDifferentialSidebarHeightUpdate,
+    );
+  };
+
+  cleanupDifferentialSidebarHeightSync = () => {
+    if (this._differentialSidebarResizeObserver) {
+      this._differentialSidebarResizeObserver.disconnect();
+      this._differentialSidebarResizeObserver = null;
+    }
+    if (this._differentialSidebarRaf) {
+      cancelAnimationFrame(this._differentialSidebarRaf);
+      this._differentialSidebarRaf = null;
+    }
+    window.removeEventListener(
+      'resize',
+      this.scheduleDifferentialSidebarHeightUpdate,
+    );
+  };
+
   componentDidMount() {
     if (this.props.differentialStudy) {
       this.getMultiModelMappingObject(this.props.differentialStudy);
     }
+
+    // Keep the left sidebar height capped to the right content height
+    this.initDifferentialSidebarHeightSync();
   }
 
   shouldComponentUpdate(nextProps) {
@@ -132,8 +223,9 @@ class Differential extends Component {
     if (this.handleSVG?.cancel) {
       this.handleSVG.cancel();
     }
-  }
 
+    this.cleanupDifferentialSidebarHeightSync();
+  }
 
   // componentWillUnmount() {
   //   window.removeEventListener('resize', this.debouncedResizeListener);
@@ -1908,6 +2000,11 @@ class Differential extends Component {
         <Grid.Row className="DifferentialContainer">
           <Grid.Column
             className="SidebarContainer"
+            style={
+              this.state.differentialSidebarMaxHeight
+                ? { maxHeight: this.state.differentialSidebarMaxHeight }
+                : undefined
+            }
             mobile={4}
             tablet={4}
             largeScreen={4}

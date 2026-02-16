@@ -238,11 +238,85 @@ class Enrichment extends Component {
     enrichmentModelIds: [],
     enrichmentResultsColumnTooltips: [],
     enrichmentPlotDescriptions: [],
+
+    // UI: cap sidebar height to match the right content (table) height
+    enrichmentSidebarMaxHeight: null,
   };
   EnrichmentViewContainerRef = React.createRef();
   EnrichmentGridRef = React.createRef();
 
   _isMountedEnrichment = false;
+
+  // ---- Sidebar height sync (right content -> sidebar cap) ----
+  _enrichmentSidebarResizeObserver = null;
+  _enrichmentSidebarRaf = null;
+  _enrichmentSidebarMaxHeightLast = null;
+
+  getEnrichmentViewportMinHeight = () => {
+    // Align with Search.scss header offset (57px)
+    const HEADER_OFFSET_PX = 57;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
+    return Math.max(0, vh - HEADER_OFFSET_PX);
+  };
+
+  scheduleEnrichmentSidebarHeightUpdate = () => {
+    if (this._enrichmentSidebarRaf) return;
+    this._enrichmentSidebarRaf = requestAnimationFrame(() => {
+      this._enrichmentSidebarRaf = null;
+      this.updateEnrichmentSidebarMaxHeight();
+    });
+  };
+
+  updateEnrichmentSidebarMaxHeight = () => {
+    const node = this.EnrichmentViewContainerRef?.current;
+    const minHeight = this.getEnrichmentViewportMinHeight();
+    if (!node) {
+      if (this._enrichmentSidebarMaxHeightLast !== minHeight) {
+        this._enrichmentSidebarMaxHeightLast = minHeight;
+        this.setState({ enrichmentSidebarMaxHeight: minHeight });
+      }
+      return;
+    }
+
+    const measured = Math.ceil(node.getBoundingClientRect().height || 0);
+    const next = Math.max(minHeight, measured);
+
+    if (
+      this._enrichmentSidebarMaxHeightLast !== null &&
+      Math.abs(this._enrichmentSidebarMaxHeightLast - next) <= 2
+    ) {
+      return;
+    }
+
+    this._enrichmentSidebarMaxHeightLast = next;
+    this.setState({ enrichmentSidebarMaxHeight: next });
+  };
+
+  initEnrichmentSidebarHeightSync = () => {
+    this.updateEnrichmentSidebarMaxHeight();
+
+    if (typeof ResizeObserver !== 'undefined') {
+      this._enrichmentSidebarResizeObserver = new ResizeObserver(() => {
+        this.scheduleEnrichmentSidebarHeightUpdate();
+      });
+
+      const node = this.EnrichmentViewContainerRef?.current;
+      if (node) {
+        this._enrichmentSidebarResizeObserver.observe(node);
+      }
+    }
+  };
+
+  cleanupEnrichmentSidebarHeightSync = () => {
+    if (this._enrichmentSidebarResizeObserver) {
+      this._enrichmentSidebarResizeObserver.disconnect();
+      this._enrichmentSidebarResizeObserver = null;
+    }
+    if (this._enrichmentSidebarRaf) {
+      cancelAnimationFrame(this._enrichmentSidebarRaf);
+      this._enrichmentSidebarRaf = null;
+    }
+  };
 
   shouldComponentUpdate(nextProps) {
     return nextProps.tab === 'enrichment';
@@ -262,6 +336,9 @@ class Enrichment extends Component {
     );
 
     window.addEventListener('resize', this.debouncedWindowResize);
+
+    // Keep the left sidebar height capped to the right content height
+    this.initEnrichmentSidebarHeightSync();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -324,9 +401,14 @@ class Enrichment extends Component {
 
     this.frozenColumnObservedElement = null;
     this.frozenColumnWrapperRef = null;
+
+    this.cleanupEnrichmentSidebarHeightSync();
   }
 
   handleWindowResize = () => {
+    // Keep sidebar cap in sync with viewport changes
+    this.scheduleEnrichmentSidebarHeightUpdate();
+
     if (!this.frozenColumnWrapperRef) return;
 
     const wrapper =
@@ -3657,6 +3739,11 @@ class Enrichment extends Component {
         <Grid.Row className="EnrichmentContainer">
           <Grid.Column
             className="SidebarContainer"
+            style={
+              this.state.enrichmentSidebarMaxHeight
+                ? { maxHeight: this.state.enrichmentSidebarMaxHeight }
+                : undefined
+            }
             mobile={4}
             tablet={4}
             largeScreen={4}
