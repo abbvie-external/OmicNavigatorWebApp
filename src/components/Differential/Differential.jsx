@@ -120,11 +120,18 @@ class Differential extends Component {
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
-  //s idebar height sync (right content -> sidebar cap) ----
+  //Sidebar height sync (right content -> sidebar cap) ----
   _differentialSidebarResizeObserver = null;
   _differentialSidebarRaf = null;
   _differentialSidebarMaxHeightLast = null;
 
+  /**
+   * Calculates the minimum height for the differential viewport by subtracting
+   * the header offset from the window's inner height.
+   *
+   * @returns {number} The calculated minimum height in pixels
+   *
+   */
   getDifferentialViewportMinHeight = () => {
     // Align with Search.scss header offset (57px)
     const HEADER_OFFSET_PX = 57;
@@ -132,6 +139,12 @@ class Differential extends Component {
     return Math.max(0, vh - HEADER_OFFSET_PX);
   };
 
+  /**
+   * Schedules a sidebar height update using requestAnimationFrame to debounce
+   * rapid successive update requests.
+   *
+   * @returns {void}
+   */
   scheduleDifferentialSidebarHeightUpdate = () => {
     if (this._differentialSidebarRaf) return;
     this._differentialSidebarRaf = requestAnimationFrame(() => {
@@ -167,11 +180,17 @@ class Differential extends Component {
     this.setState({ differentialSidebarMaxHeight: next });
   };
 
+  /**
+   * Initializes the sidebar height synchronization system by setting up observers
+   * and event listeners.
+   *
+   * @returns {void}
+   */
   initDifferentialSidebarHeightSync = () => {
-    // 1) Initial cap
+    //Initial cap
     this.updateDifferentialSidebarMaxHeight();
 
-    // 2) Observe right content growth/shrink (table streaming, layout changes)
+    //Observe right content growth/shrink (table streaming, layout changes)
     if (typeof ResizeObserver !== 'undefined') {
       this._differentialSidebarResizeObserver = new ResizeObserver(() => {
         this.scheduleDifferentialSidebarHeightUpdate();
@@ -183,13 +202,18 @@ class Differential extends Component {
       }
     }
 
-    // 3) Recompute on viewport resize
+    //Recompute on viewport resize
     window.addEventListener(
       'resize',
       this.scheduleDifferentialSidebarHeightUpdate,
     );
   };
 
+  /**
+   * Cleans up all resources related to sidebar height synchronization.
+   *
+   * @returns {void}
+   */
   cleanupDifferentialSidebarHeightSync = () => {
     if (this._differentialSidebarResizeObserver) {
       this._differentialSidebarResizeObserver.disconnect();

@@ -239,7 +239,7 @@ class Enrichment extends Component {
     enrichmentResultsColumnTooltips: [],
     enrichmentPlotDescriptions: [],
 
-    // UI: cap sidebar height to match the right content (table) height
+    //cap sidebar height to match the right content (table) height
     enrichmentSidebarMaxHeight: null,
   };
   EnrichmentViewContainerRef = React.createRef();
@@ -247,7 +247,6 @@ class Enrichment extends Component {
 
   _isMountedEnrichment = false;
 
-  // ---- Sidebar height sync (right content -> sidebar cap) ----
   _enrichmentSidebarResizeObserver = null;
   _enrichmentSidebarRaf = null;
   _enrichmentSidebarMaxHeightLast = null;
@@ -292,6 +291,12 @@ class Enrichment extends Component {
     this.setState({ enrichmentSidebarMaxHeight: next });
   };
 
+  /**
+   * Initializes the sidebar height synchronization system by setting up observers
+   * and event listeners.
+   *
+   * @returns {void}
+   */
   initEnrichmentSidebarHeightSync = () => {
     this.updateEnrichmentSidebarMaxHeight();
 
@@ -307,6 +312,11 @@ class Enrichment extends Component {
     }
   };
 
+  /**
+   * Cleans up all resources related to sidebar height synchronization.
+   *
+   * @returns {void}
+   */
   cleanupEnrichmentSidebarHeightSync = () => {
     if (this._enrichmentSidebarResizeObserver) {
       this._enrichmentSidebarResizeObserver.disconnect();
