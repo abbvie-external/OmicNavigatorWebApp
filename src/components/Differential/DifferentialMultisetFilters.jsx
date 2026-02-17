@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Select, Icon, Button } from 'semantic-ui-react';
 import * as d3 from 'd3';
+import { maxLinesWidth, measureTextWidth } from '../Shared/svgTextMeasure';
 
 import NumericExponentialInput from '../Shared/NumericExponentialInput';
 // import { ExponentialNumberInput } from '../Shared/ExponentialNumberInput';
@@ -42,7 +43,10 @@ class DifferentialMultisetFilters extends Component {
 
     if (this.props.uSettingsP.displayMetaDataP) {
       this.prepareMultiset(baseP);
-      const baseMetaSvgP = baseP.append('svg');
+      const baseMetaSvgP = baseP
+        .append('div')
+        .attr('class', 'SidebarSvgScrollX')
+        .append('svg');
       this.metaScript(baseMetaSvgP);
     }
   };
@@ -57,7 +61,6 @@ class DifferentialMultisetFilters extends Component {
       mustDifferential,
       notDifferential,
     } = this.props;
-    const svgWidthP = 315;
     const heightScalarP = 15;
     const svgHeightP =
       notDifferential.length * heightScalarP +
@@ -106,6 +109,22 @@ class DifferentialMultisetFilters extends Component {
         default:
       }
     }
+    const fontFamily = 'Lato,Arial,Helvetica,sans-serif';
+    const font15 = `15px ${fontFamily}`;
+    const font14 = `14px ${fontFamily}`;
+    const font13 = `13px ${fontFamily}`;
+    const svgWidthP = (() => {
+      const lines = [{ text: 'Set Composition:', font: font15 }]
+        .concat(setDescP.map(t => ({ text: t, font: font15 })))
+        .concat(useAnchorP ? [{ text: uAnchorP, font: font13 }] : [])
+        .concat(mustDifferential.map(t => ({ text: t, font: font13 })))
+        .concat(notSetDescP.map(t => ({ text: t, font: font14 })))
+        .concat(notDifferential.map(t => ({ text: t, font: font13 })));
+
+      const maxTextW = maxLinesWidth(lines, font14);
+      // Add room for left offsets (x≈25) + circle column + some padding.
+      return Math.max(315, maxTextW + 55);
+    })();
 
     //Reset the svg
     metaSvgP.selectAll('text').remove();
@@ -357,28 +376,28 @@ class DifferentialMultisetFilters extends Component {
       topBoxHeightP;
 
     const minWidth = 250 * heightScalarP;
-    const maxWidth = 340 * heightScalarP;
 
-    //Set the width of the svg to depending on the size of the largest test element
-    let longest = 0;
-    if (datasetP[0]) {
-      longest = datasetP[0].length;
-      for (let i = 1; i < datasetP.length; i++) {
-        if (datasetP[i].length > longest) {
-          longest = datasetP[i].length;
-        }
-      }
-    }
+    // Set the width of the svg based on actual rendered text width (industry-standard)
+    // so long test names are never clipped; horizontal scroll will appear when needed.
     const circlesWidth = 4 * circlePadding + 6 * circleRadius;
-    let textElementWidth = longest * 10 * heightScalarP;
-    let svgWidthP = circlesWidth + textElementWidth;
+
+    const labelFontSizePx = Math.round(heightScalarP * 14);
+    const labelFontFamily = 'Lato,Arial,Helvetica,sans-serif';
+    const labelFontNormal = `${labelFontSizePx}px ${labelFontFamily}`;
+    const labelFontBold = `bold ${labelFontSizePx}px ${labelFontFamily}`;
+
+    let maxLabelWidthPx = 0;
+    for (let i = 0; i < datasetP.length; i++) {
+      const d = datasetP[i];
+      const font = d === uAnchorP ? labelFontBold : labelFontNormal;
+      maxLabelWidthPx = Math.max(maxLabelWidthPx, measureTextWidth(d, font));
+    }
+
+    let svgWidthP = circlesWidth + maxLabelWidthPx + 24;
     if (svgWidthP < minWidth) {
       svgWidthP = minWidth;
-      textElementWidth = svgWidthP - circlesWidth;
-    } else if (svgWidthP > maxWidth) {
-      svgWidthP = maxWidth;
-      textElementWidth = svgWidthP - circlesWidth;
     }
+    let textElementWidth = svgWidthP - circlesWidth;
 
     //Colors
     // let chosenColorCodeP = '#00FF40';
@@ -401,7 +420,9 @@ class DifferentialMultisetFilters extends Component {
     // const topBox =
     baseP.append('div').style('padding-bottom', '5px');
 
-    const svg = baseP
+    const svgWrapper = baseP.append('div').attr('class', 'SidebarSvgScrollX');
+
+    const svg = svgWrapper
       .append('svg')
       .attr('width', svgWidthP)
       .attr('height', svgHeightP)

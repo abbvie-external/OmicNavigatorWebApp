@@ -535,7 +535,7 @@ export function diff(from, to, field = 'id') {
 
 export function getYAxis(array) {
   const match = array.find((column) => {
-    const columnLowerCase = column.toLowerCase();
+    const columnLowerCase = column?.toLowerCase();
     if (
       // p value
       columnLowerCase.includes('pval') ||
