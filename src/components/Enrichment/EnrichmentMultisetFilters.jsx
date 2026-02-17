@@ -45,7 +45,7 @@ class EnrichmentMultisetFilters extends Component {
         this.prepareMultiset(base);
         const baseMetaSvg = base
           .append('div')
-          .attr('class', 'SidebarSvgScrollX')
+          .attr('class', 'SidebarWideSvg')
           .append('svg');
         this.metaScript(baseMetaSvg);
       }
@@ -396,7 +396,7 @@ class EnrichmentMultisetFilters extends Component {
     // const topBox =
     base.append('div').style('padding-bottom', '5px');
 
-    const svgWrapper = base.append('div').attr('class', 'SidebarSvgScrollX');
+    const svgWrapper = base.append('div').attr('class', 'SidebarWideSvg');
 
     const svg = svgWrapper
       .append('svg')
@@ -861,7 +861,7 @@ class EnrichmentMultisetFilters extends Component {
     const svgHeight = dataset.length * textScalar + textScalar / 2;
     base.append('div').style('padding-bottom', '5px');
 
-    const svgWrapper = base.append('div').attr('class', 'SidebarSvgScrollX');
+    const svgWrapper = base.append('div').attr('class', 'SidebarWideSvg');
 
     const svg = svgWrapper
       .append('svg')

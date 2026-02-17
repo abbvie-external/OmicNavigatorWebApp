@@ -33,9 +33,7 @@ class DifferentialMultisetFilters extends Component {
   }
 
   makeMultiset = () => {
-    d3.selectAll('#multiset-query-p')
-      .selectAll('*')
-      .remove();
+    d3.selectAll('#multiset-query-p').selectAll('*').remove();
     const baseP = d3
       .selectAll('#multiset-query-p')
       .append('div')
@@ -45,13 +43,13 @@ class DifferentialMultisetFilters extends Component {
       this.prepareMultiset(baseP);
       const baseMetaSvgP = baseP
         .append('div')
-        .attr('class', 'SidebarSvgScrollX')
+        .attr('class', 'SidebarWideSvg')
         .append('svg');
       this.metaScript(baseMetaSvgP);
     }
   };
 
-  metaScript = metaSvgP => {
+  metaScript = (metaSvgP) => {
     const {
       uAnchorP,
       uSettingsP,
@@ -115,11 +113,11 @@ class DifferentialMultisetFilters extends Component {
     const font13 = `13px ${fontFamily}`;
     const svgWidthP = (() => {
       const lines = [{ text: 'Set Composition:', font: font15 }]
-        .concat(setDescP.map(t => ({ text: t, font: font15 })))
+        .concat(setDescP.map((t) => ({ text: t, font: font15 })))
         .concat(useAnchorP ? [{ text: uAnchorP, font: font13 }] : [])
-        .concat(mustDifferential.map(t => ({ text: t, font: font13 })))
-        .concat(notSetDescP.map(t => ({ text: t, font: font14 })))
-        .concat(notDifferential.map(t => ({ text: t, font: font13 })));
+        .concat(mustDifferential.map((t) => ({ text: t, font: font13 })))
+        .concat(notSetDescP.map((t) => ({ text: t, font: font14 })))
+        .concat(notDifferential.map((t) => ({ text: t, font: font13 })));
 
       const maxTextW = maxLinesWidth(lines, font14);
       // Add room for left offsets (x≈25) + circle column + some padding.
@@ -151,10 +149,10 @@ class DifferentialMultisetFilters extends Component {
         .enter()
         .append('text')
         .attr('x', 7)
-        .attr('y', function(d, i) {
+        .attr('y', function (d, i) {
           return 30 + heightScalarP * i;
         })
-        .text(function(d) {
+        .text(function (d) {
           return d;
         })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
@@ -166,14 +164,14 @@ class DifferentialMultisetFilters extends Component {
           .append('circle')
           .style('fill', 'green')
           .attr('cx', 17)
-          .attr('cy', function() {
+          .attr('cy', function () {
             return 30 + heightScalarP * setDescP.length;
           })
           .attr('r', 4);
         metaSvgP
           .append('text')
           .attr('x', 25)
-          .attr('y', function() {
+          .attr('y', function () {
             return 30 + heightScalarP * setDescP.length + 4;
           })
           .text(uAnchorP)
@@ -190,7 +188,7 @@ class DifferentialMultisetFilters extends Component {
         .append('circle')
         .style('fill', 'green')
         .attr('cx', 17)
-        .attr('cy', function(d, i) {
+        .attr('cy', function (d, i) {
           if (!useAnchorP) {
             return (
               30 +
@@ -214,7 +212,7 @@ class DifferentialMultisetFilters extends Component {
         .enter()
         .append('text')
         .attr('x', 25)
-        .attr('y', function(d) {
+        .attr('y', function (d) {
           if (!useAnchorP) {
             return (
               30 +
@@ -231,7 +229,7 @@ class DifferentialMultisetFilters extends Component {
             );
           }
         })
-        .text(function(d) {
+        .text(function (d) {
           return d;
         })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
@@ -246,7 +244,7 @@ class DifferentialMultisetFilters extends Component {
           .append('text')
           .attr('dy', '24px')
           .attr('x', 7)
-          .attr('y', function(d, i) {
+          .attr('y', function (d, i) {
             if (!useAnchorP) {
               return (
                 30 +
@@ -261,7 +259,7 @@ class DifferentialMultisetFilters extends Component {
               );
             }
           })
-          .text(function(d) {
+          .text(function (d) {
             return d;
           })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
@@ -276,7 +274,7 @@ class DifferentialMultisetFilters extends Component {
           .append('circle')
           .style('fill', 'red')
           .attr('cx', 17)
-          .attr('cy', function(d, i) {
+          .attr('cy', function (d, i) {
             if (!useAnchorP) {
               return (
                 30 +
@@ -309,7 +307,7 @@ class DifferentialMultisetFilters extends Component {
           .enter()
           .append('text')
           .attr('x', 25)
-          .attr('y', function(d, i) {
+          .attr('y', function (d, i) {
             if (!useAnchorP) {
               return (
                 30 +
@@ -333,7 +331,7 @@ class DifferentialMultisetFilters extends Component {
               );
             }
           })
-          .text(function(d) {
+          .text(function (d) {
             return d;
           })
           .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
@@ -343,7 +341,7 @@ class DifferentialMultisetFilters extends Component {
     }
   };
 
-  prepareMultiset = baseP => {
+  prepareMultiset = (baseP) => {
     const {
       uDataP,
       uAnchorP,
@@ -420,7 +418,7 @@ class DifferentialMultisetFilters extends Component {
     // const topBox =
     baseP.append('div').style('padding-bottom', '5px');
 
-    const svgWrapper = baseP.append('div').attr('class', 'SidebarSvgScrollX');
+    const svgWrapper = baseP.append('div').attr('class', 'SidebarWideSvg');
 
     const svg = svgWrapper
       .append('svg')
@@ -482,7 +480,7 @@ class DifferentialMultisetFilters extends Component {
       .append('circle')
       .style('fill', baseColorCodeP)
       .attr('cx', circlePadding + circleRadius)
-      .attr('cy', function(d) {
+      .attr('cy', function (d) {
         return (
           datasetP.indexOf(d) * (2 * circleRadius) +
           (topBoxHeightP + circleRadius + circlePadding) +
@@ -490,13 +488,13 @@ class DifferentialMultisetFilters extends Component {
         );
       })
       .attr('r', circleRadius)
-      .style('stroke', d =>
+      .style('stroke', (d) =>
         mustDifferential.includes(d) || d === uAnchorP
           ? chosenColorCodeP
           : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function(d) {
+      .on('click', function (d) {
         let mustDifferentialCopy = [...mustDifferential];
         let notDifferentialCopy = [...notDifferential];
         if (!mustDifferential.includes(d) && d !== uAnchorP) {
@@ -511,12 +509,9 @@ class DifferentialMultisetFilters extends Component {
           );
         }
       })
-      .on('mouseover', function(d) {
+      .on('mouseover', function (d) {
         const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
-        d3.select(this)
-          .transition()
-          .duration(100)
-          .attr('cursor', cursorStyle);
+        d3.select(this).transition().duration(100).attr('cursor', cursorStyle);
       });
 
     const maybeCircles = svg
@@ -526,7 +521,7 @@ class DifferentialMultisetFilters extends Component {
       .append('circle')
       .style('fill', backgroundColorCodeP)
       .attr('cx', 2 * circlePadding + 3 * circleRadius)
-      .attr('cy', function(d) {
+      .attr('cy', function (d) {
         return (
           datasetP.indexOf(d) * (2 * circleRadius) +
           (topBoxHeightP + circleRadius + circlePadding) +
@@ -534,7 +529,7 @@ class DifferentialMultisetFilters extends Component {
         );
       })
       .attr('r', circleRadius)
-      .style('stroke', d =>
+      .style('stroke', (d) =>
         !notDifferential.includes(d) &&
         !mustDifferential.includes(d) &&
         d !== uAnchorP
@@ -542,7 +537,7 @@ class DifferentialMultisetFilters extends Component {
           : baseColorCodeP,
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function(d) {
+      .on('click', function (d) {
         let mustDifferentialCopy = [...mustDifferential];
         let notDifferentialCopy = [...notDifferential];
         if (mustDifferential.includes(d) && d !== uAnchorP) {
@@ -559,12 +554,9 @@ class DifferentialMultisetFilters extends Component {
           );
         }
       })
-      .on('mouseover', function(d) {
+      .on('mouseover', function (d) {
         const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
-        d3.select(this)
-          .transition()
-          .duration(100)
-          .attr('cursor', cursorStyle);
+        d3.select(this).transition().duration(100).attr('cursor', cursorStyle);
       });
 
     // const miniMaybeCircles =
@@ -575,7 +567,7 @@ class DifferentialMultisetFilters extends Component {
       .append('circle')
       .style('fill', baseColorCodeP)
       .attr('cx', 2 * circlePadding + 3 * circleRadius)
-      .attr('cy', function(d) {
+      .attr('cy', function (d) {
         return (
           datasetP.indexOf(d) * (2 * circleRadius) +
           (topBoxHeightP + circleRadius + circlePadding) +
@@ -583,7 +575,7 @@ class DifferentialMultisetFilters extends Component {
         );
       })
       .attr('r', circleRadius / 3)
-      .on('click', function(d) {
+      .on('click', function (d) {
         let mustDifferentialCopy = [...mustDifferential];
         let notDifferentialCopy = [...notDifferential];
         if (mustDifferential.includes(d) && d !== uAnchorP) {
@@ -600,12 +592,9 @@ class DifferentialMultisetFilters extends Component {
           );
         }
       })
-      .on('mouseover', function(d) {
+      .on('mouseover', function (d) {
         const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
-        d3.select(this)
-          .transition()
-          .duration(100)
-          .attr('cursor', cursorStyle);
+        d3.select(this).transition().duration(100).attr('cursor', cursorStyle);
       });
 
     const notCircles = svg
@@ -615,7 +604,7 @@ class DifferentialMultisetFilters extends Component {
       .append('circle')
       .style('fill', backgroundColorCodeP)
       .attr('cx', 3 * circlePadding + 5 * circleRadius)
-      .attr('cy', function(d) {
+      .attr('cy', function (d) {
         return (
           datasetP.indexOf(d) * (2 * circleRadius) +
           (topBoxHeightP + circleRadius + circlePadding) +
@@ -623,13 +612,13 @@ class DifferentialMultisetFilters extends Component {
         );
       })
       .attr('r', circleRadius)
-      .style('stroke', d =>
+      .style('stroke', (d) =>
         notDifferential.includes(d) && d !== uAnchorP
           ? chosenColorCodeP
           : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function(d) {
+      .on('click', function (d) {
         let mustDifferentialCopy = [...mustDifferential];
         let notDifferentialCopy = [...notDifferential];
         if (!notDifferential.includes(d) && d !== uAnchorP) {
@@ -646,12 +635,9 @@ class DifferentialMultisetFilters extends Component {
           }
         }
       })
-      .on('mouseover', function(d) {
+      .on('mouseover', function (d) {
         const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
-        d3.select(this)
-          .transition()
-          .duration(100)
-          .attr('cursor', cursorStyle);
+        d3.select(this).transition().duration(100).attr('cursor', cursorStyle);
       });
 
     // const lineVert =
@@ -671,7 +657,7 @@ class DifferentialMultisetFilters extends Component {
       .enter()
       .append('text')
       .attr('x', 5 * circlePadding + 6 * circleRadius)
-      .attr('y', function(d) {
+      .attr('y', function (d) {
         return (
           datasetP.indexOf(d) * (2 * circleRadius) +
           (topBoxHeightP + circleRadius + circlePadding) +
@@ -679,12 +665,12 @@ class DifferentialMultisetFilters extends Component {
           circleRadius / 2
         );
       })
-      .text(function(d) {
+      .text(function (d) {
         return d;
       })
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-      .attr('font-weight', d => (d === uAnchorP ? 'bold' : 'normal'))
-      .attr('font-size', function() {
+      .attr('font-weight', (d) => (d === uAnchorP ? 'bold' : 'normal'))
+      .attr('font-size', function () {
         return heightScalarP * 14 + 'px';
       })
       .attr('fill', 'black');
@@ -705,7 +691,7 @@ class DifferentialMultisetFilters extends Component {
       )
       .text('Must')
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-      .attr('font-size', function() {
+      .attr('font-size', function () {
         return heightScalarP * 14 + 'px';
       })
       .attr('fill', 'black');
@@ -725,7 +711,7 @@ class DifferentialMultisetFilters extends Component {
       )
       .text('Maybe')
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-      .attr('font-size', function() {
+      .attr('font-size', function () {
         return heightScalarP * 14 + 'px';
       })
       .attr('fill', 'black');
@@ -745,7 +731,7 @@ class DifferentialMultisetFilters extends Component {
       )
       .text('Not')
       .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-      .attr('font-size', function() {
+      .attr('font-size', function () {
         return heightScalarP * 14 + 'px';
       })
       .attr('fill', 'black');
@@ -755,7 +741,7 @@ class DifferentialMultisetFilters extends Component {
         .append('line')
         .attr('class', 'numElements')
         .attr('x1', 4 * circlePadding + 6 * circleRadius)
-        .attr('x2', function() {
+        .attr('x2', function () {
           return (
             4 * circlePadding +
             6 * circleRadius +
@@ -774,7 +760,7 @@ class DifferentialMultisetFilters extends Component {
         .enter()
         .append('text')
         .attr('class', 'numElements')
-        .attr('x', function() {
+        .attr('x', function () {
           return (
             4 * circlePadding +
             6 * circleRadius +
@@ -786,13 +772,13 @@ class DifferentialMultisetFilters extends Component {
         .attr('y', topBoxHeightP - 6 * heightScalarP);
       // const numElementsPText =
       numElementsPVar
-        .text(function(d) {
+        .text(function (d) {
           const dText =
             numElementsP !== maxElementsP ? `${d} of ${maxElementsP}` : d;
           return dText;
         })
         .attr('font-family', 'Lato,Arial,Helvetica,sans-serif')
-        .attr('font-size', function() {
+        .attr('font-size', function () {
           return heightScalarP * 13 + 'px';
         })
         .attr('fill', 'black');
@@ -826,14 +812,14 @@ class DifferentialMultisetFilters extends Component {
 
     function updateCircles() {
       mustCircles
-        .style('stroke', d =>
+        .style('stroke', (d) =>
           mustDifferential.includes(d) || d === uAnchorP
             ? chosenColorCodeP
             : 'transparent',
         )
         .attr('stroke-width', circleRadius / 5);
       maybeCircles
-        .style('stroke', d =>
+        .style('stroke', (d) =>
           !notDifferential.includes(d) &&
           !mustDifferential.includes(d) &&
           d !== uAnchorP
@@ -842,7 +828,7 @@ class DifferentialMultisetFilters extends Component {
         )
         .attr('stroke-width', circleRadius / 5);
       notCircles
-        .style('stroke', d =>
+        .style('stroke', (d) =>
           notDifferential.includes(d) ? chosenColorCodeP : 'transparent',
         )
         .attr('stroke-width', circleRadius / 5);
@@ -857,11 +843,11 @@ class DifferentialMultisetFilters extends Component {
     this.props.onAddFilterDifferential();
   };
 
-  removeFilter = index => {
+  removeFilter = (index) => {
     this.props.onRemoveFilterDifferential(index);
   };
 
-  changeHoveredFilter = index => {
+  changeHoveredFilter = (index) => {
     this.props.onChangeHoveredFilter(index);
   };
 
@@ -876,7 +862,7 @@ class DifferentialMultisetFilters extends Component {
     const OperatorsP = uSettingsP.thresholdOperatorP;
     const indexFiltersP = uSettingsP.indexFiltersP;
     const hoveredFilter = uSettingsP.hoveredFilter;
-    const callbackFactory = index => value => {
+    const callbackFactory = (index) => (value) => {
       this.props.onHandleSigValuePInputChange('sigValueP', value, index);
     };
     return (
