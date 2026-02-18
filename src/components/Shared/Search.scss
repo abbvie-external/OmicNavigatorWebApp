@@ -8,7 +8,7 @@
 
   /* Aesthetic, thin scrollbars (only visible on overflow) */
   scrollbar-width: thin; /* Firefox */
-  scrollbar-color: rgba(0,0,0,0.35) transparent; /* Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent; /* Firefox */
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -206,4 +206,10 @@
   height: 100% !important;
   max-height: 75vh !important;
   width: inherit !important;
+}
+
+.SidebarWideSvg {
+  svg {
+    margin-right: 12px;
+  }
 }

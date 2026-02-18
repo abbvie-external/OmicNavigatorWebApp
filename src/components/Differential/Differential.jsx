@@ -24,6 +24,7 @@ import TransitionStill from '../Transitions/TransitionStill';
 import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import './Differential.scss';
 import '../Shared/Table.scss';
+import { HEADER_OFFSET_PX } from '../Shared/constants';
 
 let cancelRequestGetMapping = () => {};
 class Differential extends Component {
@@ -134,7 +135,6 @@ class Differential extends Component {
    */
   getDifferentialViewportMinHeight = () => {
     // Align with Search.scss header offset (57px)
-    const HEADER_OFFSET_PX = 57;
     const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
     return Math.max(0, vh - HEADER_OFFSET_PX);
   };

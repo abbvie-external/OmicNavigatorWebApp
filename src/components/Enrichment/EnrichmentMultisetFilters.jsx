@@ -872,7 +872,7 @@ class EnrichmentMultisetFilters extends Component {
     // const rect =
     svg
       .append('path')
-      .attr('d', rightRoundedRect(0, 0, svgWidth + 20, svgHeight, 20))
+      .attr('d', rightRoundedRect(0, 0, svgWidth, svgHeight, 20))
       .attr('fill', 'white');
     function rightRoundedRect(x, y, width, height, radius) {
       return (

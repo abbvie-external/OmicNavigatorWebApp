@@ -37,6 +37,7 @@ import { EZGrid } from '../Shared/QHGrid/index.module.js';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 import PlotsOverlay from '../Differential/PlotsOverlay';
 import EnrichmentOverlayBreadcrumbs from './EnrichmentOverlayBreadcrumbs';
+import { HEADER_OFFSET_PX } from '../Shared/constants';
 
 let cancelRequestEnrichmentGetPlot = () => {};
 let cancelRequestEnrichmentGetMultiPlot = () => {};
@@ -253,7 +254,6 @@ class Enrichment extends Component {
 
   getEnrichmentViewportMinHeight = () => {
     // Align with Search.scss header offset (57px)
-    const HEADER_OFFSET_PX = 57;
     const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
     return Math.max(0, vh - HEADER_OFFSET_PX);
   };
