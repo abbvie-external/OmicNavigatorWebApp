@@ -24,6 +24,7 @@ import TransitionStill from '../Transitions/TransitionStill';
 import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import './Differential.scss';
 import '../Shared/Table.scss';
+import { HEADER_OFFSET_PX } from '../Shared/constants';
 
 let cancelRequestGetMapping = () => {};
 class Differential extends Component {
@@ -111,20 +112,143 @@ class Differential extends Component {
       multisetFiltersVisibleParentRef: false,
       multisetButttonActiveDifferential: false,
       multisetQueriedDifferential: false,
+
+      //cap sidebar height to match the right content (table) height
+      differentialSidebarMaxHeight: null,
     };
   }
 
   differentialViewContainerRef = React.createRef();
   differentialGridRef = React.createRef();
 
+  //Sidebar height sync (right content -> sidebar cap) ----
+  _differentialSidebarResizeObserver = null;
+  _differentialSidebarRaf = null;
+  _differentialSidebarMaxHeightLast = null;
+
+  /**
+   * Calculates the minimum height for the differential viewport by subtracting
+   * the header offset from the window's inner height.
+   *
+   * @returns {number} The calculated minimum height in pixels
+   *
+   */
+  getDifferentialViewportMinHeight = () => {
+    // Align with Search.scss header offset (57px)
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 0;
+    return Math.max(0, vh - HEADER_OFFSET_PX);
+  };
+
+  /**
+   * Schedules a sidebar height update using requestAnimationFrame to debounce
+   * rapid successive update requests.
+   *
+   * @returns {void}
+   */
+  scheduleDifferentialSidebarHeightUpdate = () => {
+    if (this._differentialSidebarRaf) return;
+    this._differentialSidebarRaf = requestAnimationFrame(() => {
+      this._differentialSidebarRaf = null;
+      this.updateDifferentialSidebarMaxHeight();
+    });
+  };
+
+  updateDifferentialSidebarMaxHeight = () => {
+    const node = this.differentialViewContainerRef?.current;
+    const minHeight = this.getDifferentialViewportMinHeight();
+    if (!node) {
+      // Still enforce a sane minimum to avoid sidebar infinite growth
+      if (this._differentialSidebarMaxHeightLast !== minHeight) {
+        this._differentialSidebarMaxHeightLast = minHeight;
+        this.setState({ differentialSidebarMaxHeight: minHeight });
+      }
+      return;
+    }
+
+    const measured = Math.ceil(node.getBoundingClientRect().height || 0);
+    const next = Math.max(minHeight, measured);
+
+    // Avoid render loops / churn from tiny sub-pixel changes
+    if (
+      this._differentialSidebarMaxHeightLast !== null &&
+      Math.abs(this._differentialSidebarMaxHeightLast - next) <= 2
+    ) {
+      return;
+    }
+
+    this._differentialSidebarMaxHeightLast = next;
+    this.setState({ differentialSidebarMaxHeight: next });
+  };
+
+  /**
+   * Initializes the sidebar height synchronization system by setting up observers
+   * and event listeners.
+   *
+   * @returns {void}
+   */
+  initDifferentialSidebarHeightSync = () => {
+    //Initial cap
+    this.updateDifferentialSidebarMaxHeight();
+
+    //Observe right content growth/shrink (table streaming, layout changes)
+    if (typeof ResizeObserver !== 'undefined') {
+      this._differentialSidebarResizeObserver = new ResizeObserver(() => {
+        this.scheduleDifferentialSidebarHeightUpdate();
+      });
+
+      const node = this.differentialViewContainerRef?.current;
+      if (node) {
+        this._differentialSidebarResizeObserver.observe(node);
+      }
+    }
+
+    //Recompute on viewport resize
+    window.addEventListener(
+      'resize',
+      this.scheduleDifferentialSidebarHeightUpdate,
+    );
+  };
+
+  /**
+   * Cleans up all resources related to sidebar height synchronization.
+   *
+   * @returns {void}
+   */
+  cleanupDifferentialSidebarHeightSync = () => {
+    if (this._differentialSidebarResizeObserver) {
+      this._differentialSidebarResizeObserver.disconnect();
+      this._differentialSidebarResizeObserver = null;
+    }
+    if (this._differentialSidebarRaf) {
+      cancelAnimationFrame(this._differentialSidebarRaf);
+      this._differentialSidebarRaf = null;
+    }
+    window.removeEventListener(
+      'resize',
+      this.scheduleDifferentialSidebarHeightUpdate,
+    );
+  };
+
   componentDidMount() {
     if (this.props.differentialStudy) {
       this.getMultiModelMappingObject(this.props.differentialStudy);
     }
+
+    // Keep the left sidebar height capped to the right content height
+    this.initDifferentialSidebarHeightSync();
   }
 
   shouldComponentUpdate(nextProps) {
     return nextProps.tab === 'differential';
+  }
+
+  componentWillUnmount() {
+    // Prevent debounced setState from firing after unmount
+    if (this.handleSVG?.cancel) {
+      this.handleSVG.cancel();
+    }
+
+    this.cleanupDifferentialSidebarHeightSync();
   }
 
   // componentWillUnmount() {
@@ -1900,6 +2024,11 @@ class Differential extends Component {
         <Grid.Row className="DifferentialContainer">
           <Grid.Column
             className="SidebarContainer"
+            style={
+              this.state.differentialSidebarMaxHeight
+                ? { maxHeight: this.state.differentialSidebarMaxHeight }
+                : undefined
+            }
             mobile={4}
             tablet={4}
             largeScreen={4}

@@ -2,8 +2,39 @@
   // background-color: #F6F6F6;
   background-color: #e0e1e2;
   overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
   min-height: calc(100vh - 57px) !important;
   height: auto !important;
+
+  /* Aesthetic, thin scrollbars (only visible on overflow) */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.35) transparent; /* Firefox */
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.28);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.38);
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 
   @media (max-width: 677px) {
     padding-right: 10px !important;
@@ -11,6 +42,24 @@
 
   .SearchContainer {
     padding: 20px 20px 5px 20px !important;
+
+    // Ellipsis for dropdown selected value text
+    .ui.selection.dropdown > .text {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      width: calc(100% - 2em) !important;
+      display: block !important;
+    }
+
+    // Ellipsis for custom tooltip span inside menu items
+    .dropdown-ellipsis-item {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      display: block !important;
+      max-width: 100% !important;
+    }
   }
 
   .FilterStudyContainer {
@@ -157,4 +206,10 @@
   height: 100% !important;
   max-height: 75vh !important;
   width: inherit !important;
+}
+
+.SidebarWideSvg {
+  svg {
+    margin-right: 12px;
+  }
 }
