@@ -274,6 +274,10 @@ class ScatterPlot extends Component {
   }
 
   componentWillUnmount() {
+    // Cancel pending debounced click handler to prevent late setState calls
+    if (this.handleSVGClick?.cancel) {
+      this.handleSVGClick.cancel();
+    }
     this.clearState();
     d3.select('#VolcanoChart').remove();
   }

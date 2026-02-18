@@ -120,6 +120,9 @@ class EnrichmentSearch extends Component {
     isFilteredEnrichment: false,
     multisetFiltersVisibleEnrichment: false,
     isSmallScreen: true,
+    studyDropdownOpen: false,
+    modelDropdownOpen: false,
+    annotationDropdownOpen: false,
   };
 
   componentDidMount() {
@@ -154,12 +157,23 @@ class EnrichmentSearch extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.setScreen);
+    if (this.setScreen?.cancel) {
+      this.setScreen.cancel();
+    }
   }
 
   setScreen = _.debounce(
     () => this.setState({ isSmallScreen: window.innerWidth < 1725 }),
     300,
   );
+
+  handleDropdownOpen = (dropdownName) => () => {
+    this.setState({ [`${dropdownName}DropdownOpen`]: true });
+  };
+
+  handleDropdownClose = (dropdownName) => () => {
+    this.setState({ [`${dropdownName}DropdownOpen`]: false });
+  };
 
   getEnrichmentsStudies = () => {
     omicNavigatorService
@@ -1108,6 +1122,9 @@ class EnrichmentSearch extends Component {
       // activateMultisetFilters,
       multisetFiltersVisibleEnrichment,
       isSmallScreen,
+      studyDropdownOpen,
+      modelDropdownOpen,
+      annotationDropdownOpen,
     } = this.state;
 
     const {
@@ -1405,13 +1422,17 @@ class EnrichmentSearch extends Component {
                 searchInput={{ id: 'form-select-control-estudy' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={this.handleDropdownOpen('study')}
+                onClose={this.handleDropdownClose('study')}
               />
             }
             style={StudyPopupStyle}
             className="CustomTooltip"
             inverted
+            on="hover"
+            open={studyDropdownOpen ? false : undefined}
             position="bottom right"
-            content={enrichmentStudyTooltip}
+            content={studyDropdownOpen ? null : enrichmentStudyTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
@@ -1435,14 +1456,18 @@ class EnrichmentSearch extends Component {
                 searchInput={{ id: 'form-select-control-emodel' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={this.handleDropdownOpen('model')}
+                onClose={this.handleDropdownClose('model')}
               />
             }
             style={StudyPopupStyle}
             disabled={!enrichmentStudy}
             className="CustomTooltip"
             inverted
+            on="hover"
+            open={modelDropdownOpen ? false : undefined}
             position="bottom right"
-            content={enrichmentModelTooltip}
+            content={modelDropdownOpen ? null : enrichmentModelTooltip}
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
@@ -1464,14 +1489,20 @@ class EnrichmentSearch extends Component {
                 searchInput={{ id: 'form-select-control-edatabase' }}
                 selectOnBlur={false}
                 selectOnNavigation={false}
+                onOpen={this.handleDropdownOpen('annotation')}
+                onClose={this.handleDropdownClose('annotation')}
               />
             }
             style={StudyPopupStyle}
             disabled={enrichmentAnnotationTooltip === ''}
             className="CustomTooltip"
             inverted
+            on="hover"
+            open={annotationDropdownOpen ? false : undefined}
             position="bottom right"
-            content={enrichmentAnnotationTooltip}
+            content={
+              annotationDropdownOpen ? null : enrichmentAnnotationTooltip
+            }
             mouseEnterDelay={1000}
             mouseLeaveDelay={0}
           />
