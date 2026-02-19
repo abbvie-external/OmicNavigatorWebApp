@@ -93,6 +93,20 @@ class BarcodePlot extends Component {
     window.addEventListener('resize', this._onWindowResize);
   }
 
+  /**
+   * Detaches all event listeners and cleans up resources associated with the shift sub-brush feature.
+   *
+   * This method performs a complete teardown of the shift+drag sub-brush interaction by:
+   * 1. Removing all mouse event listeners (mousedown, mousemove, mouseup)
+   * 2. Nullifying listener references to prevent memory leaks
+   * 3. Resetting all sub-brush state flags
+   * 4. Safely removing the temporary sub-brush overlay rectangle from the DOM
+   *
+   * This method is idempotent and safe to call multiple times. It includes defensive checks
+   * to handle cases where listeners or DOM elements may have already been removed.
+   *
+   * @returns {void}
+   * */
   detachShiftSubBrushListeners() {
     const svgNode = this.barcodeSVGRef?.current;
     if (svgNode && this._shiftSubBrushMouseDownCapture) {
