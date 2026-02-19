@@ -8,6 +8,22 @@ class BarcodePlot extends Component {
   _isMounted = false;
   _resizeTimer = null;
   _onWindowResize = null;
+  _keydownHandler = null;
+  _keyupHandler = null;
+
+  // Anchor for Shift+Click range selection within brushed data
+  lastShiftClickId = null;
+
+  // Current main brush selection in SVG pixel coordinates: [x0, x1]
+  currentBrushSelectionPx = null;
+
+  // SHIFT+drag "sub-brush" inside the current brush window
+  shiftSubBrushActive = false;
+  shiftSubBrushStartX = null;
+  shiftSubBrushRect = null; // d3 selection of the temporary rect
+  _shiftSubBrushMouseDownCapture = null;
+  _shiftSubBrushMouseMove = null;
+  _shiftSubBrushMouseUp = null;
 
   state = {
     switch: 0,
@@ -49,6 +65,28 @@ class BarcodePlot extends Component {
   componentDidMount() {
     this._isMounted = true;
     this.setWidth(true, false);
+
+    // Track modifier keys for cursor feedback.
+    // Avoid React re-renders by toggling CSS classes on the container.
+    const containerEl = document.getElementById('BarcodeChartContainer');
+    const setModifierClass = (ctrlDown, shiftDown) => {
+      if (!containerEl) return;
+      containerEl.classList.toggle('modifier-ctrl', !!ctrlDown);
+      containerEl.classList.toggle('modifier-shift', !!shiftDown);
+    };
+
+    this._keydownHandler = (e) => {
+      setModifierClass(e.ctrlKey || e.metaKey, e.shiftKey);
+    };
+
+    this._keyupHandler = (e) => {
+      // keyup provides the modifier state after release
+      setModifierClass(e.ctrlKey || e.metaKey, e.shiftKey);
+    };
+
+    window.addEventListener('keydown', this._keydownHandler);
+    window.addEventListener('keyup', this._keyupHandler);
+
     let resizedFn;
     this._onWindowResize = () => {
       clearTimeout(this._resizeTimer);
@@ -57,6 +95,205 @@ class BarcodePlot extends Component {
       }, 200);
     };
     window.addEventListener('resize', this._onWindowResize);
+  }
+
+  detachShiftSubBrushListeners() {
+    const svgNode = this.barcodeSVGRef?.current;
+    if (svgNode && this._shiftSubBrushMouseDownCapture) {
+      svgNode.removeEventListener(
+        'mousedown',
+        this._shiftSubBrushMouseDownCapture,
+        true,
+      );
+    }
+    if (this._shiftSubBrushMouseMove) {
+      window.removeEventListener(
+        'mousemove',
+        this._shiftSubBrushMouseMove,
+        true,
+      );
+    }
+    if (this._shiftSubBrushMouseUp) {
+      window.removeEventListener('mouseup', this._shiftSubBrushMouseUp, true);
+    }
+
+    this._shiftSubBrushMouseDownCapture = null;
+    this._shiftSubBrushMouseMove = null;
+    this._shiftSubBrushMouseUp = null;
+
+    this.shiftSubBrushActive = false;
+    this.shiftSubBrushStartX = null;
+    if (this.shiftSubBrushRect) {
+      try {
+        this.shiftSubBrushRect.remove();
+      } catch (e) {
+        // no-op
+      }
+      this.shiftSubBrushRect = null;
+    }
+  }
+
+  attachShiftSubBrushListeners(barcodeHeight) {
+    // SHIFT + drag within the *current* brush window:
+    // - draws a temporary sub-range overlay
+    // - replaces orange multi-select with the sub-range (main brush window unchanged)
+    this.detachShiftSubBrushListeners();
+
+    const svgNode = this.barcodeSVGRef?.current;
+    if (!svgNode) return;
+
+    const self = this;
+    const halfHeight = Math.round(barcodeHeight * 0.5);
+
+    const getSvgPoint = (evt) => {
+      const rect = svgNode.getBoundingClientRect();
+      const vb = svgNode.viewBox?.baseVal;
+      const vbWidth = vb?.width || rect.width || 1;
+      const vbHeight = vb?.height || rect.height || 1;
+
+      const x = ((evt.clientX - rect.left) * vbWidth) / (rect.width || 1);
+      const y = ((evt.clientY - rect.top) * vbHeight) / (rect.height || 1);
+      return { x, y };
+    };
+
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+    this._shiftSubBrushMouseMove = (evt) => {
+      if (!self.shiftSubBrushActive || self.shiftSubBrushStartX == null) return;
+
+      const { x } = getSvgPoint(evt);
+      const sel = self.currentBrushSelectionPx;
+      if (!sel) return;
+
+      const x0 = clamp(self.shiftSubBrushStartX, sel[0], sel[1]);
+      const x1 = clamp(x, sel[0], sel[1]);
+      const left = Math.min(x0, x1);
+      const right = Math.max(x0, x1);
+
+      if (self.shiftSubBrushRect) {
+        self.shiftSubBrushRect
+          .attr('x', left)
+          .attr('width', Math.max(0, right - left));
+      }
+
+      evt.preventDefault();
+      evt.stopPropagation();
+    };
+
+    this._shiftSubBrushMouseUp = (evt) => {
+      if (!self.shiftSubBrushActive || self.shiftSubBrushStartX == null) return;
+
+      const { x } = getSvgPoint(evt);
+      const sel = self.currentBrushSelectionPx;
+
+      const cleanup = () => {
+        self.shiftSubBrushActive = false;
+        self.shiftSubBrushStartX = null;
+        if (self.shiftSubBrushRect) {
+          self.shiftSubBrushRect.remove();
+          self.shiftSubBrushRect = null;
+        }
+        window.removeEventListener(
+          'mousemove',
+          self._shiftSubBrushMouseMove,
+          true,
+        );
+        window.removeEventListener('mouseup', self._shiftSubBrushMouseUp, true);
+      };
+
+      if (!sel) {
+        cleanup();
+        return;
+      }
+
+      const x0 = clamp(self.shiftSubBrushStartX, sel[0], sel[1]);
+      const x1 = clamp(x, sel[0], sel[1]);
+      const left = Math.min(x0, x1);
+      const right = Math.max(x0, x1);
+
+      // Ignore micro-drags (accidental clicks)
+      if (right - left < 2) {
+        cleanup();
+        return;
+      }
+
+      // Replace multi-select with the sub-range, but only within the currently brushed data set.
+      const brushedData =
+        self.lastBrushedData || self.props.barcodeSettings?.brushedData || [];
+      const inSubRange = brushedData.filter((d) => {
+        const px = parseFloat(d.x2);
+        return left <= px && px <= right;
+      });
+
+      const nextMulti = inSubRange.map((d) => ({ featureID: d.featureID }));
+
+      if (self.props.onHandleProteinSelected) {
+        self.props.onHandleProteinSelected(nextMulti);
+      }
+
+      // Clear single selection if it falls outside the new multi-select range.
+      const selectedProteinId = self.props.selectedProteinId;
+      if (
+        selectedProteinId &&
+        !inSubRange.some((d) => d.featureID === selectedProteinId) &&
+        self.props.onHandleSingleProteinSelected
+      ) {
+        self.props.onHandleSingleProteinSelected(null);
+      }
+
+      cleanup();
+      evt.preventDefault();
+      evt.stopPropagation();
+    };
+
+    this._shiftSubBrushMouseDownCapture = (evt) => {
+      // capture phase so we can prevent D3 brush from handling this gesture
+      if (!evt.shiftKey) return;
+      if (!self.currentBrushSelectionPx) return;
+
+      const { x, y } = getSvgPoint(evt);
+      const sel = self.currentBrushSelectionPx;
+
+      // Only enable inside the current brush window and inside the brush's vertical band
+      if (x < sel[0] || x > sel[1]) return;
+      if (y < 0 || y > halfHeight) return;
+
+      // Start sub-brush
+      self.shiftSubBrushActive = true;
+      self.shiftSubBrushStartX = x;
+
+      // Create/replace the temporary overlay rect within the brush group so it sits above lines.
+      try {
+        const brushGroup = d3.select('.barcodeBrush');
+        brushGroup.selectAll('rect.barcodeShiftSubBrushRect').remove();
+        self.shiftSubBrushRect = brushGroup
+          .append('rect')
+          .attr('class', 'barcodeShiftSubBrushRect')
+          .attr('y', 0)
+          .attr('height', halfHeight)
+          .attr('x', x)
+          .attr('width', 0);
+      } catch (e) {
+        // If anything goes wrong, fail gracefully and do not block the normal brush
+        self.shiftSubBrushActive = false;
+        self.shiftSubBrushStartX = null;
+        self.shiftSubBrushRect = null;
+        return;
+      }
+
+      // Attach move/up listeners for this drag lifecycle
+      window.addEventListener('mousemove', self._shiftSubBrushMouseMove, true);
+      window.addEventListener('mouseup', self._shiftSubBrushMouseUp, true);
+
+      evt.preventDefault();
+      evt.stopPropagation();
+    };
+
+    svgNode.addEventListener(
+      'mousedown',
+      this._shiftSubBrushMouseDownCapture,
+      true,
+    );
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -309,6 +546,73 @@ class BarcodePlot extends Component {
     });
   };
 
+  // ========================================
+  // CLICK SELECTION HELPERS
+  // ========================================
+
+  isFeatureInBrushedData = (featureID) => {
+    const brushed = this.props.barcodeSettings?.brushedData || [];
+    return brushed.some((d) => d.featureID === featureID);
+  };
+
+  getBrushedFeatureOrder = () => {
+    const brushed = this.props.barcodeSettings?.brushedData || [];
+    // Sort by x-position (statistic) for deterministic range selection
+    return [...brushed]
+      .filter((d) => d?.featureID != null)
+      .sort((a, b) => Number(a.statistic) - Number(b.statistic))
+      .map((d) => d.featureID);
+  };
+
+  buildHighlightedProteinsPayload = (featureIDs) => {
+    const existing = this.props.HighlightedProteins || [];
+    const existingById = new Map(existing.map((p) => [p.featureID, p]));
+    const uniq = [];
+    const seen = new Set();
+
+    featureIDs.forEach((id) => {
+      if (seen.has(id)) return;
+      seen.add(id);
+      // Prefer the full object from existing highlighted list, else minimal shape.
+      uniq.push(existingById.get(id) || { featureID: id });
+    });
+
+    return uniq;
+  };
+
+  handleLineClick = (event, lineData) => {
+    const featureID = lineData?.featureID;
+    if (!featureID) return;
+
+    // Only allow clicks on lines within the current brushed data window.
+    if (!this.isFeatureInBrushedData(featureID)) return;
+
+    const isCtrl = event.ctrlKey || event.metaKey;
+
+    // Ctrl/Cmd+Click: toggle multi-selection membership.
+    if (isCtrl) {
+      if (this.props.onHandleProteinSelected) {
+        const current = this.props.HighlightedProteins || [];
+        const exists = current.some((p) => p.featureID === featureID);
+        const nextIds = exists
+          ? current
+              .filter((p) => p.featureID !== featureID)
+              .map((p) => p.featureID)
+          : [...current.map((p) => p.featureID), featureID];
+
+        this.props.onHandleProteinSelected(
+          this.buildHighlightedProteinsPayload(nextIds),
+        );
+      }
+      return;
+    }
+
+    // Plain click: update single selection.
+    if (this.props.onHandleSingleProteinSelected) {
+      this.props.onHandleSingleProteinSelected(featureID);
+    }
+  };
+
   getMaxObject(array) {
     if (array) {
       const max = Math.max.apply(
@@ -328,6 +632,9 @@ class BarcodePlot extends Component {
     const self = this;
     self.resized = resized;
     let objsBrush = {};
+
+    // Ensure we don't accumulate native listeners across re-renders/resizes
+    self.detachShiftSubBrushListeners();
 
     // Remove existing brushes
     if (d3.selectAll('.barcodeBrush').nodes().length > 0) {
@@ -352,6 +659,7 @@ class BarcodePlot extends Component {
       .on('brush', function () {
         if (!self.resized || d3.event.sourceEvent?.composed) {
           const selection = d3.event?.selection || null;
+          self.currentBrushSelectionPx = selection;
           if (selection != null) {
             const brushedLines = d3.brushSelection(this);
             const isBrushed = function (brushedLines, x) {
@@ -465,6 +773,7 @@ class BarcodePlot extends Component {
       .on('end', function () {
         if (!self.resized || d3.event.sourceEvent?.composed) {
           const selection = d3.event?.selection || null;
+          self.currentBrushSelectionPx = selection;
           if (selection != null) {
             const brushedData = self.props.barcodeSettings.brushedData || [];
             const brushedIds = new Set(brushedData.map((d) => d.featureID));
@@ -481,10 +790,40 @@ class BarcodePlot extends Component {
             }
 
             if (self.props.onHandleProteinSelected) {
-              const filteredMulti = HighlightedProteins.filter((p) =>
-                brushedIds.has(p.featureID),
-              );
-              self.props.onHandleProteinSelected(filteredMulti);
+              const sourceEvent = d3.event?.sourceEvent || {};
+              const isShift = !!sourceEvent.shiftKey;
+
+              if (isShift) {
+                // SHIFT + drag: add brushed items into orange multi-select (do not replace).
+                // Guard: when the user is *moving* the existing brush window (dragging the selection rect),
+                // keep default behavior to avoid accidental multi-select growth.
+                const target = sourceEvent?.target;
+                const isSelectionDrag =
+                  !!target?.classList && target.classList.contains('selection');
+
+                if (isSelectionDrag) {
+                  const filteredMulti = (HighlightedProteins || []).filter(
+                    (p) => brushedIds.has(p.featureID),
+                  );
+                  self.props.onHandleProteinSelected(filteredMulti);
+                } else {
+                  const byId = new Map(
+                    (HighlightedProteins || []).map((p) => [p.featureID, p]),
+                  );
+                  brushedIds.forEach((id) => {
+                    if (!byId.has(id)) {
+                      byId.set(id, { featureID: id });
+                    }
+                  });
+                  self.props.onHandleProteinSelected([...byId.values()]);
+                }
+              } else {
+                // Default: keep multi-select constrained to the brushed window.
+                const filteredMulti = (HighlightedProteins || []).filter((p) =>
+                  brushedIds.has(p.featureID),
+                );
+                self.props.onHandleProteinSelected(filteredMulti);
+              }
             }
 
             if (brushedData.length > 0) {
@@ -521,6 +860,9 @@ class BarcodePlot extends Component {
       .append('g')
       .attr('class', 'barcodeBrush')
       .call(objsBrush);
+
+    // Attach capture listeners for SHIFT sub-brush (must happen after the brush group exists)
+    self.attachShiftSubBrushListeners(barcodeHeight);
 
     if (initialBrush) {
       const quartileTicks = d3.selectAll('line').filter(function () {
@@ -610,6 +952,8 @@ class BarcodePlot extends Component {
   componentWillUnmount() {
     this._isMounted = false;
 
+    this.detachShiftSubBrushListeners();
+
     if (this._onWindowResize) {
       window.removeEventListener('resize', this._onWindowResize);
       this._onWindowResize = null;
@@ -617,6 +961,15 @@ class BarcodePlot extends Component {
     if (this._resizeTimer) {
       clearTimeout(this._resizeTimer);
       this._resizeTimer = null;
+    }
+
+    if (this._keydownHandler) {
+      window.removeEventListener('keydown', this._keydownHandler);
+      this._keydownHandler = null;
+    }
+    if (this._keyupHandler) {
+      window.removeEventListener('keyup', this._keyupHandler);
+      this._keyupHandler = null;
     }
   }
 
@@ -663,6 +1016,10 @@ class BarcodePlot extends Component {
         </text>
       </g>
     ));
+    const brushedIdSet = new Set(
+      (barcodeSettings.brushedData || []).map((d) => d.featureID),
+    );
+
     // example data:
     // featureDisplay: "RPL24_T83"
     // featureEnrichment: "RPL24"
@@ -673,7 +1030,12 @@ class BarcodePlot extends Component {
       <line
         id={`barcode-line-${d.featureID}`}
         className="barcode-line"
-        style={{ stroke: '#838383', strokeWidth: 1.5, opacity: 0.5 }}
+        style={{
+          stroke: '#838383',
+          strokeWidth: 1.5,
+          opacity: 0.5,
+          cursor: brushedIdSet.has(d.featureID) ? 'pointer' : 'not-allowed',
+        }}
         key={`${d.featureID}`}
         x1={xScale(d.statistic) + settings.margin.left}
         x2={xScale(d.statistic) + settings.margin.left}
@@ -685,6 +1047,7 @@ class BarcodePlot extends Component {
         statistic={d.statistic}
         onMouseEnter={(e) => this.handleLineEnter(e)}
         onMouseLeave={this.handleLineLeave}
+        onClick={(e) => this.handleLineClick(e, d)}
         // cursor="crosshair"
       />
     ));
