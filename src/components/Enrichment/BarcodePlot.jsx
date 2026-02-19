@@ -10,10 +10,6 @@ class BarcodePlot extends Component {
   _onWindowResize = null;
   _keydownHandler = null;
   _keyupHandler = null;
-
-  // Anchor for Shift+Click range selection within brushed data
-  lastShiftClickId = null;
-
   // Current main brush selection in SVG pixel coordinates: [x0, x1]
   currentBrushSelectionPx = null;
 
@@ -125,7 +121,9 @@ class BarcodePlot extends Component {
     this.shiftSubBrushStartX = null;
     if (this.shiftSubBrushRect) {
       try {
-        this.shiftSubBrushRect.remove();
+        if (this.shiftSubBrushRect && !this.shiftSubBrushRect.empty()) {
+          this.shiftSubBrushRect.remove();
+        }
       } catch (e) {
         // no-op
       }
@@ -133,6 +131,20 @@ class BarcodePlot extends Component {
     }
   }
 
+  /**
+   * Attaches event listeners for Shift+drag sub-brush selection.
+   *
+   * This feature allows users to select a sub-range within the current brush
+   * by holding Shift and dragging. The sub-range replaces the multi-selection
+   * (orange) while keeping the main brush window unchanged.
+   *
+   * @param {number} barcodeHeight - Height of the barcode visualization
+   * @throws {Error} If barcodeBrush group is not found (fails gracefully)
+   *
+   * @example
+   * // After brush is initialized
+   * this.attachShiftSubBrushListeners(500);
+   */
   attachShiftSubBrushListeners(barcodeHeight) {
     // SHIFT + drag within the *current* brush window:
     // - draws a temporary sub-range overlay
@@ -264,7 +276,8 @@ class BarcodePlot extends Component {
 
       // Create/replace the temporary overlay rect within the brush group so it sits above lines.
       try {
-        const brushGroup = d3.select('.barcodeBrush');
+        const brushGroup = d3.select(svgNode).select('.barcodeBrush');
+        if (brushGroup.empty()) throw new Error('barcodeBrush group missing');
         brushGroup.selectAll('rect.barcodeShiftSubBrushRect').remove();
         self.shiftSubBrushRect = brushGroup
           .append('rect')
@@ -300,6 +313,7 @@ class BarcodePlot extends Component {
     if (
       this.props.horizontalSplitPaneSize !== prevProps.horizontalSplitPaneSize
     ) {
+      this.detachShiftSubBrushListeners();
       this.setWidth(false, true);
     }
 
@@ -484,17 +498,16 @@ class BarcodePlot extends Component {
   }
 
   handleLineEnter = (event) => {
-    const lineIdMult = event.target.attributes[6].nodeValue;
-    const lineName = event.target.attributes[7].nodeValue;
-    const lineStatistic = event.target.attributes[9].nodeValue;
+    const target = event.currentTarget || event.target;
+    const lineIdMult = target.getAttribute('featureid');
+    const lineName = target.getAttribute('lineid');
+    const lineStatistic = Number(target.getAttribute('statistic'));
+    const x2 = Number(target.getAttribute('x2') || target.getAttribute('x1'));
     const textAnchor =
       lineStatistic > this.props.barcodeSettings.highStat / 1.5
         ? 'end'
         : 'start';
-    const textPosition =
-      textAnchor === 'end'
-        ? event.target.attributes[2].nodeValue - 5
-        : event.target.attributes[2].nodeValue + 5;
+    const textPosition = textAnchor === 'end' ? x2 - 5 : x2 + 5;
     const lineId = `#barcode-line-${lineIdMult}`;
     const hoveredLine = d3.select(`line[id='barcode-line-${lineIdMult}']`);
 
@@ -551,7 +564,8 @@ class BarcodePlot extends Component {
   // ========================================
 
   isFeatureInBrushedData = (featureID) => {
-    const brushed = this.props.barcodeSettings?.brushedData || [];
+    const brushed =
+      this.lastBrushedData || this.props.barcodeSettings?.brushedData || [];
     return brushed.some((d) => d.featureID === featureID);
   };
 
@@ -708,13 +722,14 @@ class BarcodePlot extends Component {
 
             const brushedArr = brushed._groups[0];
             const brushedDataVar = brushedArr.map((a) => {
+              const el = a;
               return {
-                x2: a.attributes[2].nodeValue,
-                featureID: a.attributes[6].nodeValue,
-                lineID: a.attributes[7].nodeValue,
-                logFC: a.attributes[8].nodeValue,
-                statistic: a.attributes[9].nodeValue,
-                class: a.attributes[1].nodeValue,
+                x2: Number(el.getAttribute('x2') || el.getAttribute('x1')),
+                featureID: el.getAttribute('featureid'),
+                lineID: el.getAttribute('lineid'),
+                logFC: el.getAttribute('logfc'),
+                statistic: Number(el.getAttribute('statistic')),
+                class: el.getAttribute('class'),
               };
             });
             const brushedDataTooltips = brushedDataVar.map((line) => {
