@@ -3,6 +3,7 @@ import ButtonActions from '../Shared/ButtonActions';
 import { Icon, Popup } from 'semantic-ui-react';
 import './BarcodePlot.scss';
 import * as d3 from 'd3';
+import { MIN_DRAG_THRESHOLD_PX } from '../Shared/constants';
 
 class BarcodePlot extends Component {
   _isMounted = false;
@@ -12,6 +13,10 @@ class BarcodePlot extends Component {
   _keyupHandler = null;
   // Current main brush selection in SVG pixel coordinates: [x0, x1]
   currentBrushSelectionPx = null;
+
+  // Holds the most recent brushed data (features in the brushed window).
+  // Initialized to an empty array to avoid undefined checks elsewhere.
+  lastBrushedData = [];
 
   // SHIFT+drag "sub-brush" inside the current brush window
   shiftSubBrushActive = false;
@@ -238,7 +243,7 @@ class BarcodePlot extends Component {
       const right = Math.max(x0, x1);
 
       // Ignore micro-drags (accidental clicks)
-      if (right - left < 2) {
+      if (right - left < MIN_DRAG_THRESHOLD_PX) {
         cleanup();
         return;
       }
@@ -583,6 +588,9 @@ class BarcodePlot extends Component {
     return brushed.some((d) => d.featureID === featureID);
   };
 
+  // TODO: This helper is currently unused in this component.
+  // Purpose: returns brushed feature IDs ordered by their statistic (ascending).
+  // Keep for future deterministic range-selection or remove to reduce clutter.
   getBrushedFeatureOrder = () => {
     const brushed = this.props.barcodeSettings?.brushedData || [];
     // Sort by x-position (statistic) for deterministic range selection
