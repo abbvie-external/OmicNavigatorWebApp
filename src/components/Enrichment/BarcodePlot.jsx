@@ -15,8 +15,8 @@ class BarcodePlot extends Component {
   currentBrushSelectionPx = null;
 
   // Holds the most recent brushed data (features in the brushed window).
-  // Initialized to an empty array to avoid undefined checks elsewhere.
-  lastBrushedData = [];
+  // Start as null so props-based brushedData can be honored until first brush.
+  lastBrushedData = null;
 
   // SHIFT+drag "sub-brush" inside the current brush window
   shiftSubBrushActive = false;
@@ -250,7 +250,9 @@ class BarcodePlot extends Component {
 
       // Replace multi-select with the sub-range, but only within the currently brushed data set.
       const brushedData =
-        self.lastBrushedData || self.props.barcodeSettings?.brushedData || [];
+        self.lastBrushedData?.length > 0
+          ? self.lastBrushedData
+          : self.props.barcodeSettings?.brushedData || [];
       const inSubRange = brushedData.filter((d) => {
         const px = parseFloat(d.x2);
         return left <= px && px <= right;
@@ -584,7 +586,9 @@ class BarcodePlot extends Component {
 
   isFeatureInBrushedData = (featureID) => {
     const brushed =
-      this.lastBrushedData || this.props.barcodeSettings?.brushedData || [];
+      this.lastBrushedData?.length > 0
+        ? this.lastBrushedData
+        : this.props.barcodeSettings?.brushedData || [];
     return brushed.some((d) => d.featureID === featureID);
   };
 
