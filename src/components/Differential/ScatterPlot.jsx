@@ -1008,8 +1008,7 @@ class ScatterPlot extends Component {
   }
 
   handleBinHover(d) {
-    // FIX: Eagerly remove previous tooltip so fast mouse movement
-    // between bins never leaves orphaned orange rects.
+    //Eagerly remove previous tooltip so fast mouse movement between bins never leaves orphaned orange rects.
     d3.select('#tooltip').remove();
     if (!this.state.brushing) {
       const bin = d3.select(
@@ -1043,8 +1042,7 @@ class ScatterPlot extends Component {
           .raise();
       }
 
-      // FIX: Call getToolTip inside the setState callback so it reads
-      // the updated hoveredBin/hovering values, not stale state.
+      //Call getToolTip inside the setState callback so it reads the updated hoveredBin/hovering values, not stale state.
       this.setState(
         {
           hoveredBin: d,
@@ -1059,8 +1057,7 @@ class ScatterPlot extends Component {
   }
 
   handleCircleHover(e) {
-    // FIX: Eagerly remove previous tooltip so fast mouse movement
-    // between circles never leaves orphaned orange rects.
+    //Eagerly remove previous tooltip so fast mouse movement between circles never leaves orphaned orange rects.  between circles never leaves orphaned orange rects.
     d3.select('#tooltip').remove();
 
     const elem = d3.select(
@@ -1070,7 +1067,6 @@ class ScatterPlot extends Component {
       return;
     }
     if (!this.state.brushing) {
-      // FIX: Deflate the PREVIOUSLY hovered circle before inflating the new one.
       const prevHoveredElement = this.state.hoveredCircleElement;
       if (prevHoveredElement) {
         const prevHovered = document.getElementById(prevHoveredElement);
