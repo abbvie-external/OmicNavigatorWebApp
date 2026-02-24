@@ -62,8 +62,8 @@ class Tabs extends Component {
       featureToHighlightInDiffTable: '',
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
-      // when updating the app version, change one line in 3 files: package.json, mzanifest.json and Tabs.jsx
-      appVersion: '2.3.2',
+      // when updating the app version, change one line in 4 files: package.json, package-lock.json, public/manifest.json and Tabs.jsx
+      appVersion: '2.3.3',
       packageVersion: '',
       infoOpen: false,
       screenWidth: window.innerWidth,

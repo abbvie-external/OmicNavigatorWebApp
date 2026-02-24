@@ -1,7 +1,10 @@
+// Base line styles
 .barcode-line {
   stroke: #838383;
   stroke-width: 1.5px;
   opacity: 0.5;
+  cursor: default;
+  transition: stroke-width 120ms ease, opacity 120ms ease;
 }
 
 .barcode-line.HoveredLine {
@@ -34,6 +37,11 @@
   opacity: 1;
 }
 
+// Cursor: only show "hand" for lines that are clickable (i.e., in the brushed window)
+.barcode-line.selectedReference,
+.barcode-line.selected {
+  cursor: pointer;
+}
 // .barcode {
 //   cursor: crosshair !important;
 // }
@@ -60,4 +68,26 @@
 
 #PrimaryBackground {
   background-color: #ff4400 !important;
+}
+
+// Modifier key cursor hints (applied via container class on keydown)
+// Keep the hand cursor for clickable lines even when modifiers are held.
+#BarcodeChartContainer.modifier-ctrl .barcode-line.selectedReference,
+#BarcodeChartContainer.modifier-ctrl .barcode-line.selected {
+  cursor: copy !important;
+}
+
+#BarcodeChartContainer.modifier-shift .barcodeBrush .selection {
+  cursor: cell !important;
+}
+.barcodeBrush .handle {
+  cursor: ew-resize !important;
+}
+
+.barcodeBrush .barcodeShiftSubBrushRect {
+  fill: rgba(255, 126, 56, 0.15); // Orange with transparency
+  stroke: #ff7e38; // Orange stroke
+  stroke-width: 1;
+  cursor: crosshair !important;
+  pointer-events: none;
 }
