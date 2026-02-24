@@ -649,6 +649,73 @@ class BarcodePlot extends Component {
     }
   };
 
+  /**
+   * Handles clicks on the SVG background to clear all active selections.
+   *
+   * This method provides a convenient way for users to deselect all features by clicking
+   * on empty space within the barcode visualization. It clears both multi-selection
+   * (highlighted proteins) and single selection (selected protein), as well as any
+   * active tooltip states.
+   *
+   * @param {MouseEvent} event - The click event triggered on the SVG element
+   * @returns {void}
+   */
+  handleBackgroundClick = (event) => {
+    // Only act on plain clicks (no Ctrl/Shift modifiers held).
+    if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+    const target = event.target;
+    const tagName = (target.tagName || '').toLowerCase();
+
+    // Ignore clicks that landed on interactive children:
+    // • <line> elements  – barcode lines (handled by handleLineClick)
+    // • Elements inside the brush group (handles, selection rect, overlay)
+    // • The shift-sub-brush overlay rect
+    if (tagName === 'line') return;
+
+    const classList = target.classList || {};
+    if (
+      classList.contains?.('selection') ||
+      classList.contains?.('handle') ||
+      classList.contains?.('overlay') ||
+      classList.contains?.('barcodeShiftSubBrushRect')
+    ) {
+      return;
+    }
+
+    // Walk up to make sure we're not inside the brush <g> group
+    let el = target;
+    while (el && el !== event.currentTarget) {
+      if (
+        el.classList &&
+        (el.classList.contains('barcodeBrush') ||
+          el.classList.contains('barcodeShiftSubBrushRect'))
+      ) {
+        return;
+      }
+      el = el.parentElement;
+    }
+
+    // Clear hover / tooltip state
+    this.setState({
+      hoveredLineId: null,
+      hoveredLineName: null,
+      highlightedLineName: null,
+      tooltipPosition: null,
+      tooltipTextAnchor: null,
+    });
+
+    // Clear multi-selection (orange highlighted proteins)
+    if (this.props.onHandleProteinSelected) {
+      this.props.onHandleProteinSelected([]);
+    }
+
+    // Clear single selection (blue selected protein)
+    if (this.props.onHandleSingleProteinSelected) {
+      this.props.onHandleSingleProteinSelected(null);
+    }
+  };
+
   getMaxObject(array) {
     if (array) {
       const max = Math.max.apply(
@@ -1137,6 +1204,7 @@ class BarcodePlot extends Component {
           width={barcodeContainerWidth}
           viewBox={`0 0 ${barcodeContainerWidth} ${horizontalSplitPaneSize}`}
           preserveAspectRatio="xMinYMin meet"
+          onClick={this.handleBackgroundClick}
         >
           {/* X Axis */}
           <path

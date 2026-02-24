@@ -1008,6 +1008,9 @@ class ScatterPlot extends Component {
   }
 
   handleBinHover(d) {
+    // FIX: Eagerly remove previous tooltip so fast mouse movement
+    // between bins never leaves orphaned orange rects.
+    d3.select('#tooltip').remove();
     if (!this.state.brushing) {
       const bin = d3.select(
         `#path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
@@ -1040,21 +1043,42 @@ class ScatterPlot extends Component {
           .raise();
       }
 
-      this.setState({
-        hoveredBin: d,
-        hoveredElement: 'bin',
-        hovering: true,
-      });
-
-      this.getToolTip();
+      // FIX: Call getToolTip inside the setState callback so it reads
+      // the updated hoveredBin/hovering values, not stale state.
+      this.setState(
+        {
+          hoveredBin: d,
+          hoveredElement: 'bin',
+          hovering: true,
+        },
+        () => {
+          this.getToolTip();
+        },
+      );
     }
   }
 
   handleCircleHover(e) {
+    // FIX: Eagerly remove previous tooltip so fast mouse movement
+    // between circles never leaves orphaned orange rects.
+    d3.select('#tooltip').remove();
+
     const elem = d3.select(
       `circle[id='volcanoDataPoint-${e[this.props.differentialFeatureIdKey]}`,
     )._groups[0][0];
     if (!this.state.brushing) {
+      // FIX: Deflate the PREVIOUSLY hovered circle before inflating the new one.
+      const prevHoveredElement = this.state.hoveredCircleElement;
+      if (prevHoveredElement) {
+        const prevHovered = document.getElementById(prevHoveredElement);
+        if (prevHovered && prevHovered !== elem) {
+          const prevR = this.getRadiusForCircleClass(
+            prevHovered.getAttribute('class') || '',
+          );
+          prevHovered.setAttribute('r', prevR);
+        }
+      }
+
       const hoveredData = {
         id: elem.attributes['circleid']?.value,
         xstat: elem.attributes['xstatistic']?.value,
@@ -1069,45 +1093,59 @@ class ScatterPlot extends Component {
         if (circle != null) {
           circle.attr('r', this.getHoverCircleRadius());
           circle.raise();
-          this.setState({
-            hoveredElement: 'circle',
-            hoveredCircleData: hoveredData,
-            hoveredCircleId: hoveredId || null,
-            hoveredCircleElement: hoveredElement,
-            hovering: true,
-          });
+          //  Call getToolTip inside the setState callback so it reads
+          // the updated hoveredCircleData/hovering values, not stale state.
+          this.setState(
+            {
+              hoveredElement: 'circle',
+              hoveredCircleData: hoveredData,
+              hoveredCircleId: hoveredId || null,
+              hoveredCircleElement: hoveredElement,
+              hovering: true,
+            },
+            () => {
+              this.getToolTip();
+            },
+          );
         }
       }
-      this.getToolTip();
     }
   }
 
   handleCircleLeave(e) {
     d3.selectAll('circle.volcanoPlot-dataPoint').classed('hovered', false);
-    const hovered = document.getElementById(this.state.hoveredCircleElement);
+    //Look up the circle being left via the event argument (e),
+    // not via this.state.hoveredCircleElement, which may already
+    // point to a different circle if mouseenter fired first.
+    const leavingId = `volcanoDataPoint-${
+      e[this.props.differentialFeatureIdKey]
+    }`;
+    const hovered = document.getElementById(leavingId);
     if (hovered != null) {
-      const hoveredCircle =
-        d3.select(
-          `circle[id='volcanoDataPoint-${
-            e[this.props.differentialFeatureIdKey]
-          }`,
-        )._groups[0][0] ?? null;
-      if (hoveredCircle != null) {
-        const nextR = this.getRadiusForCircleClass(
-          hoveredCircle.attributes['class']?.value,
-        );
-        hoveredCircle.attributes['r'].value = nextR;
-        this.setState({
-          hoveredCircleData: {
-            position: [],
-            id: null,
-            xstat: null,
-            ystat: null,
-          },
-          hovering: false,
-        });
-      }
+      const nextR = this.getRadiusForCircleClass(
+        hovered.getAttribute('class') || '',
+      );
+      hovered.setAttribute('r', nextR);
     }
+    // Also restore any circle recorded in state (belt-and-suspenders).
+    const stateHovered = this.state.hoveredCircleElement
+      ? document.getElementById(this.state.hoveredCircleElement)
+      : null;
+    if (stateHovered != null && stateHovered !== hovered) {
+      const nextR = this.getRadiusForCircleClass(
+        stateHovered.getAttribute('class') || '',
+      );
+      stateHovered.setAttribute('r', nextR);
+    }
+    this.setState({
+      hoveredCircleData: {
+        position: [],
+        id: null,
+        xstat: null,
+        ystat: null,
+      },
+      hovering: false,
+    });
   }
 
   handleBinLeave(d, bins) {
@@ -1143,6 +1181,8 @@ class ScatterPlot extends Component {
   }
 
   getToolTip() {
+    d3.select('#tooltip').remove();
+
     const { hoveredCircleData, hovering, hoveredElement, hoveredBin, circles } =
       this.state;
     const {
