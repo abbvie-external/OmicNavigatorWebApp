@@ -698,7 +698,7 @@ class ScatterPlot extends Component {
           d3.select('#tooltip').remove();
           d3.event.stopPropagation();
           const elem = d3.select(
-            `circle[id='volcanoDataPoint-${e[differentialFeatureIdKey]}`,
+            `circle[id='volcanoDataPoint-${e[differentialFeatureIdKey]}']`,
           );
 
           if (d3.event.metaKey || d3.event.ctrlKey) {
@@ -1064,8 +1064,11 @@ class ScatterPlot extends Component {
     d3.select('#tooltip').remove();
 
     const elem = d3.select(
-      `circle[id='volcanoDataPoint-${e[this.props.differentialFeatureIdKey]}`,
+      `circle[id='volcanoDataPoint-${e[this.props.differentialFeatureIdKey]}']`,
     )._groups[0][0];
+    if (!elem || !elem.attributes) {
+      return;
+    }
     if (!this.state.brushing) {
       // FIX: Deflate the PREVIOUSLY hovered circle before inflating the new one.
       const prevHoveredElement = this.state.hoveredCircleElement;
