@@ -264,16 +264,6 @@ class BarcodePlot extends Component {
         self.props.onHandleProteinSelected(nextMulti);
       }
 
-      // Clear single selection if it falls outside the new multi-select range.
-      const selectedProteinId = self.props.selectedProteinId;
-      if (
-        selectedProteinId &&
-        !inSubRange.some((d) => d.featureID === selectedProteinId) &&
-        self.props.onHandleSingleProteinSelected
-      ) {
-        self.props.onHandleSingleProteinSelected(null);
-      }
-
       cleanup();
       evt.preventDefault();
       evt.stopPropagation();
