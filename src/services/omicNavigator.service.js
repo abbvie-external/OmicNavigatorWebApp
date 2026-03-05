@@ -2,6 +2,13 @@ import $ from 'jquery';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import('opencpu.js/opencpu-0.5.js');
+
+const isCanceledError = (error) =>
+  axios.isCancel?.(error) ||
+  error?.code === 'ERR_CANCELED' ||
+  error?.name === 'CanceledError' ||
+  error?.name === 'AbortError';
+
 window.jQuery = $;
 
 class OmicNavigatorService {
@@ -15,20 +22,24 @@ class OmicNavigatorService {
     this.timeoutLength = 240000;
   }
 
-  async axiosPost(method, obj, params, handleError, cancelToken) {
+  async axiosPost(method, obj, params, handleError, signal, timeoutOverride) {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
     return new Promise(function (resolve, reject) {
       const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true&na="string"`;
+      const timeout =
+        typeof timeoutOverride === 'number'
+          ? timeoutOverride
+          : self.timeoutLength;
       axios
         .post(axiosPostUrl, obj, {
           params: paramsObj,
-          cancelToken,
-          timeout: self.timeoutLength,
+          signal,
+          timeout,
         })
         .then((response) => resolve(response.data))
         .catch(function (error) {
-          if (!axios.isCancel(error)) {
+          if (!isCanceledError(error)) {
             if (
               method !== 'getFavicons' &&
               method !== 'getReportLink' &&
@@ -50,12 +61,12 @@ class OmicNavigatorService {
     }
   }
 
-  async getPlotUrl(method, obj, handleError, cancelToken) {
+  async getPlotUrl(method, obj, handleError, signal) {
     const self = this;
     const axiosPostUrl = `${self.url}/${method}`;
     try {
       const { data } = await axios.post(axiosPostUrl, obj, {
-        cancelToken,
+        signal,
         timeout: self.timeoutLength,
       });
       const splitUrls = data.split('/ocpu/');
@@ -64,7 +75,7 @@ class OmicNavigatorService {
       const url = `${self.baseUrl}${graphicsUrl}/svg`;
       return url;
     } catch (error) {
-      if (!axios.isCancel(error)) {
+      if (!isCanceledError(error)) {
         if (handleError != null) {
           handleError(false);
         }
@@ -73,19 +84,19 @@ class OmicNavigatorService {
     }
   }
 
-  async axiosPostPlotly(method, obj, params, handleError, cancelToken) {
+  async axiosPostPlotly(method, obj, params, handleError, signal) {
     const paramsObj = params ? { digits: 10 } : {};
     const self = this;
     const axiosPostUrl = `${self.url}/${method}/json?auto_unbox=true`;
     try {
       const { data } = await axios.post(axiosPostUrl, obj, {
         params: paramsObj,
-        cancelToken,
+        signal,
         timeout: self.timeoutLength,
       });
       return data;
     } catch (error) {
-      if (!axios.isCancel(error)) {
+      if (!isCanceledError(error)) {
         console.log(`failed to retrieve plot for ${method} with payload:`);
         if (handleError != null) {
           handleError(false);
@@ -95,7 +106,7 @@ class OmicNavigatorService {
     }
   }
 
-  async ocpuPlotCall(method, obj, handleError, cancelToken) {
+  async ocpuPlotCall(method, obj, handleError, signal) {
     const self = this;
     return new Promise(function (resolve, reject) {
       window.ocpu
@@ -109,12 +120,12 @@ class OmicNavigatorService {
           axios
             .get(url, {
               responseType: 'text', // needed for SVG
-              cancelToken,
+              signal,
               timeout: self.timeoutLength,
             })
             .then((response) => resolve(response))
             .catch(function (thrown) {
-              if (!axios.isCancel(thrown)) {
+              if (!isCanceledError(thrown)) {
                 if (handleError != null) {
                   handleError(false);
                 }
@@ -139,7 +150,7 @@ class OmicNavigatorService {
     plotType,
     testID,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     this.setUrl();
     const cacheKey = `plotStudy_${study}_${modelID}_${testID}_${featureID}_${plotID}_${plotType}`;
@@ -159,12 +170,12 @@ class OmicNavigatorService {
           obj,
           null,
           errorCb,
-          cancelToken,
+          signal,
         );
         this[cacheKey] = dataFromPlotly;
         return dataFromPlotly;
       } else {
-        const promise = this.getPlotUrl('plotStudy', obj, errorCb, cancelToken);
+        const promise = this.getPlotUrl('plotStudy', obj, errorCb, signal);
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
@@ -180,7 +191,7 @@ class OmicNavigatorService {
     plotType,
     testID,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     this.setUrl();
     const obj = {
@@ -196,11 +207,11 @@ class OmicNavigatorService {
         obj,
         null,
         errorCb,
-        cancelToken,
+        signal,
       );
       return data;
     } else {
-      const promise = this.ocpuPlotCall('plotStudy', obj, errorCb, cancelToken);
+      const promise = this.ocpuPlotCall('plotStudy', obj, errorCb, signal);
       const dataFromPromise = await promise;
       return dataFromPromise;
     }
@@ -213,7 +224,7 @@ class OmicNavigatorService {
     plotID,
     testID,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     this.setUrl();
     const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${testID}_${featureID}_${plotID}`;
@@ -230,7 +241,7 @@ class OmicNavigatorService {
         testID,
       },
       errorCb,
-      cancelToken,
+      signal,
     );
     function timeoutResolver(ms) {
       return new Promise((resolve, reject) => {
@@ -302,7 +313,7 @@ class OmicNavigatorService {
     return studiesFromPromise;
   }
 
-  async getStudyMeta(study, cancelToken) {
+  async getStudyMeta(study, signal) {
     const cacheKey = `getStudyMeta_${study}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -315,7 +326,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;
@@ -328,7 +339,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getResultsModels(study, cancelToken) {
+  async getResultsModels(study, signal) {
     const cacheKey = `getResultsModels_${study}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -341,7 +352,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;
@@ -354,7 +365,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getEnrichmentsModels(study, cancelToken) {
+  async getEnrichmentsModels(study, signal) {
     const cacheKey = `getEnrichmentsModels_${study}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -367,7 +378,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;
@@ -380,7 +391,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getResultsTests(study, model, cancelToken) {
+  async getResultsTests(study, model, signal) {
     const cacheKey = `getResultsTests_${study}-${model}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -394,7 +405,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;
@@ -407,7 +418,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getEnrichmentsAnnotations(study, model, cancelToken) {
+  async getEnrichmentsAnnotations(study, model, signal) {
     const cacheKey = `getEnrichmentsAnnotations_${study}_${model}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -421,7 +432,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;
@@ -434,7 +445,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getHasAnnotationTerms(study, annotationID, cancelToken) {
+  async getHasAnnotationTerms(study, annotationID, signal) {
     const cacheKey = `hasTerms_${study}_${annotationID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -448,7 +459,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;
@@ -461,7 +472,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getReportLink(study, modelID, errorCb, cancelToken) {
+  async getReportLink(study, modelID, errorCb, signal) {
     const cacheKey = `getReportLink_${study}_${modelID}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -488,7 +499,7 @@ class OmicNavigatorService {
     annotationID,
     termID,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     const cacheKey = `getResultsTable_${study}_${modelID}_${testID}_${annotationID}_${termID}`;
     if (this[cacheKey] != null) {
@@ -500,7 +511,7 @@ class OmicNavigatorService {
         obj,
         true,
         errorCb,
-        cancelToken,
+        signal,
         25000,
       );
       const dataFromPromise = await promise;
@@ -630,7 +641,7 @@ class OmicNavigatorService {
     operator,
     column,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     const promise = this.axiosPost(
       'getResultsIntersection',
@@ -646,7 +657,7 @@ class OmicNavigatorService {
       },
       true,
       errorCb,
-      cancelToken,
+      signal,
       25000,
     );
     const dataFromPromise = await promise;
@@ -663,7 +674,7 @@ class OmicNavigatorService {
     operator,
     type,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     const promise = this.axiosPost(
       'getEnrichmentsIntersection',
@@ -679,7 +690,7 @@ class OmicNavigatorService {
       },
       true,
       errorCb,
-      cancelToken,
+      signal,
       25000,
     );
     const dataFromPromise = await promise;
@@ -693,7 +704,7 @@ class OmicNavigatorService {
     operator,
     column,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     const cacheKey = `getResultsMultiset_${study}_${modelID}_${sigValue}_${operator}_${column}`;
     if (this[cacheKey] != null) {
@@ -710,7 +721,7 @@ class OmicNavigatorService {
           column,
         },
         errorCb,
-        cancelToken,
+        signal,
         25000,
       );
       const dataFromPromise = await promise;
@@ -728,7 +739,7 @@ class OmicNavigatorService {
     type,
     tests,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     const cacheKey = `getEnrichmentsMultiset_${study}_${modelID}_${annotationID}_${sigValue}_${operator}_${type}_${tests}`;
     if (this[cacheKey] != null) {
@@ -747,7 +758,7 @@ class OmicNavigatorService {
           tests,
         },
         errorCb,
-        cancelToken,
+        signal,
         25000,
       );
       const dataFromPromise = await promise;
@@ -756,7 +767,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getEnrichmentsNetwork(study, model, annotation, errorCb, cancelToken) {
+  async getEnrichmentsNetwork(study, model, annotation, errorCb, signal) {
     const promise = this.axiosPost(
       'getEnrichmentsNetwork',
       {
@@ -766,14 +777,14 @@ class OmicNavigatorService {
       },
       true,
       errorCb,
-      cancelToken,
+      signal,
       45000,
     );
     const dataFromPromise = await promise;
     return dataFromPromise;
   }
 
-  async getNodeFeatures(study, annotationID, termID, errorCb, cancelToken) {
+  async getNodeFeatures(study, annotationID, termID, errorCb, signal) {
     // uncomment cache when fix display issue
     // const cacheKey = `getNodeFeatures_${study}_${annotationID}_${termID}`;
     // if (this[cacheKey] != null) {
@@ -788,7 +799,7 @@ class OmicNavigatorService {
       },
       false,
       errorCb,
-      cancelToken,
+      signal,
       25000,
     );
     const dataFromPromise = await promise;
@@ -803,7 +814,7 @@ class OmicNavigatorService {
     termID1,
     termID2,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     const cacheKey = `getLinkFeatures_${study}_${annotationID}_${termID1}_${termID2}`;
     if (this[cacheKey] != null) {
@@ -819,7 +830,7 @@ class OmicNavigatorService {
         },
         false,
         errorCb,
-        cancelToken,
+        signal,
         25000,
       );
       const dataFromPromise = await promise;
@@ -835,7 +846,7 @@ class OmicNavigatorService {
     annotationID,
     termID,
     errorCb,
-    cancelToken,
+    signal,
   ) {
     const cacheKey = `getBarcodeData_${study}_${modelID}_${testID}_${annotationID}_${termID}`;
     if (this[cacheKey] != null) {
@@ -852,7 +863,7 @@ class OmicNavigatorService {
         },
         false,
         errorCb,
-        cancelToken,
+        signal,
         25000,
       );
       const dataFromPromise = await promise;
@@ -861,7 +872,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getFavicons(differentialResultsLinkouts, errorCb, cancelToken) {
+  async getFavicons(differentialResultsLinkouts, errorCb, signal) {
     const promise = this.axiosPost(
       'getFavicons',
       {
@@ -869,7 +880,7 @@ class OmicNavigatorService {
       },
       false,
       errorCb,
-      cancelToken,
+      signal,
       25000,
     );
     const dataFromPromise = await promise;
@@ -888,7 +899,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getMapping(study, cancelToken) {
+  async getMapping(study, signal) {
     const cacheKey = `getMapping_${study}}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -901,7 +912,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;
@@ -915,7 +926,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getAllTests(study, cancelToken) {
+  async getAllTests(study, signal) {
     const cacheKey = `getAllTests_${study}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -928,7 +939,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;
@@ -941,7 +952,7 @@ class OmicNavigatorService {
     }
   }
 
-  async getPlotDescriptions(study, model, cancelToken) {
+  async getPlotDescriptions(study, model, signal) {
     const cacheKey = `getPlots_${study}_${model}`;
     if (this[cacheKey] != null) {
       return this[cacheKey];
@@ -955,7 +966,7 @@ class OmicNavigatorService {
           },
           false,
           null,
-          cancelToken,
+          signal,
           25000,
         );
         const dataFromPromise = await promise;

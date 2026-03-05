@@ -744,8 +744,8 @@ class BarcodePlot extends Component {
         [settings.margin.left + 4, 0],
         [barcodeWidth + 15, Math.round(barcodeHeight * 0.5)],
       ])
-      .on('start', function () {
-        if (!self.resized || d3.event.sourceEvent?.composed) {
+      .on('start', function (event) {
+        if (!self.resized || event.sourceEvent?.composed) {
           self.setState({
             highlightedLineName: null,
             hoveredLineId: null,
@@ -753,9 +753,9 @@ class BarcodePlot extends Component {
           });
         }
       })
-      .on('brush', function () {
-        if (!self.resized || d3.event.sourceEvent?.composed) {
-          const selection = d3.event?.selection || null;
+      .on('brush', function (event) {
+        if (!self.resized || event.sourceEvent?.composed) {
+          const selection = event?.selection || null;
           self.currentBrushSelectionPx = selection;
           if (selection != null) {
             const brushedLines = d3.brushSelection(this);
@@ -868,9 +868,9 @@ class BarcodePlot extends Component {
           }
         }
       })
-      .on('end', function () {
-        if (!self.resized || d3.event.sourceEvent?.composed) {
-          const selection = d3.event?.selection || null;
+      .on('end', function (event) {
+        if (!self.resized || event.sourceEvent?.composed) {
+          const selection = event?.selection || null;
           self.currentBrushSelectionPx = selection;
           if (selection != null) {
             const brushedData = self.props.barcodeSettings.brushedData || [];
@@ -888,7 +888,7 @@ class BarcodePlot extends Component {
             }
 
             if (self.props.onHandleProteinSelected) {
-              const sourceEvent = d3.event?.sourceEvent || {};
+              const sourceEvent = event?.sourceEvent || {};
               const isShift = !!sourceEvent.shiftKey;
 
               if (isShift) {

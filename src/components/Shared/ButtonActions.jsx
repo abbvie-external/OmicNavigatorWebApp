@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Dropdown } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
-import jsonToTxt from 'json-to-txt';
+import { toTabDelimitedText } from '../../utilities/textExport';
 // import { excelService } from '../../services/excel.service';
 import { pdfService } from '../../services/pdf.service';
 import './ButtonActions.scss';
@@ -172,7 +172,7 @@ class ButtonActions extends Component {
     let modelNoPeriods = model.replace(/\./g, '_');
     let testNoPeriods = test.replace(/\./g, '_');
     const sortedData = refFwd.current?.qhGridRef.current?.getSortedData() || [];
-    const dataInString = jsonToTxt({ data: sortedData });
+    const dataInString = toTabDelimitedText(sortedData);
     let a = document.createElement('a');
     let file = new Blob([dataInString], { type: 'text/plain' });
     a.href = URL.createObjectURL(file);

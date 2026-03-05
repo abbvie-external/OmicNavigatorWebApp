@@ -1,5 +1,4 @@
 import DOMPurify from 'dompurify';
-import { CancelToken } from 'axios';
 import {
   isMultiModelMultiTest,
   getTestsArg,
@@ -9,50 +8,55 @@ import {
 
 class PlotHelpers {
   // =====================================================
-  // CANCEL TOKEN MANAGEMENT
+  // REQUEST CANCELLATION (AbortController)
   // =====================================================
-  static cancelFunctions = {
-    singlePlot: () => {},
-    multiPlot: () => {},
-    overlay: () => {},
+  static abortControllers = {
+    singlePlot: null,
+    multiPlot: null,
+    overlay: null,
   };
 
   /**
-   * Creates a new cancel token and stores the cancel function
+   * Creates a new AbortSignal and stores the controller so we can cancel
+   * any in-flight request for the same key.
    *
    * @param {string} key - 'singlePlot' | 'multiPlot' | 'overlay'
-   * @returns {Object} Axios CancelToken
+   * @returns {AbortSignal | undefined}
    */
-  static createCancelToken(key) {
-    // Cancel any existing request of this type
-    this.cancelFunctions[key]();
+  static createAbortSignal(key) {
+    // Abort any existing request of this type
+    this.abortRequest(key);
 
-    // Create new token
-    return new CancelToken((c) => {
-      this.cancelFunctions[key] = c;
-    });
+    const controller = new AbortController();
+    this.abortControllers[key] = controller;
+    return controller.signal;
   }
 
   /**
-   * Cancels a specific request type
+   * Aborts a specific request type
    */
-  static cancelRequest(key) {
-    if (this.cancelFunctions[key]) {
-      this.cancelFunctions[key]();
-      this.cancelFunctions[key] = () => {};
+  static abortRequest(key) {
+    const controller = this.abortControllers[key];
+    if (controller) {
+      try {
+        controller.abort();
+      } catch (_) {
+        // no-op
+      }
     }
+    this.abortControllers[key] = null;
   }
 
   /**
-   * Cancels all ongoing requests
+   * Aborts all ongoing requests
    */
-  static cancelAllRequests() {
-    Object.keys(this.cancelFunctions).forEach((key) => {
-      this.cancelRequest(key);
+  static abortAllRequests() {
+    Object.keys(this.abortControllers).forEach((key) => {
+      this.abortRequest(key);
     });
   }
 
-  // =====================================================
+// =====================================================
   // PLOT METADATA CONVERSION
   // =====================================================
 

@@ -1,7 +1,6 @@
 import _, { filter, debounce } from 'lodash-es';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { CancelToken } from 'axios';
 import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
 import { toast } from 'react-toastify';
@@ -501,9 +500,9 @@ class Enrichment extends Component {
       enrichmentTest: test,
     });
     cancelRequestGetBarcodeData();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestGetBarcodeData = e;
-    });
+    const controller = new AbortController();
+    const cancelToken = controller.signal;
+    cancelRequestGetBarcodeData = () => controller.abort();
     omicNavigatorService
       .getBarcodeData(
         enrichmentStudy,
@@ -803,9 +802,9 @@ class Enrichment extends Component {
 
     // cancel any previous multi-feature in-flight request
     cancelRequestEnrichmentGetMultiPlot();
-    const cancelToken = new CancelToken((c) => {
-      cancelRequestEnrichmentGetMultiPlot = c;
-    });
+    const controller = new AbortController();
+    const cancelToken = controller.signal;
+    cancelRequestEnrichmentGetMultiPlot = () => controller.abort();
 
     const self = this;
 
@@ -1224,9 +1223,9 @@ class Enrichment extends Component {
     const id = featureId != null ? featureId : '';
 
     cancelRequestEnrichmentGetOverlayPlot();
-    const cancelToken = new CancelToken((e) => {
-      cancelRequestEnrichmentGetOverlayPlot = e;
-    });
+    const controller = new AbortController();
+    const cancelToken = controller.signal;
+    cancelRequestEnrichmentGetOverlayPlot = () => controller.abort();
 
     const self = this;
 
@@ -1351,9 +1350,9 @@ class Enrichment extends Component {
 
     // Cancel any previous in-flight multi-feature overlay request.
     cancelRequestEnrichmentGetOverlayMultiPlot();
-    const cancelToken = new CancelToken((c) => {
-      cancelRequestEnrichmentGetOverlayMultiPlot = c;
-    });
+    const controller = new AbortController();
+    const cancelToken = controller.signal;
+    cancelRequestEnrichmentGetOverlayMultiPlot = () => controller.abort();
 
     const title = `Multi-Feature Plot (${ids.length} features)`;
 
@@ -1833,9 +1832,9 @@ class Enrichment extends Component {
       );
     } else {
       cancelRequestGetEnrichmentsNetwork();
-      let cancelToken = new CancelToken((e) => {
-        cancelRequestGetEnrichmentsNetwork = e;
-      });
+      const controller = new AbortController();
+    const cancelToken = controller.signal;
+    cancelRequestGetEnrichmentsNetwork = () => controller.abort();
       omicNavigatorService
         .getEnrichmentsNetwork(
           enrichmentStudy,
@@ -2407,9 +2406,9 @@ class Enrichment extends Component {
     plotDataEnrichmentVar.key = id;
     this.setState({ svgExportName: id });
     cancelRequestEnrichmentGetPlot();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestEnrichmentGetPlot = e;
-    });
+    const controller = new AbortController();
+    const cancelToken = controller.signal;
+    cancelRequestEnrichmentGetPlot = () => controller.abort();
     let self = this;
     let plots = enrichmentPlotTypes;
     if (plots.length) {

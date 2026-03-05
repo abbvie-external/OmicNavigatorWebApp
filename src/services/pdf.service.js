@@ -1,4 +1,4 @@
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import canvg from 'canvg';
 import html2canvas from 'html2canvas';
 
@@ -13,7 +13,7 @@ class PdfService {
     let data = svg.outerHTML;
     canvg(canvas, data);
     let imgData = canvas.toDataURL('image/png');
-    let doc = new jsPDF('l');
+    const doc = new jsPDF({ orientation: 'landscape' });
     // var pdfWidth = doc.internal.pageSize.getWidth();
     // var pdfHeight = doc.internal.pageSize.getHeight();
     // let widthPixels = svg.viewBox.baseVal.width;
@@ -22,7 +22,7 @@ class PdfService {
     let heightPixels = 677.25;
     let widthMM = Math.floor(widthPixels * 0.264583);
     let heightMM = Math.floor(heightPixels * 0.264583);
-    doc.addImage(imgData, 'png', 15, 15, widthMM, heightMM);
+    doc.addImage(imgData, 'PNG', 15, 15, widthMM, heightMM);
     doc.save('PDF-01.pdf');
   }
   convertToPdf(svg) {

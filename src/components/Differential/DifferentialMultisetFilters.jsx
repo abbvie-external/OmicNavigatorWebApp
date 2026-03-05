@@ -494,7 +494,7 @@ class DifferentialMultisetFilters extends Component {
           : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function (d) {
+      .on('click', function (event, d) {
         let mustDifferentialCopy = [...mustDifferential];
         let notDifferentialCopy = [...notDifferential];
         if (!mustDifferential.includes(d) && d !== uAnchorP) {
@@ -509,7 +509,7 @@ class DifferentialMultisetFilters extends Component {
           );
         }
       })
-      .on('mouseover', function (d) {
+      .on('mouseover', function (event, d) {
         const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
         d3.select(this).transition().duration(100).attr('cursor', cursorStyle);
       });
@@ -537,7 +537,7 @@ class DifferentialMultisetFilters extends Component {
           : baseColorCodeP,
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function (d) {
+      .on('click', function (event, d) {
         let mustDifferentialCopy = [...mustDifferential];
         let notDifferentialCopy = [...notDifferential];
         if (mustDifferential.includes(d) && d !== uAnchorP) {
@@ -554,7 +554,7 @@ class DifferentialMultisetFilters extends Component {
           );
         }
       })
-      .on('mouseover', function (d) {
+      .on('mouseover', function (event, d) {
         const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
         d3.select(this).transition().duration(100).attr('cursor', cursorStyle);
       });
@@ -575,7 +575,7 @@ class DifferentialMultisetFilters extends Component {
         );
       })
       .attr('r', circleRadius / 3)
-      .on('click', function (d) {
+      .on('click', function (event, d) {
         let mustDifferentialCopy = [...mustDifferential];
         let notDifferentialCopy = [...notDifferential];
         if (mustDifferential.includes(d) && d !== uAnchorP) {
@@ -592,7 +592,7 @@ class DifferentialMultisetFilters extends Component {
           );
         }
       })
-      .on('mouseover', function (d) {
+      .on('mouseover', function (event, d) {
         const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
         d3.select(this).transition().duration(100).attr('cursor', cursorStyle);
       });
@@ -618,7 +618,7 @@ class DifferentialMultisetFilters extends Component {
           : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function (d) {
+      .on('click', function (event, d) {
         let mustDifferentialCopy = [...mustDifferential];
         let notDifferentialCopy = [...notDifferential];
         if (!notDifferential.includes(d) && d !== uAnchorP) {
@@ -635,7 +635,7 @@ class DifferentialMultisetFilters extends Component {
           }
         }
       })
-      .on('mouseover', function (d) {
+      .on('mouseover', function (event, d) {
         const cursorStyle = d !== uAnchorP ? 'pointer' : 'not-allowed';
         d3.select(this).transition().duration(100).attr('cursor', cursorStyle);
       });

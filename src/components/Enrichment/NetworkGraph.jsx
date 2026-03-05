@@ -658,20 +658,20 @@ class NetworkGraph extends Component {
                       ),
                     );
                   })
-                  .on('mouseover', function (d, i) {
+                  .on('mouseover', function (event, d) {
                     let jaccardTotal = linkType * d.jaccard;
                     let overlapValue = 1 - linkType;
                     let overlapTotal = overlapValue * d.overlap;
                     let total = jaccardTotal + overlapTotal;
                     edgeWeight = total;
                     let tooltipLRPosition =
-                      d3.event.pageX > window.innerWidth * 0.8
-                        ? `${d3.event.pageX - 275}px`
-                        : `${d3.event.pageX + 10}px`;
+                      event.pageX > window.innerWidth * 0.8
+                        ? `${event.pageX - 275}px`
+                        : `${event.pageX + 10}px`;
                     let tooltipTBPosition =
-                      d3.event.pageY > window.innerHeight * 0.7
-                        ? `${d3.event.pageY - 150}px`
-                        : `${d3.event.pageY - 15}px`;
+                      event.pageY > window.innerHeight * 0.7
+                        ? `${event.pageY - 150}px`
+                        : `${event.pageY - 15}px`;
                     d3.select(this)
                       .transition()
                       .duration(50)
@@ -735,7 +735,7 @@ class NetworkGraph extends Component {
                   //         .style('top', tooltipTBPosition);
                   //     });
                   // })
-                  .on('mouseout', function (d, i) {
+                  .on('mouseout', function (event, d) {
                     // d3.select(this).transition()
                     //     .duration('50')
                     //     .attr('opacity', .75)
@@ -763,13 +763,15 @@ class NetworkGraph extends Component {
                   .call(
                     d3
                       .drag()
-                      .on('start', function () {
-                        dragstarted(this);
+                      .on('start', function (event) {
+                        dragstarted(event);
                       })
-                      .on('drag', function (d) {
-                        ondrag(d, cellHeight, cellWidth, this);
+                      .on('drag', function (event, d) {
+                        ondrag(event, d, cellHeight, cellWidth, this);
                       })
-                      .on('end', dragended),
+                      .on('end', function (event, d) {
+                        dragended(event, d);
+                      }),
                   );
 
                 node.each(multiple);
@@ -896,8 +898,8 @@ class NetworkGraph extends Component {
                       if (d.data.value != null) return color(d.data.value);
                       return '#d3d3d3';
                     })
-                    .on('click', function (d) {
-                      // if (d3.event.defaultPrevented) return;
+                    .on('click', function (event, d) {
+                      // if (event.defaultPrevented) return;
                       d3.selectAll('.tooltip-pieSlice').style('opacity', 0);
                       self.props.onHandlePieClick(
                         self.props.enrichmentStudy,
@@ -907,7 +909,7 @@ class NetworkGraph extends Component {
                         d.data.prop,
                       );
                     })
-                    .on('mouseover', function (d, i) {
+                    .on('mouseover', function (event, d) {
                       d3.select(this)
                         .transition()
                         .duration(50)
@@ -915,13 +917,13 @@ class NetworkGraph extends Component {
                         .attr('d', arc.outerRadius(50).innerRadius(0));
                       div.transition().duration(50).style('opacity', 1);
                       let tooltipLRPosition =
-                        d3.event.pageX > window.innerWidth * 0.8
-                          ? `${d3.event.pageX - 275}px`
-                          : `${d3.event.pageX + 10}px`;
+                        event.pageX > window.innerWidth * 0.8
+                          ? `${event.pageX - 275}px`
+                          : `${event.pageX + 10}px`;
                       let tooltipTBPosition =
-                        d3.event.pageY > window.innerHeight * 0.85
-                          ? `${d3.event.pageY - 100}px`
-                          : `${d3.event.pageY - 15}px`;
+                        event.pageY > window.innerHeight * 0.85
+                          ? `${event.pageY - 100}px`
+                          : `${event.pageY - 15}px`;
                       let pValueDisplay;
                       if (Math.abs(d.data.value) > 0.001)
                         pValueDisplay = d.data.value?.toPrecision(3) || 'N/A';
@@ -990,7 +992,7 @@ class NetworkGraph extends Component {
                     //     console.error('Error during getNodeFeatures', error);
                     //   });
                     //})
-                    .on('mouseout', function (d, i) {
+                    .on('mouseout', function (event, d) {
                       // self.setState({
                       //   nodeFeatures: '',
                       // });
@@ -1002,14 +1004,14 @@ class NetworkGraph extends Component {
                       div.transition().duration('50').style('opacity', 0);
                     });
                 }
-                function dragstarted(o) {
-                  d3.event.sourceEvent.stopPropagation();
-                  d3.event.sourceEvent.preventDefault();
+                function dragstarted(event) {
+                  event.sourceEvent.stopPropagation();
+                  event.sourceEvent.preventDefault();
                 }
 
-                function ondrag(d, cellHeight, cellWidth, me) {
-                  d.x = d3.event.x;
-                  d.y = d3.event.y;
+                function ondrag(event, d, cellHeight, cellWidth, me) {
+                  d.x = event.x;
+                  d.y = event.y;
                   let xPos = Math.max(
                     radiusVar(d[networkSettings.nodeSize]),
                     Math.min(
@@ -1049,10 +1051,10 @@ class NetworkGraph extends Component {
                     .attr('y2', yPos);
                 }
 
-                function dragended(d) {
-                  if (!d3.event.active) simulation.alphaTarget(0);
-                  d.fx = d3.event.x;
-                  d.fy = d3.event.y;
+                function dragended(event, d) {
+                  if (!event.active) simulation.alphaTarget(0);
+                  d.fx = event.x;
+                  d.fy = event.y;
                 }
               }
             });
@@ -1089,8 +1091,8 @@ class NetworkGraph extends Component {
           // function dragended(d) {
           // }
 
-          function zoomed() {
-            chartView.attr('transform', d3.event.transform);
+          function zoomed(event) {
+            chartView.attr('transform', event.transform);
           }
         }
       } else {
