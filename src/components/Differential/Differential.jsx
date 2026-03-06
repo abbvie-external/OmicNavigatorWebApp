@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Grid, Popup, Sidebar, Icon } from 'semantic-ui-react';
 import _ from 'lodash-es';
-import { CancelToken } from 'axios';
 import DOMPurify from 'dompurify';
 import { withRouter } from 'react-router-dom';
 import SVG from 'react-inlinesvg';
@@ -811,7 +810,7 @@ class Differential extends Component {
       ? 'overlay'
       : 'singlePlot';
 
-    const cancelToken = PlotHelpers.createCancelToken(cancelTokenKey);
+    const cancelToken = PlotHelpers.createAbortSignal(cancelTokenKey);
 
     const plotArgsConfig = {
       differentialModelIds,
@@ -1038,7 +1037,7 @@ class Differential extends Component {
     const self = this;
 
     // Cancel token for multi plots
-    const cancelToken = PlotHelpers.createCancelToken('multiPlot');
+    const cancelToken = PlotHelpers.createAbortSignal('multiPlot');
 
     // Filter for multi-feature plots only
     const multifeaturePlots = PlotHelpers.filterPlotsByType(
@@ -1117,7 +1116,7 @@ class Differential extends Component {
             );
 
           if (result === true) {
-            PlotHelpers.cancelRequest('multiPlot');
+            PlotHelpers.abortRequest('multiPlot');
             this.getMultifeaturePlotTransition(featureids, true, 0);
           } else if (result && result.data) {
             const sanitizedSVG = PlotHelpers.sanitizeStaticSvg(result.data, {
@@ -1312,7 +1311,7 @@ class Differential extends Component {
     const { differentialStudy, differentialModel, differentialTest } =
       this.props;
 
-    const cancelToken = PlotHelpers.createCancelToken('multiPlot');
+    const cancelToken = PlotHelpers.createAbortSignal('multiPlot');
 
     const multifeaturePlots = PlotHelpers.filterPlotsByType(
       differentialPlotTypes,
@@ -1880,11 +1879,11 @@ class Differential extends Component {
 
   getMultiModelMappingObject = (differentialStudy) => {
     cancelRequestGetMapping();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestGetMapping = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelRequestGetMapping = () => controller.abort();
     omicNavigatorService
-      .getMapping(differentialStudy, cancelToken)
+      .getMapping(differentialStudy, signal)
       .then((mappingObj) => {
         const mappingObject = mappingObj?.default || null;
         this.setMultiModelMappingObject(mappingObject);

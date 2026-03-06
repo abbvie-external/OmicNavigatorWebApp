@@ -428,7 +428,7 @@ class ViolinPlot extends Component {
         .attr('opacity', 1.0);
       const brushedData = brushed.data() || [];
       const sourceEvent = (event && event.sourceEvent) || {};
-      const isShift = !!d3.event.sourceEvent.shiftKey;
+      const isShift = !!sourceEvent.shiftKey;
       const isCtrlOrMeta = !!sourceEvent.ctrlKey || !!sourceEvent.metaKey;
 
       if (brushedData.length > 0) {
@@ -1557,11 +1557,11 @@ class ViolinPlot extends Component {
       }
 
       self.chart.objs.svg
-        .on('click', function () {
+        .on('click', function (event) {
           if (self.props.multiFeatureBullpenOpen) {
             return;
           }
-          const target = d3.event.target || {};
+          const target = event.target || {};
           const tagName = (target.tagName || '').toLowerCase();
 
           // Ignore clicks on circles; those are handled on the point itself
@@ -1638,7 +1638,7 @@ class ViolinPlot extends Component {
             .selectAll('circle')
             .data(circleData)
             .attr('pointer-events', 'all')
-            .on('mouseover', (d) => {
+            .on('mouseover', (event, d) => {
               self.isHovering = true;
 
               d3.select(`circle[id='violin_${d.featureID}']`)
@@ -1648,7 +1648,7 @@ class ViolinPlot extends Component {
                 .attr('r', dOpts.pointSize * 2); // same hover behavior for all
 
               if (self.props.violinSettings.tooltip.show) {
-                const m = d3.mouse(self.chart.objs.chartDiv.node());
+                const m = d3.pointer(event, self.chart.objs.chartDiv.node());
 
                 // Avoid leaving an invisible tooltip "displayed" above the SVG
                 // (it can intercept clicks/hover/brush). When element labels are
@@ -1673,7 +1673,7 @@ class ViolinPlot extends Component {
               }
               return null;
             })
-            .on('mouseout', (d) => {
+            .on('mouseout', (event, d) => {
               d3.select(`circle[id='violin_${d.featureID}']`)
                 .transition()
                 .duration(300)
@@ -1708,13 +1708,16 @@ class ViolinPlot extends Component {
                   });
               }
             })
-            .on('click', (d) => {
+            .on('click', (event, d) => {
               self.isHovering = false;
-              d3.event.stopPropagation();
+              event.stopPropagation();
 
-              self.chart.objs.tooltip.interrupt().style('opacity', 0).style('display', 'none');
+              self.chart.objs.tooltip
+                .interrupt()
+                .style('opacity', 0)
+                .style('display', 'none');
 
-              const isCtrlOrMeta = d3.event.metaKey || d3.event.ctrlKey;
+              const isCtrlOrMeta = event.metaKey || event.ctrlKey;
               const { HighlightedProteins = [], selectedProteinId } =
                 self.props;
 
