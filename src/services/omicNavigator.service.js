@@ -39,17 +39,19 @@ class OmicNavigatorService {
         })
         .then((response) => resolve(response.data))
         .catch(function (error) {
-          if (!isCanceledError(error)) {
-            if (
-              method !== 'getFavicons' &&
-              method !== 'getReportLink' &&
-              method !== 'getMetaFeaturesTable'
-            ) {
-              toast.error(`${error.message}`);
-            }
-            if (handleError != null) {
-              handleError(false);
-            }
+          if (isCanceledError(error)) {
+            resolve(null);
+            return;
+          }
+          if (
+            method !== 'getFavicons' &&
+            method !== 'getReportLink' &&
+            method !== 'getMetaFeaturesTable'
+          ) {
+            toast.error(`${error.message}`);
+          }
+          if (handleError != null) {
+            handleError(false);
           }
         });
     });
@@ -332,9 +334,10 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        // if (axios.isCancel) {
-        // }
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
+        }
       }
     }
   }
@@ -358,9 +361,10 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        // if (axios.isCancel) {
-        // }
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
+        }
       }
     }
   }
@@ -384,9 +388,10 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        // if (axios.isCancel) {
-        // }
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
+        }
       }
     }
   }
@@ -411,8 +416,9 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        if (axios.isCancel) {
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
         }
       }
     }
@@ -438,8 +444,9 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        if (axios.isCancel) {
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
         }
       }
     }
@@ -465,8 +472,9 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        if (axios.isCancel) {
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
         }
       }
     }
@@ -483,7 +491,7 @@ class OmicNavigatorService {
         obj,
         false,
         errorCb,
-        null,
+        signal,
         25000,
       );
       const dataFromPromise = await promise;
@@ -918,10 +926,10 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        // if (axios.isCancel) {
-        // console.log('multi-model mapping cancelled')
-        // }
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
+        }
       }
     }
   }
@@ -945,8 +953,9 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        if (axios.isCancel) {
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
         }
       }
     }
@@ -972,8 +981,9 @@ class OmicNavigatorService {
         const dataFromPromise = await promise;
         this[cacheKey] = dataFromPromise;
         return dataFromPromise;
-      } catch {
-        if (axios.isCancel) {
+      } catch (error) {
+        if (isCanceledError(error)) {
+          return;
         }
       }
     }

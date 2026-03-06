@@ -772,8 +772,8 @@ class EnrichmentSearch extends Component {
       this.props.onHandleEnrichmentTableLoading(true);
       cancelRequestGetEnrichmentsIntersection();
       const controller = new AbortController();
-    const signal = controller.signal;
-    cancelRequestGetEnrichmentsIntersection = () => controller.abort();
+      const signal = controller.signal;
+      cancelRequestGetEnrichmentsIntersection = () => controller.abort();
       omicNavigatorService
         .getEnrichmentsIntersection(
           enrichmentStudy,
@@ -1068,8 +1068,8 @@ class EnrichmentSearch extends Component {
     if (tests?.length > 1) {
       cancelRequestGetEnrichmentsMultiset();
       const controller = new AbortController();
-    const signal = controller.signal;
-    cancelRequestGetEnrichmentsMultiset = () => controller.abort();
+      const signal = controller.signal;
+      cancelRequestGetEnrichmentsMultiset = () => controller.abort();
       omicNavigatorService
         .getEnrichmentsMultiset(
           enrichmentStudy,

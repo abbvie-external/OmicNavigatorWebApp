@@ -1833,8 +1833,8 @@ class Enrichment extends Component {
     } else {
       cancelRequestGetEnrichmentsNetwork();
       const controller = new AbortController();
-    const cancelToken = controller.signal;
-    cancelRequestGetEnrichmentsNetwork = () => controller.abort();
+      const cancelToken = controller.signal;
+      cancelRequestGetEnrichmentsNetwork = () => controller.abort();
       omicNavigatorService
         .getEnrichmentsNetwork(
           enrichmentStudy,
