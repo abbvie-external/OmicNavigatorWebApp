@@ -34,7 +34,6 @@ import ButtonActions from '../Shared/ButtonActions';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import { ResizableBox } from 'react-resizable';
 import '../Shared/ReactResizable.css';
-import { CancelToken } from 'axios';
 let cancelRequestGetNodeFeaturesSearch = () => {};
 
 const StyledSlider = styled(ReactSlider)`
@@ -364,9 +363,9 @@ class NetworkGraphControls extends Component {
 
   getNodeFeatures(enrichmentStudy, enrichmentAnnotation, termid) {
     cancelRequestGetNodeFeaturesSearch();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestGetNodeFeaturesSearch = e;
-    });
+    const controller = new AbortController();
+    const cancelToken = controller.signal;
+    cancelRequestGetNodeFeaturesSearch = () => controller.abort();
     omicNavigatorService
       .getNodeFeatures(
         enrichmentStudy,

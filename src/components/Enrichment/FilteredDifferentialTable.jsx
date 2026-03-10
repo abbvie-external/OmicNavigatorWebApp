@@ -9,7 +9,6 @@ import {
   Linkout,
 } from '../Shared/helpers';
 import './FilteredDifferentialTable.scss';
-import { CancelToken } from 'axios';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
@@ -132,9 +131,9 @@ class FilteredDifferentialTable extends Component {
       const key = this.props.plotDataEnrichment.key.split(':');
       const name = key[0].trim() || '';
       cancelRequestFPTGetResultsTable();
-      let cancelToken = new CancelToken((e) => {
-        cancelRequestFPTGetResultsTable = e;
-      });
+      const controller = new AbortController();
+    const cancelToken = controller.signal;
+    cancelRequestFPTGetResultsTable = () => controller.abort();
       omicNavigatorService
         .getResultsTable(
           this.props.enrichmentStudy,

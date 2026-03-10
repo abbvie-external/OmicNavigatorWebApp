@@ -476,7 +476,7 @@ class EnrichmentMultisetFilters extends Component {
           : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function (d) {
+      .on('click', function (event, d) {
         if (!multisetTestsFilteredOut.includes(d)) {
           if (!mustEnrichment.includes(d) && d !== uAnchor) {
             let mustEnrichmentCopy = [...mustEnrichment];
@@ -518,7 +518,7 @@ class EnrichmentMultisetFilters extends Component {
           : baseColorCode,
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function (d) {
+      .on('click', function (event, d) {
         if (!multisetTestsFilteredOut.includes(d)) {
           let mustEnrichmentCopy = [...mustEnrichment];
           let notEnrichmentCopy = [...notEnrichment];
@@ -553,7 +553,7 @@ class EnrichmentMultisetFilters extends Component {
         );
       })
       .attr('r', circleRadius / 3)
-      .on('click', function (d) {
+      .on('click', function (event, d) {
         if (!multisetTestsFilteredOut.includes(d)) {
           let mustEnrichmentCopy = [...mustEnrichment];
           let notEnrichmentCopy = [...notEnrichment];
@@ -593,7 +593,7 @@ class EnrichmentMultisetFilters extends Component {
           : 'transparent',
       )
       .attr('stroke-width', circleRadius / 5)
-      .on('click', function (d) {
+      .on('click', function (event, d) {
         if (!multisetTestsFilteredOut.includes(d)) {
           let mustEnrichmentCopy = [...mustEnrichment];
           let notEnrichmentCopy = [...notEnrichment];
@@ -673,7 +673,7 @@ class EnrichmentMultisetFilters extends Component {
         .property('checked', function (d) {
           return !multisetTestsFilteredOut.includes(d);
         })
-        .on('change', function (d) {
+        .on('change', function (event, d) {
           self.props.onFilterOutChange(d);
         });
     }
@@ -946,7 +946,7 @@ class EnrichmentMultisetFilters extends Component {
       .property('checked', function (d) {
         return !multisetTestsFilteredOut.includes(d);
       })
-      .on('change', function (d) {
+      .on('change', function (event, d) {
         self.props.onFilterOutChange(d);
       });
   }

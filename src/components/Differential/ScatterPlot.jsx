@@ -580,16 +580,16 @@ class ScatterPlot extends Component {
           (d) => `path-${Math.ceil(d.x)}-${Math.ceil(d.y)}-${d.length}`,
         )
         .attr('cursor', 'pointer')
-        .on('mouseenter', (d) => {
+        .on('mouseenter', (event, d) => {
           this.handleBinHover(d);
         })
-        .on('mouseleave', (d) => {
+        .on('mouseleave', (event, d) => {
           this.handleBinLeave(d, bins);
           d3.select('#tooltip').remove();
         })
-        .on('click', (item, index) => {
-          d3.event.stopPropagation();
-          if (!d3.event.metaKey && !d3.event.ctrlKey) {
+        .on('click', (event, item) => {
+          event.stopPropagation();
+          if (!event.metaKey && !event.ctrlKey) {
             d3.select('#tooltip').remove();
             d3.select('#nonfiltered-elements').selectAll('circle').remove();
             let allCircles = [...this.state.circles, ...item];
@@ -687,21 +687,21 @@ class ScatterPlot extends Component {
         .attr('ystatistic', (d) => `${this.doTransform(d[yAxisLabel], 'y')}`)
         .attr('xstatistic', (d) => `${this.doTransform(d[xAxisLabel], 'x')}`)
         .attr('cursor', 'pointer')
-        .on('mouseenter', (e) => {
+        .on('mouseenter', (event, e) => {
           this.handleCircleHover(e);
         })
-        .on('mouseleave', (e) => {
+        .on('mouseleave', (event, e) => {
           this.handleCircleLeave(e);
           d3.select('#tooltip').remove();
         })
-        .on('click', (e) => {
+        .on('click', (event, e) => {
           d3.select('#tooltip').remove();
-          d3.event.stopPropagation();
+          event.stopPropagation();
           const elem = d3.select(
             `circle[id='volcanoDataPoint-${e[differentialFeatureIdKey]}']`,
           );
 
-          if (d3.event.metaKey || d3.event.ctrlKey) {
+          if (event.metaKey || event.ctrlKey) {
             // control-click dot
             if (elem.attr('class').includes('highlighted')) {
               let elemData = JSON.parse(
@@ -1591,8 +1591,8 @@ class ScatterPlot extends Component {
         },
       });
     };
-    const endBrush = function () {
-      if (d3.event.selection != null) {
+    const endBrush = function (event) {
+      if (event.selection != null) {
         const brush = d3.brushSelection(this);
 
         const isBrushed = function (x, y) {
@@ -1625,7 +1625,7 @@ class ScatterPlot extends Component {
         if (!!total.length) {
           if (
             // SHIFT BOX-SELECT FOR MULTI-FEATURE PLOTS
-            d3.event.sourceEvent?.shiftKey
+            event.sourceEvent?.shiftKey
           ) {
             // filter out irrelevant grey circles
             const filteredDifferentialTableDataSet = new Set(

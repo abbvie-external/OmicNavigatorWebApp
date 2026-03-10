@@ -11,7 +11,6 @@ import {
   Button,
 } from 'semantic-ui-react';
 import ndjsonStream from 'can-ndjson-stream';
-import { CancelToken } from 'axios';
 import _ from 'lodash-es';
 import { getDynamicSize, getYAxis } from '../Shared/helpers';
 import '../Shared/Search.scss';
@@ -337,13 +336,13 @@ class DifferentialSearch extends Component {
   getAllTests = async (study) => {
     const { onSetDifferentialResultsColumnTooltips } = this.props;
     cancelGetAllDifferentialTests();
-    let cancelToken = new CancelToken((e) => {
-      cancelGetAllDifferentialTests = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelGetAllDifferentialTests = () => controller.abort();
     try {
       const getAllTestsResponse = await omicNavigatorService.getAllTests(
         study,
-        cancelToken,
+        signal,
       );
       if (getAllTestsResponse) {
         onSetDifferentialResultsColumnTooltips(getAllTestsResponse);
@@ -358,12 +357,12 @@ class DifferentialSearch extends Component {
 
   getAndSetTestOptions = async (study, model) => {
     cancelGetResultsTests();
-    let cancelToken = new CancelToken((e) => {
-      cancelGetResultsTests = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelGetResultsTests = () => controller.abort();
     try {
       const getResultsTestsResponse =
-        await omicNavigatorService.getResultsTests(study, model, cancelToken);
+        await omicNavigatorService.getResultsTests(study, model, signal);
       if (
         getResultsTestsResponse &&
         Object.keys(getResultsTestsResponse).length > 0
@@ -403,11 +402,11 @@ class DifferentialSearch extends Component {
   getDifferentialPlotDescriptions = (study, model) => {
     const { onSetDifferentialPlotDescriptions } = this.props;
     cancelGetDifferentialPlotDescriptions();
-    let cancelToken = new CancelToken((e) => {
-      cancelGetDifferentialPlotDescriptions = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelGetDifferentialPlotDescriptions = () => controller.abort();
     omicNavigatorService
-      .getPlotDescriptions(study, model, cancelToken)
+      .getPlotDescriptions(study, model, signal)
       .then((getPlotDescriptionsResponse) => {
         if (getPlotDescriptionsResponse) {
           onSetDifferentialPlotDescriptions(getPlotDescriptionsResponse);
@@ -425,12 +424,12 @@ class DifferentialSearch extends Component {
 
   getAndSetModelOptions = async (study) => {
     cancelGetResultsModels();
-    let cancelToken = new CancelToken((e) => {
-      cancelGetResultsModels = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelGetResultsModels = () => controller.abort();
     try {
       const getResultsModelsResponse =
-        await omicNavigatorService.getResultsModels(study, cancelToken);
+        await omicNavigatorService.getResultsModels(study, signal);
       if (
         getResultsModelsResponse &&
         Object.keys(getResultsModelsResponse).length > 0
@@ -509,11 +508,11 @@ class DifferentialSearch extends Component {
 
   getReportLink = (study, model) => {
     cancelRequestGetReportLinkDifferential();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestGetReportLinkDifferential = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelRequestGetReportLinkDifferential = () => controller.abort();
     omicNavigatorService
-      .getReportLink(study, model, this.setStudyReportTooltip, cancelToken)
+      .getReportLink(study, model, this.setStudyReportTooltip, signal)
       .then((getReportLinkResponse) => {
         let links = [];
         if (Array.isArray(getReportLinkResponse)) {
@@ -947,9 +946,9 @@ class DifferentialSearch extends Component {
     });
     this.props.onHandleResultsTableLoading(true);
     cancelRequestGetResultsIntersection();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestGetResultsIntersection = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelRequestGetResultsIntersection = () => controller.abort();
     omicNavigatorService
       .getResultsIntersection(
         differentialStudy,
@@ -961,7 +960,7 @@ class DifferentialSearch extends Component {
         this.jsonToList(selectedOperatorP),
         this.jsonToList(selectedColP),
         this.handleErrorGetResultsIntersection,
-        cancelToken,
+        signal,
       )
       .then((inferenceData) => {
         onDifferentialSearch(
@@ -1014,9 +1013,9 @@ class DifferentialSearch extends Component {
     eColP,
   ) {
     cancelRequestGetResultsMultiset();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestGetResultsMultiset = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelRequestGetResultsMultiset = () => controller.abort();
     omicNavigatorService
       .getResultsMultiset(
         differentialStudy,
@@ -1025,7 +1024,7 @@ class DifferentialSearch extends Component {
         eOperatorP,
         eColP,
         undefined,
-        cancelToken,
+        signal,
       )
       .then((svgUrl) => {
         if (svgUrl) {

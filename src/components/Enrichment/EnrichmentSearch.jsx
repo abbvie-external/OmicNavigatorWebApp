@@ -11,7 +11,6 @@ import {
 } from 'semantic-ui-react';
 import _ from 'lodash-es';
 import ndjsonStream from 'can-ndjson-stream';
-import { CancelToken } from 'axios';
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
@@ -310,13 +309,13 @@ class EnrichmentSearch extends Component {
   getAllTests = async (study) => {
     const { onSetEnrichmentResultsColumnTooltips } = this.props;
     cancelGetAllEnrichmentTests();
-    let cancelToken = new CancelToken((e) => {
-      cancelGetAllEnrichmentTests = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelGetAllEnrichmentTests = () => controller.abort();
     try {
       const getAllTestsResponse = await omicNavigatorService.getAllTests(
         study,
-        cancelToken,
+        signal,
       );
       if (getAllTestsResponse) {
         onSetEnrichmentResultsColumnTooltips(getAllTestsResponse);
@@ -331,15 +330,15 @@ class EnrichmentSearch extends Component {
 
   getAndSetAnnotationOptions = async (study, model) => {
     cancelGetEnrichmentsAnnotations();
-    let cancelToken = new CancelToken((e) => {
-      cancelGetEnrichmentsAnnotations = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelGetEnrichmentsAnnotations = () => controller.abort();
     try {
       const getEnrichmentsAnnotationsResponse =
         await omicNavigatorService.getEnrichmentsAnnotations(
           study,
           model,
-          cancelToken,
+          signal,
         );
       if (
         getEnrichmentsAnnotationsResponse &&
@@ -379,11 +378,11 @@ class EnrichmentSearch extends Component {
   getEnrichmentPlotDescriptions = (study, model) => {
     const { onSetEnrichmentPlotDescriptions } = this.props;
     cancelGetEnrichmentPlotDescriptions();
-    let cancelToken = new CancelToken((e) => {
-      cancelGetEnrichmentPlotDescriptions = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelGetEnrichmentPlotDescriptions = () => controller.abort();
     omicNavigatorService
-      .getPlotDescriptions(study, model, cancelToken)
+      .getPlotDescriptions(study, model, signal)
       .then((getPlotDescriptionsResponse) => {
         if (getPlotDescriptionsResponse) {
           onSetEnrichmentPlotDescriptions(getPlotDescriptionsResponse);
@@ -401,12 +400,12 @@ class EnrichmentSearch extends Component {
 
   getAndSetModelOptions = async (study) => {
     cancelGetEnrichmentsModels();
-    let cancelToken = new CancelToken((e) => {
-      cancelGetEnrichmentsModels = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelGetEnrichmentsModels = () => controller.abort();
     try {
       const getEnrichmentsModelsResponse =
-        await omicNavigatorService.getEnrichmentsModels(study, cancelToken);
+        await omicNavigatorService.getEnrichmentsModels(study, signal);
       if (
         getEnrichmentsModelsResponse &&
         Object.keys(getEnrichmentsModelsResponse).length > 0
@@ -482,11 +481,11 @@ class EnrichmentSearch extends Component {
 
   getReportLink = (study, model) => {
     cancelRequestGetReportLinkEnrichment();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestGetReportLinkEnrichment = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelRequestGetReportLinkEnrichment = () => controller.abort();
     omicNavigatorService
-      .getReportLink(study, model, this.setStudyReportTooltip, cancelToken)
+      .getReportLink(study, model, this.setStudyReportTooltip, signal)
       .then((getReportLinkResponse) => {
         let links = [];
         if (Array.isArray(getReportLinkResponse)) {
@@ -772,9 +771,9 @@ class EnrichmentSearch extends Component {
       });
       this.props.onHandleEnrichmentTableLoading(true);
       cancelRequestGetEnrichmentsIntersection();
-      let cancelToken = new CancelToken((e) => {
-        cancelRequestGetEnrichmentsIntersection = e;
-      });
+      const controller = new AbortController();
+      const signal = controller.signal;
+      cancelRequestGetEnrichmentsIntersection = () => controller.abort();
       omicNavigatorService
         .getEnrichmentsIntersection(
           enrichmentStudy,
@@ -786,7 +785,7 @@ class EnrichmentSearch extends Component {
           this.jsonToList(selectedOperator),
           value,
           undefined,
-          cancelToken,
+          signal,
         )
         .then((annotationData) => {
           const multisetResults = annotationData;
@@ -1003,9 +1002,9 @@ class EnrichmentSearch extends Component {
       onDisablePlotEnrichment();
     }
     cancelRequestGetEnrichmentsIntersection();
-    let cancelToken = new CancelToken((e) => {
-      cancelRequestGetEnrichmentsIntersection = e;
-    });
+    const controller = new AbortController();
+    const signal = controller.signal;
+    cancelRequestGetEnrichmentsIntersection = () => controller.abort();
     omicNavigatorService
       .getEnrichmentsIntersection(
         enrichmentStudy,
@@ -1017,7 +1016,7 @@ class EnrichmentSearch extends Component {
         this.jsonToList(selectedOperator),
         pValueType,
         this.handleErrorGetEnrichmentsIntersection,
-        cancelToken,
+        signal,
       )
       .then((annotationData) => {
         const multisetResults = annotationData;
@@ -1068,9 +1067,9 @@ class EnrichmentSearch extends Component {
     });
     if (tests?.length > 1) {
       cancelRequestGetEnrichmentsMultiset();
-      let cancelToken = new CancelToken((e) => {
-        cancelRequestGetEnrichmentsMultiset = e;
-      });
+      const controller = new AbortController();
+      const signal = controller.signal;
+      cancelRequestGetEnrichmentsMultiset = () => controller.abort();
       omicNavigatorService
         .getEnrichmentsMultiset(
           enrichmentStudy,
@@ -1081,7 +1080,7 @@ class EnrichmentSearch extends Component {
           pValueType,
           tests,
           undefined,
-          cancelToken,
+          signal,
         )
         .then((svgUrl) => {
           if (svgUrl) {
