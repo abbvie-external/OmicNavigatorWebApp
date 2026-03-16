@@ -131,7 +131,7 @@ class OmicNavigatorService {
                 if (handleError != null) {
                   handleError(false);
                 }
-                return `Error: ${error.response.data}`;
+                return `Error: ${thrown?.response?.data || 'Request failed'}`;
               }
             });
         })
