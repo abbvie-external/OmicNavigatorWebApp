@@ -15,9 +15,13 @@ export default [
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
       globals: {
         ...globals.browser,
-        ...globals.node,
       },
     },
     settings: {
@@ -48,6 +52,14 @@ export default [
           "newlines-between": "always",
         },
       ],
+    },
+  },
+  {
+    files: ["*.config.{js,mjs,cjs}", "eslint.config.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
 ];

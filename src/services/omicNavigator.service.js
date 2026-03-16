@@ -9,6 +9,9 @@ const isCanceledError = (error) =>
   error?.name === 'CanceledError' ||
   error?.name === 'AbortError';
 
+const getErrorMessage = (error) =>
+  error?.response?.data || 'Request failed';
+
 window.jQuery = $;
 
 class OmicNavigatorService {
@@ -81,7 +84,7 @@ class OmicNavigatorService {
         if (handleError != null) {
           handleError(false);
         }
-        return `Error: ${error.response.data}`;
+        return `Error: ${getErrorMessage(error)}`;
       }
     }
   }
@@ -103,7 +106,7 @@ class OmicNavigatorService {
         if (handleError != null) {
           handleError(false);
         }
-        return `Error: ${error.response.data}`;
+        return `Error: ${getErrorMessage(error)}`;
       }
     }
   }
@@ -257,7 +260,7 @@ class OmicNavigatorService {
       this[cacheKey] = promise;
       return promise;
     } catch (err) {
-      return `Error: ${error.response.data}`;
+      return `Error: ${getErrorMessage(err)}`;
       // return err;
     }
   }
