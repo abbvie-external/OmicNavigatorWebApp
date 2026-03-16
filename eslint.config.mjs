@@ -1,20 +1,20 @@
-import js from "@eslint/js";
-import globals from "globals";
-import importPlugin from "eslint-plugin-import";
-import jsxA11y from "eslint-plugin-jsx-a11y";
-import reactPlugin from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
+import js from '@eslint/js';
+import globals from 'globals';
+import importPlugin from 'eslint-plugin-import';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**"],
+    ignores: ['dist/**', 'node_modules/**'],
   },
   js.configs.recommended,
   {
-    files: ["**/*.{js,jsx}"],
+    files: ['**/*.{js,jsx}'],
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
+      ecmaVersion: 'latest',
+      sourceType: 'module',
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
@@ -26,36 +26,36 @@ export default [
     },
     settings: {
       react: {
-        version: "detect",
+        version: 'detect',
       },
-      "import/resolver": {
+      'import/resolver': {
         node: {
-          extensions: [".js", ".jsx"],
+          extensions: ['.js', '.jsx'],
         },
       },
     },
     plugins: {
       import: importPlugin,
-      "jsx-a11y": jsxA11y,
+      'jsx-a11y': jsxA11y,
       react: reactPlugin,
-      "react-hooks": reactHooks,
+      'react-hooks': reactHooks,
     },
     rules: {
-      "react/jsx-uses-react": "off",
-      "react/react-in-jsx-scope": "off",
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-      "import/order": [
-        "warn",
+      'react/jsx-uses-react': 'off',
+      'react/react-in-jsx-scope': 'off',
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+      'import/order': [
+        'warn',
         {
-          alphabetize: { order: "asc", caseInsensitive: true },
-          "newlines-between": "always",
+          alphabetize: { order: 'asc', caseInsensitive: true },
+          'newlines-between': 'always',
         },
       ],
     },
   },
   {
-    files: ["*.config.{js,mjs,cjs}", "eslint.config.mjs"],
+    files: ['*.config.{js,mjs,cjs}', 'eslint.config.mjs'],
     languageOptions: {
       globals: {
         ...globals.node,
