@@ -9,6 +9,34 @@ const isCanceledError = (error) =>
   error?.name === 'CanceledError' ||
   error?.name === 'AbortError';
 
+const normalizeErrorData = (data) => {
+  if (typeof data === 'string') {
+    return data;
+  }
+  if (typeof data?.message === 'string') {
+    return data.message;
+  }
+  if (data == null) {
+    return '';
+  }
+  try {
+    return JSON.stringify(data);
+  } catch (err) {
+    return String(data);
+  }
+};
+
+const getErrorMessage = (error) => {
+  const responseMessage = normalizeErrorData(error?.response?.data);
+  if (responseMessage) {
+    return responseMessage;
+  }
+  if (typeof error?.message === 'string' && error.message) {
+    return error.message;
+  }
+  return 'Request failed';
+};
+
 window.jQuery = $;
 
 class OmicNavigatorService {
@@ -48,7 +76,7 @@ class OmicNavigatorService {
             method !== 'getReportLink' &&
             method !== 'getMetaFeaturesTable'
           ) {
-            toast.error(`${error.message}`);
+            toast.error(getErrorMessage(error));
           }
           if (handleError != null) {
             handleError(false);
@@ -81,7 +109,7 @@ class OmicNavigatorService {
         if (handleError != null) {
           handleError(false);
         }
-        return `Error: ${error.response.data}`;
+        return `Error: ${getErrorMessage(error)}`;
       }
     }
   }
@@ -103,7 +131,7 @@ class OmicNavigatorService {
         if (handleError != null) {
           handleError(false);
         }
-        return `Error: ${error.response.data}`;
+        return `Error: ${getErrorMessage(error)}`;
       }
     }
   }
@@ -131,7 +159,7 @@ class OmicNavigatorService {
                 if (handleError != null) {
                   handleError(false);
                 }
-                return `Error: ${error.response.data}`;
+                return `Error: ${getErrorMessage(thrown)}`;
               }
             });
         })
@@ -139,7 +167,7 @@ class OmicNavigatorService {
           if (handleError != null) {
             handleError(false);
           }
-          return `Error: ${error.response.data}`;
+          return `Error: ${getErrorMessage(error)}`;
         });
     });
   }
@@ -248,7 +276,7 @@ class OmicNavigatorService {
     function timeoutResolver(ms) {
       return new Promise((resolve, reject) => {
         setTimeout(function () {
-          reject(true);
+          reject(new Error('Request timed out'));
         }, ms);
       });
     }
@@ -257,7 +285,7 @@ class OmicNavigatorService {
       this[cacheKey] = promise;
       return promise;
     } catch (err) {
-      return `Error: ${error.response.data}`;
+      return `Error: ${getErrorMessage(err)}`;
       // return err;
     }
   }
