@@ -1,7 +1,8 @@
+import _ from 'lodash-es';
 import React, { Component } from 'react';
 import { Popup, Dimmer, Loader, Icon } from 'semantic-ui-react';
+
 import { omicNavigatorService } from '../../services/omicNavigator.service';
-import _ from 'lodash-es';
 import {
   isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
@@ -9,9 +10,8 @@ import {
   Linkout,
 } from '../Shared/helpers';
 import './FilteredDifferentialTable.scss';
-import CustomEmptyMessage from '../Shared/Templates';
-// eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
+import CustomEmptyMessage from '../Shared/Templates';
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {
@@ -132,8 +132,8 @@ class FilteredDifferentialTable extends Component {
       const name = key[0].trim() || '';
       cancelRequestFPTGetResultsTable();
       const controller = new AbortController();
-    const cancelToken = controller.signal;
-    cancelRequestFPTGetResultsTable = () => controller.abort();
+      const cancelToken = controller.signal;
+      cancelRequestFPTGetResultsTable = () => controller.abort();
       omicNavigatorService
         .getResultsTable(
           this.props.enrichmentStudy,
@@ -379,7 +379,7 @@ class FilteredDifferentialTable extends Component {
     let id;
     const { HighlightedProteins = [], selectedProteinId } = this.props;
     const { filteredDifferentialFeatureIdKey } = this.props;
-    /* eslint-disable eqeqeq */
+
     const highlightedIds = HighlightedProteins.map((p) => p.featureID);
     const featureId = item[filteredDifferentialFeatureIdKey];
     if (highlightedIds.includes(featureId)) {
@@ -533,7 +533,7 @@ class FilteredDifferentialTable extends Component {
             disableGrouping
             // disableSort
             disableColumnVisibilityToggle
-            disableColumnReorder
+            //disableColumnReorder
             // disableFilters={false}
             min-height="5vh"
             height="auto"

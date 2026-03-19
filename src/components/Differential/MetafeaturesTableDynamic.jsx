@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Popup } from 'semantic-ui-react';
+
 // import _ from 'lodash-es';
 import {
   isNotNANullUndefinedEmptyStringInf,
@@ -225,7 +226,7 @@ class MetafeaturesTableDynamic extends Component {
           // disableGrouping
           // disableSort
           disableColumnVisibilityToggle
-          disableColumnReorder
+          //disableColumnReorder
           // disableFilters={false}
           min-height="5vh"
           height={ratioVhString}
