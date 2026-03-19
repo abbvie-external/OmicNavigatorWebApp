@@ -1,17 +1,16 @@
-import React, { Component } from 'react';
+import { CSSProperties, Component, MouseEvent, ReactNode, RefObject } from 'react';
 import { QHGridProps, QHGridRef } from './QHGrid';
-import type { ColumnConfig, FilterValues, InnerColumnConfig, QuickView, QuickViewsConfig, RowLevelPropsCalc, View, ViewState } from './types';
-export interface EZGridProps<T = unknown, ATI = unknown> {
+import type { ColumnConfig, FilterValues, InnerColumnConfig, ObjectLiteral, QuickView, QuickViewsConfig, RowLevelPropsCalc, SharedEZGridDataProps, SharedEZGridProps, SharedQHGridProps, View, ViewState } from './types';
+export interface EZGridProps<Data extends ObjectLiteral = ObjectLiteral, ATI = unknown> extends SharedEZGridProps, SharedEZGridDataProps<Data, ATI>, SharedQHGridProps<Data, ATI> {
     /**
-     * An array of objects containing the information to be displayed in the grid.
-     * Informs the types of most of the Grid
+     * class name to apply to the root element of the Grid
      */
-    data: T[];
+    className?: string;
     /**
      * The configuration for the columns. Uses render prop functions to render custom content
      * Each Column requires a field (and possibly id). You can also choose which type of filtering are needed here
      */
-    columnsConfig: ColumnConfig<T, ATI>[];
+    columnsConfig: ColumnConfig<Data, ATI>[];
     /**
      * The number items to display at once.
      * Can be 5,10,15,30,45,60,75,100,250,500,1000
@@ -24,16 +23,11 @@ export interface EZGridProps<T = unknown, ATI = unknown> {
     /**
      * Called after the data is filtered with the new filteredData
      */
-    onFiltered?: QHGridProps<T, ATI>['onFiltered'];
+    onFiltered?: QHGridProps<Data, ATI>['onFiltered'];
     /**
      * Called after the filtered data is sorted with the new sortedData
      */
-    onSorted?: QHGridProps<T, ATI>['onSorted'];
-    /**
-     * The beginning of the name to use when exporting. Will be baseName+date.
-     * Setting this enables exporting to excel.
-     */
-    exportBaseName?: string;
+    onSorted?: QHGridProps<Data, ATI>['onSorted'];
     /**
      * Tells the grid to show the loading dimmer and prevent user interaction before the data is loaded
      * @default false
@@ -42,26 +36,21 @@ export interface EZGridProps<T = unknown, ATI = unknown> {
     /**
      * The message to display when the component is loading
      */
-    loadingMessage?: React.ReactNode;
-    /**
-     * An object to use to pass into the template or exportTemplate functions in the columnsConfig.
-     * Allows for data/functions to be passed through into the templates for advanced functionality.
-     */
-    additionalTemplateInfo: ATI;
+    loadingMessage?: ReactNode;
     /**
      * A function that allows you to take the item and index and return styles that should be applied to each row.
      * It uses React Styles (object)
      * @deprecated Use `rowLevelPropsCalc` instead
      */
-    rowLevelStyleCalc?: (item: T, index: number) => React.CSSProperties;
+    rowLevelStyleCalc?: (item: Data, index: number) => CSSProperties;
     /**
      * A function that allows you to take the item and index and return props that should be applied to the row
      */
-    rowLevelPropsCalc?: RowLevelPropsCalc<T>;
+    rowLevelPropsCalc?: RowLevelPropsCalc<Data>;
     /**
      * This is called whenever a row is clicked on. Allows you to perform operations like selecting rows
      */
-    onRowClick?: (event: React.MouseEvent, itemData: T, index: number) => void;
+    onRowClick?: (event: MouseEvent, itemData: Data, index: number) => void;
     /**
      * A function that fetches the data and enables a refresh data button in the bottom right corner.
      */
@@ -84,16 +73,17 @@ export interface EZGridProps<T = unknown, ATI = unknown> {
     ownerId?: string;
     /**
      * A react Node to render within a popup to show when hovering over a Legend button. Setting this shows the Legend Button in the Header
+     * @deprecated Use {@link extraHeaderItem} instead
      */
-    legend?: React.ReactNode;
+    legend?: ReactNode;
     /**
      * A react Node to render in the Header. Can use Fragments to render many extra things in the Header
      */
-    extraHeaderItem?: React.ReactNode;
+    extraHeaderItem?: ReactNode;
     /**
      * The message to display when the data is empty and the component isn't loading
      */
-    emptyMessage?: string | React.ReactNode;
+    emptyMessage?: string | ReactNode;
     /**
      * The amount of time to debounce the general search. Defaults to 500ms. 0ms means don't debounce.
      */
@@ -163,29 +153,29 @@ export interface EZGridProps<T = unknown, ATI = unknown> {
      */
     height?: string;
 }
-export interface EZGridState<T, ATI> extends ViewState<T, ATI> {
-    columnsConfig: InnerColumnConfig<T, ATI>[];
+export interface EZGridState<Data extends ObjectLiteral, ATI> extends ViewState<Data, ATI> {
+    columnsConfig: InnerColumnConfig<Data, ATI>[];
 }
-export default class EZGrid<T, ATI = unknown> extends Component<EZGridProps<T, ATI>, EZGridState<T, ATI>> {
-    state: EZGridState<T, ATI>;
-    qhGridRef: React.RefObject<QHGridRef<T>>;
+export default class EZGrid<Data extends ObjectLiteral, ATI = unknown> extends Component<EZGridProps<Data, ATI>, EZGridState<Data, ATI>> {
+    state: EZGridState<Data, ATI>;
+    qhGridRef: RefObject<QHGridRef<Data, ATI> | null>;
     static defaultProps: {
         showError: () => void;
         itemsPerPage: number;
     };
     componentDidMount: () => void;
-    componentDidUpdate: (prevProps: EZGridProps<T, ATI>, prevState: EZGridState<T, ATI>) => void;
+    componentDidUpdate: (prevProps: EZGridProps<Data, ATI>, prevState: EZGridState<Data, ATI>) => void;
     setFilters: (newFilters: FilterValues) => void;
-    setSort: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
-    handleGeneralSearch: QHGridProps<T, ATI>['onGeneralSearch'];
-    handleGroupChange: QHGridProps<T, ATI>['onGroupChange'];
+    setSort: (sortBy: string, sortOrder: "asc" | "desc") => void;
+    handleGeneralSearch: QHGridProps<Data, ATI>['onGeneralSearch'];
+    handleGroupChange: QHGridProps<Data, ATI>['onGroupChange'];
     handleSort: (field: string) => void;
     handleColumnVisibilityToggle: (colId: string) => void;
     handleColumnReorder: (curIdx: number, newIdx: number) => void;
-    handleFilterUpdate: QHGridProps<T, ATI>['onFilterUpdate'];
-    handleItemsPerPageChange: QHGridProps<T, ATI>['onItemsPerPageChange'];
-    handlePageChange: QHGridProps<T, ATI>['onPageChange'];
+    handleFilterUpdate: QHGridProps<Data, ATI>['onFilterUpdate'];
+    handleItemsPerPageChange: QHGridProps<Data, ATI>['onItemsPerPageChange'];
+    handlePageChange: QHGridProps<Data, ATI>['onPageChange'];
     getView: () => View;
     handleQuickViewChange: (quickView: QuickView) => void;
-    render(): JSX.Element;
+    render(): import("react/jsx-runtime").JSX.Element;
 }

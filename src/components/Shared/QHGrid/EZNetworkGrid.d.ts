@@ -1,12 +1,11 @@
-import React, { PureComponent } from 'react';
+import { CSSProperties, MouseEvent, PureComponent, ReactNode, RefObject } from 'react';
 import { QHGridProps, QHGridRef } from './QHGrid';
-import { ColumnConfig, FilterValues, InnerColumnConfig, QuickView, QuickViewsConfig, RowLevelPropsCalc, View, ViewState } from './types';
-export interface EZNetworkGridProps<T = unknown, ATI = unknown> {
+import { ColumnConfig, FilterValues, InnerColumnConfig, ObjectLiteral, QuickView, QuickViewsConfig, RowLevelPropsCalc, SharedEZGridDataProps, SharedEZGridProps, SharedQHGridProps, View, ViewState } from './types';
+export interface EZNetworkGridProps<Data extends ObjectLiteral = ObjectLiteral, ATI = unknown> extends SharedEZGridProps, SharedEZGridDataProps<Data, ATI>, SharedQHGridProps<Data, ATI> {
     /**
-     * An array of objects containing the information to be displayed in the grid.
-     * Informs the types of most of the Grid
+     * class name to apply to the root element of the Grid
      */
-    data: T[];
+    className?: string;
     /**
      * The total number of rows in the data. Since the data prop is going to only be one page on this,
      * this tells the grid that there should be x pages based on itemsPerPage
@@ -16,7 +15,7 @@ export interface EZNetworkGridProps<T = unknown, ATI = unknown> {
      * The configuration for the columns. Uses render prop functions to render custom content
      * Each Column requires a field (and possibly id). You can also choose which type of filtering are needed here
      */
-    columnsConfig: ColumnConfig<T, ATI>[];
+    columnsConfig: ColumnConfig<Data, ATI>[];
     /**
      * The number items to display at once.
      * Can be 5,10,15,30,45,60,75,100,250,500,1000
@@ -27,11 +26,6 @@ export interface EZNetworkGridProps<T = unknown, ATI = unknown> {
      */
     onItemsPerPageChange?: (itemsPerPage: number) => void;
     /**
-     * The beginning of the name to use when exporting. Will be baseName+date.
-     * Setting this enables exporting to excel.
-     */
-    exportBaseName?: string;
-    /**
      * Tells the grid to show the loading dimmer and prevent user interaction before the data is loaded
      * @default false
      */
@@ -39,35 +33,30 @@ export interface EZNetworkGridProps<T = unknown, ATI = unknown> {
     /**
      * The message to display when the component is loading
      */
-    loadingMessage?: React.ReactNode;
-    /**
-     * An object to use to pass into the template or exportTemplate functions in the columnsConfig.
-     * Allows for data/functions to be passed through into the templates for advanced functionality.
-     */
-    additionalTemplateInfo: ATI;
+    loadingMessage?: ReactNode;
     /**
      * A function that allows you to take the item and index and return styles that should be applied to each row.
      * It uses React Styles (object)
      * @deprecated Use `rowLevelPropsCalc` instead
      */
-    rowLevelStyleCalc?: (item: T, index: number) => React.CSSProperties;
+    rowLevelStyleCalc?: (item: Data, index: number) => CSSProperties;
     /**
      * A function that allows you to take the item and index and return props that should be applied to the row
      */
-    rowLevelPropsCalc?: RowLevelPropsCalc<T>;
+    rowLevelPropsCalc?: RowLevelPropsCalc<Data>;
     /**
      * This is called whenever a row is clicked on. Allows you to perform operations like selecting rows
      */
-    onRowClick?: (event: React.MouseEvent, itemData: T, index: number) => void;
+    onRowClick?: (event: MouseEvent, itemData: Data, index: number) => void;
     /**
      * A function that fetches the data based on the filters selected
      */
-    fetchData: (state: ViewState<T, ATI>, props: object) => void;
+    fetchData: (state: ViewState<Data, ATI>, props: object) => void;
     /**
      * A function that fetches the whole amount of data based on the filters selected
      * This is used for generating the excel report
      */
-    fetchReportData?: (state: ViewState<T, ATI>, props: object) => Promise<T[]> | T[];
+    fetchReportData?: (state: ViewState<Data, ATI>, props: object) => Promise<Data[]> | Data[];
     /**
      * A collection of views that are easily switched between. There are options to make them user-addable as well as remotely stored through a service and database. Setting this enables basic quick views. Quick Views work by changing the current setting of the grid to their view. They don't lock the grid to that view, however.
      */
@@ -86,16 +75,17 @@ export interface EZNetworkGridProps<T = unknown, ATI = unknown> {
     ownerId?: string;
     /**
      * A react Node to render within a popup to show when hovering over a Legend button. Setting this shows the Legend Button in the Header
+     * @deprecated Use {@link extraHeaderItem} instead
      */
-    legend?: React.ReactNode;
+    legend?: ReactNode;
     /**
      * A react Node to render in the Header. Can use Fragments to render many extra things in the Header
      */
-    extraHeaderItem?: React.ReactNode;
+    extraHeaderItem?: ReactNode;
     /**
      * The message to display when the data is empty and the component isn't loading
      */
-    emptyMessage?: string | React.ReactNode;
+    emptyMessage?: string | ReactNode;
     /**
      * The amount of time to debounce the general search. Defaults to 500ms. 0ms means don't debounce.
      */
@@ -165,31 +155,31 @@ export interface EZNetworkGridProps<T = unknown, ATI = unknown> {
      */
     height?: string;
 }
-export interface EZNetworkGridState<T, ATI> extends ViewState<T, ATI> {
-    columnsConfig: InnerColumnConfig<T, ATI>[];
+export interface EZNetworkGridState<Data extends ObjectLiteral, ATI> extends ViewState<Data, ATI> {
+    columnsConfig: InnerColumnConfig<Data, ATI>[];
 }
-export default class EZNetworkGrid<T, ATI = unknown> extends PureComponent<EZNetworkGridProps<T, ATI>, EZNetworkGridState<T, ATI>> {
-    state: EZNetworkGridState<T, ATI>;
-    qhGridRef: React.RefObject<QHGridRef<T>>;
+export default class EZNetworkGrid<Data extends ObjectLiteral, ATI = unknown> extends PureComponent<EZNetworkGridProps<Data, ATI>, EZNetworkGridState<Data, ATI>> {
+    state: EZNetworkGridState<Data, ATI>;
+    qhGridRef: RefObject<QHGridRef<Data, ATI> | null>;
     static defaultProps: {
         showError: () => void;
         itemsPerPage: number;
     };
     componentDidMount: () => void;
-    componentDidUpdate: (prevProps: EZNetworkGridProps<T, ATI>, prevState: EZNetworkGridState<T, ATI>) => void;
+    componentDidUpdate: (prevProps: EZNetworkGridProps<Data, ATI>, prevState: EZNetworkGridState<Data, ATI>) => void;
     setFilters: (newFilters: FilterValues) => void;
-    setSort: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
+    setSort: (sortBy: string, sortOrder: "asc" | "desc") => void;
     handleGeneralSearch: (generalSearch: string) => void;
-    handleGroupChange: QHGridProps<T, ATI>['onGroupChange'];
+    handleGroupChange: QHGridProps<Data, ATI>['onGroupChange'];
     handleSort: (field: string) => void;
     handleColumnVisibilityToggle: (colId: string) => void;
     handleColumnReorder: (curIdx: number, newIdx: number) => void;
-    handleFilterUpdate: QHGridProps<T, ATI>['onFilterUpdate'];
+    handleFilterUpdate: QHGridProps<Data, ATI>['onFilterUpdate'];
     getView: () => View;
     handleQuickViewChange: (quickView: QuickView) => void;
-    handleItemsPerPageChange: QHGridProps<T, ATI>['onItemsPerPageChange'];
-    handlePageChange: QHGridProps<T, ATI>['onPageChange'];
+    handleItemsPerPageChange: QHGridProps<Data, ATI>['onItemsPerPageChange'];
+    handlePageChange: QHGridProps<Data, ATI>['onPageChange'];
     fetchData: () => void;
-    fetchReportData: () => T[] | Promise<T[]>;
-    render(): JSX.Element;
+    fetchReportData: () => Data[] | Promise<Data[]>;
+    render(): import("react/jsx-runtime").JSX.Element;
 }

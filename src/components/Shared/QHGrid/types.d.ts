@@ -1,5 +1,9 @@
-/// <reference types="react" />
-import { TableRowProps } from 'semantic-ui-react';
+import { CSSProperties, DetailedHTMLProps, HTMLAttributes, MouseEvent, ReactNode } from 'react';
+import { Get, Paths } from 'type-fest';
+import type { FilterValue } from './FilterTypeConfig';
+export type ObjectLiteral = {
+    [key: string]: any;
+};
 export interface MFBaseProps {
     /**
      * When true, makes the Select All and Clear buttons clear the search
@@ -8,7 +12,7 @@ export interface MFBaseProps {
     /**
      * This allows you to map the data to show as something that you want to display
      */
-    accessor?: string | number | object | ((option: string) => any);
+    accessor?: string | number | object | ((option: FilterValue) => ReactNode);
 }
 export interface RMFBaseProps {
     /**
@@ -24,7 +28,18 @@ export interface RMFBaseProps {
     /**
      * Parameters to send as part of the GET request (sent as query params)
      */
-    remoteParams?: any;
+    remoteParams?: Record<string, string>;
+    /**
+     * Allows you to modify the request as desired on a one-off basis for convenience before it is sent out
+     * either via the grid or via the `fetchAsync` function
+     */
+    remotePreRequest?: (request: Request) => Request;
+    /**
+     * Allows you to modify the response from the server to what it needs to be for the filter.
+     * This is useful if the server returns a different format than what the filter expects
+     * or if you want to do some extra processing on the data before it is used.
+     */
+    processData?: (remoteData: unknown) => Set<FilterValue>;
     /**
      * If true, makes the local data factor into the filter (rather than solely remote)
      */
@@ -36,58 +51,98 @@ export interface RMFBaseProps {
     /**
      * This allows you to map the data to show as something that you want to display
      */
-    accessor?: string | number | object | ((option: string) => any);
+    accessor?: string | number | object | ((option: FilterValue) => ReactNode);
 }
 /** standard filter, lets you select values to show. (could be looked at as an autocomplete) */
-declare type multiFilter = {
+type multiFilter = {
     type: 'multiFilter';
     props?: MFBaseProps;
 };
-declare type MultiFilterValue = string[];
+type MultiFilterValue = string[];
 /**  multiFilter but lets you query a service for the values */
-declare type remoteMultiFilter = {
+type remoteMultiFilter = {
     props: RMFBaseProps;
     type: 'remoteMultiFilter';
 };
 /** A filter type that lets you filter by a date range */
-declare type dateFilter = {
+type dateFilter = {
     type: 'dateFilter';
-    props?: {};
+    props?: Record<string, unknown>;
 };
-declare type DateFilterValue = {
+type DateFilterValue = {
     startDate: string;
     endDate: string;
 };
 /** A filter type that lets you filter numbers easily. */
-declare type numericFilter = {
+type numericFilter = {
     type: 'numericFilter';
-    props?: {};
+    props?: Record<string, unknown>;
 };
-declare type NumericFilterValue = {
+type NumericFilterValue = {
     combination: '&&' | '||';
     comparison: '=' | '!=' | '>=' | '>' | '<=' | '<' | 'null' | '!null';
     value: number;
 }[];
 /** A filter type that lets you filter strings easily. Uses comparisons rather than exact values*/
-declare type alphanumericFilter = {
+type alphanumericFilter = {
     type: 'alphanumericFilter';
-    props?: {};
+    props?: Record<string, unknown>;
 };
-declare type AlphanumericFilterValue = {
+type AlphanumericFilterValue = {
     combination: '&&' | '||';
     comparison: '=' | '!=' | 'contains' | '!contains' | 'starts' | 'ends' | 'null' | '!null' | 'empty' | '!empty';
     value: string;
 }[];
-export declare type Accessor<T> = (item: T, field: keyof T) => any;
-export declare type SortAccessor<T> = (item: T, field: keyof T) => number | string;
-export declare type GroupAccessor<T> = (item: T, field: keyof T) => number | string;
-export declare type ExportTemplate<T, ATI> = (value: any, item: T, additionalTemplateInfo: ATI) => string | number;
-export declare type Template<T, ATI> = (value: any, item: T, additionalTemplateInfo: ATI) => React.ReactNode;
+export type Accessor<Data extends ObjectLiteral, Path extends Paths<Data>> = (item: Data, field: Path) => any;
+export type SortAccessor<Data extends ObjectLiteral, Path extends Paths<Data>> = (item: Data, field: Path) => number | string;
+export type GroupAccessor<Data extends ObjectLiteral, Path extends Paths<Data>> = (item: Data, field: Path) => number | string;
+export type ExportTemplate<Data extends ObjectLiteral, ATI, Path extends Paths<Data> = Paths<Data>> = (value: Get<Data, Path extends string ? Path : never>, item: Data, additionalTemplateInfo: ATI) => string | number;
+export type Template<Data extends ObjectLiteral, ATI, Path extends Paths<Data> = Paths<Data>> = (value: Get<Data, Path extends string ? Path : never>, item: Data, additionalTemplateInfo: ATI) => ReactNode;
+/**
+ * Custom font icon config. Used to add custom icons to the quick view menu.
+ * @see https://fonts.google.com/icons for a list of valid icons
+ */
+export interface IconConfig {
+    /**
+     * The icon to display. Render as a QIcon to render a QIcon, otherwise render whatever you need. If a string, it will be rendered as-is for things like emojis.
+     *
+     * It can also be a custom icon by using JSX. You will have to constrain the icon to fit 1em x 1em and make sure that it uses `currentColor` for the color.
+     */
+    iconName: ReactNode;
+    /**
+     * What to display in the list of icons. This must be unique as it is used to identify the icon.
+     */
+    label: string;
+    /**
+     * The previous labels (or icon-Names) of the icon. Used to help with backwards compatibility if you are removing/changing out icons, you can set them here
+     * and this will check for those names for identifying which icon to use.
+     *
+     * If you want to switch an icon out, then you can set this to the old name and it will show the new icon.
+     */
+    previousValues?: string[];
+}
+export interface IconColorConfig {
+    label: string;
+    /**
+     * A css value that will be used to color the icon.
+     * If it starts with -- then it will be treated as a css variable.
+     * Otherwise it'll be passed into style.color directly.
+     */
+    value: string;
+    /**
+     * The previous value of the color. Used to help with backwards compatibility.
+     *
+     * If you want to switch a color out, then you can set this to the old value and it will show the new color.
+     */
+    previousValues?: string[];
+}
 export interface BaseColumnConfig {
-    /** Props to be passed into each columns <Table.HeaderCell /> tag */
-    headerAttributes?: React.HTMLAttributes<HTMLTableHeaderCellElement>;
+    /** Attributes to be passed into the `th` element for the column */
+    headerAttributes?: HTMLAttributes<HTMLTableCellElement>;
     /** Styles to be passed into each columns <col /> tag within the colgroups. Allows for basic customization by column */
-    columnStyle?: React.CSSProperties;
+    columnStyle?: CSSProperties;
+    /** Attributes to be passed into each `td` element in the column */
+    cellAttributes?: HTMLAttributes<HTMLTableCellElement>;
     /** Unique identifier for the column. Optional - uses the field name as the default value. */
     id?: string;
     /** The title for use in the export. Useful if you use JSX in the main title field or need a different title in the excel */
@@ -114,39 +169,40 @@ export interface BaseColumnConfig {
     /** Tells the grid that the value made from unqiue columns is unique in the data. It is a possible optimization when the data is going to be re-sorted often. Almost certainly not necessary. */
     unique?: boolean;
 }
-export interface ColumnConfig<T, ATI = any> extends BaseColumnConfig {
+export interface ColumnConfig<Data extends ObjectLiteral, ATI = unknown> extends BaseColumnConfig {
     /**
      * A function that allows you to customize what the exported values should look like for this column. Should return simple data types that will export properly.
      */
-    exportTemplate?: (value: any, item: T, additionalTemplateinfo: ATI) => any;
+    exportTemplate?: (value: any, item: Data, additionalTemplateinfo: ATI) => any;
     /**
      * The entry in the data object that the column uses. Can be the key, or an object for better customization
      */
-    field: keyof T | {
+    field: {
         /** The key of the data object that the column uses */
-        field: keyof T;
+        field: Paths<Data>;
         /** A way to take the data and return it in a way that's more useful.
          * The return value of this goes straight to the template functions (or the grid if there isn't a template function)
          */
-        accessor?: keyof T | number | object | Accessor<T>;
+        accessor?: Paths<Data> | object | Accessor<Data, Paths<Data>>;
         /** A way to take the data and return it in a way that's more useful.
          * The return value of this tells the grid how the sorting should work for the column
          */
-        sortAccessor?: keyof T | number | object | SortAccessor<T>;
+        sortAccessor?: Paths<Data> | object | SortAccessor<Data, Paths<Data>>;
         /** A way to take the data and return it in a way that's more useful.
          * The return value of this tells the grid how the grouping should work for the column
          */
-        groupAccessor?: keyof T | number | object | GroupAccessor<T>;
-    };
+        groupAccessor?: Paths<Data> | object | GroupAccessor<Data, Paths<Data>>;
+    } | Paths<Data>;
     /** Indicates that the column should be filterable */
     filterable?: multiFilter | remoteMultiFilter | dateFilter | numericFilter | alphanumericFilter;
     /** A template for the column that returns what should be displayed in the table's cell. Allows for deep/dynamic customization */
-    template?: (value: any, item: T, additionalTemplateinfo: ATI) => React.ReactNode;
+    template?: (value: any, item: Data, additionalTemplateinfo: ATI) => ReactNode;
 }
-export declare type InnerColumnConfig<T, ATI> = ColumnConfig<T, ATI> & {
+export type InnerColumnConfig<Data extends ObjectLiteral, ATI> = ColumnConfig<Data, ATI> & {
     id: string;
     hidden: boolean;
 };
+export type SortOrder = 'asc' | 'desc';
 export interface View {
     /**
      * The groupings. Currently must be present (empty array for no groupings)
@@ -159,7 +215,7 @@ export interface View {
     /**
      * the order for the sort. If sortBy is set, this must be set too for the sortBy to take effect.
      */
-    sortOrder: 'asc' | 'desc' | null;
+    sortOrder: SortOrder | null;
     /**
      * The search that should be associated with the quick view. Should be set to '' (empty string) when no search desired.
      */
@@ -184,8 +240,8 @@ export interface View {
         /** whether the column should be hidden.*/ hidden: boolean;
     }[];
 }
-export interface ViewState<T, ATI> extends View {
-    columns: InnerColumnConfig<T, ATI>[];
+export interface ViewState<Data extends ObjectLiteral, ATI> extends View {
+    columns: InnerColumnConfig<Data, ATI>[];
 }
 export interface QuickViewConfig {
     /**
@@ -197,11 +253,11 @@ export interface QuickViewConfig {
      */
     group?: string;
     /**
-     * The icon to display in the quick view menu. Can be any icon in Semantic UI. There's a more limited group of icons allowed in the Quick View creation menu.
+     * The icon to display in the quick view menu. Can be Can be one of a few icons from material symbols outlined. There's a more limited group of icons allowed in the Quick View creation menu.
      */
     icon?: string;
     /**
-     * The color to make the quick view's icon. Can be 'red','orange','yellow','olive','green','teal','blue','violet','purple','pink','brown','grey','black','AbbvieBlue', 'AbbviePurple', and 'AbbvieTeal'
+     * The color to make the quick view's icon. Can be 'red','orange','yellow','olive','green','teal','blue','violet','purple','pink','brown','grey','black'
      */
     color?: string;
     /**
@@ -209,13 +265,13 @@ export interface QuickViewConfig {
      */
     custom?: boolean;
 }
-export declare type QuickViewsConfig = Record<string, QuickViewConfig>;
+export type QuickViewsConfig = Record<string, QuickViewConfig>;
 export interface QuickView extends QuickViewConfig {
     name: string;
 }
 export interface FilterValues {
     [columnId: string]: {
-        type: 'multiFilter' | 'remoteMultiFilter' | 'remoteAndLocalMultiFilter';
+        type: 'multiFilter' | 'remoteMultiFilter';
         value: MultiFilterValue;
     } | {
         type: 'dateFilter';
@@ -238,10 +294,128 @@ export interface BaseGrouping {
      */
     sortOrder: 'asc' | 'desc';
 }
-export interface Grouping<T, ATI> extends BaseGrouping {
-    field: ColumnConfig<T, ATI>['field'];
+export interface Grouping<Data extends ObjectLiteral, ATI> extends BaseGrouping {
+    field: ColumnConfig<Data, ATI>['field'];
     title: string;
     type?: BaseColumnConfig['type'];
 }
-export declare type RowLevelPropsCalc<T> = (item: T, index: number) => Partial<TableRowProps & React.DetailedHTMLProps<React.HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>>;
+export type RowLevelPropsCalc<Data extends ObjectLiteral> = (item: Data, index: number) => Partial<DetailedHTMLProps<HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>>;
+/**
+ * @deprecated
+ */
+export type RowLevelStyleCalc<Data extends ObjectLiteral> = (item: Data, index: number) => CSSProperties;
+export type RowClickHandler<Data extends ObjectLiteral> = (event: MouseEvent, itemData: Data, index: number) => void;
+export interface SharedEZGridDataProps<Data extends ObjectLiteral, ATI> {
+    /**
+     * An array of objects containing the information to be displayed in the grid.
+     * Informs the types of most of the Grid
+     */
+    data: Data[];
+    /**
+     * An object to use to pass into the template or exportTemplate functions in the columnsConfig.
+     * Allows for data/functions to be passed through into the templates for advanced functionality.
+     */
+    additionalTemplateInfo: ATI;
+}
+export interface SharedEZGridProps {
+    /**
+     * The icons to allow for custom Quick Views
+     *
+     * defaults are exported as `baseIcons`
+     */
+    qvIcons?: IconConfig[];
+    /**
+     * The colors to allow for custom Quick Views
+     *
+     * defaults are exported as `baseIconColors`
+     */
+    qvIconColors?: IconColorConfig[];
+}
+export type FetchQuickViews = (type: 'quickViews', request: Request) => Promise<QuickViewsConfig>;
+export type FetchVocab = (type: 'vocab', request: Request) => Promise<FilterValue[]>;
+export type FetchAsyncFunc = (type: 'quickViews' | 'vocab', request: Request) => Promise<unknown>;
+export type ExcelExportCB<Data extends ObjectLiteral, ATI> = (xlsxData: {
+    /**
+     * A guess of the widths of the columns in the aoaData, mainly just makes sure that Date columns are long enough to display properly.
+     *
+     * This goes into `worksheet['!cols']` in the xlsx library
+     *
+     * To turn on autofilter for the columns, you can set
+     * ```js
+     *  worksheet['!autofilter'] = { ref: `A1:${XLSX.utils.encode_col(wsCols.length-1)}1`};
+     * ```
+     */
+    toWsCols(aoaData: any[][]): {
+        width: number;
+    }[];
+    /**
+     * The columns that are currently visible or should be exported
+     */
+    visibleColumns: InnerColumnConfig<Data, ATI>[];
+    /**
+     * Unprocessed Data for manually setting up the export data
+     */
+    data: Data[];
+    /**
+     * Array of Array data that can be put into XLSX.utils.aoa_to_sheet. This should use the `{ cellDates: true }` option
+     *
+     * The first row is the headers, and the rest are the data.
+     *
+     * This is a convenience method to parse the data to avoid having to do it manually.
+     */
+    toArrayOfArrays(): any[][];
+}) => void | Promise<void>;
+export interface SharedQHGridProps<Data extends ObjectLiteral, ATI> {
+    /**
+     * This is called when the user clicks on the excel download button. It's called with the relevant data
+     * and some helpers to make it easier to convert the data to an excel file.
+     *
+     * The button only exists if this is set.
+     */
+    onExcelExport?: ExcelExportCB<Data, ATI>;
+    /**
+     * This allows you to take control of the data calls to the server for the data calls that the QHGrid makes directly -
+     * which are `get`/`put` QuickViews, and `get` vocab for the Remote Multi-Filter filter-type.
+     * This is primarily just an inversion for extra control and the ability to set headers or use custom axios/ky instances as needed.
+     * For Remote-Multi-Filters, data manipulation shouldn't be done here but in the `processData` function of the filter props.
+     * There is also a `remotePreRequest` hook that can be set per-column for RMFs to make it easier to customize the initial request object on a column-by-column basis.
+     *
+     * You can use this to add Auth headers, use `axios` or `ky` to perform the data call
+     *
+     * This gives you the request type and the `Request` object which can be put directly into `fetch`
+     * or can be put piecemeal into an `axios` call to perform API request. The request object can be mutated in this function without issue as it is created solely for this.
+     *
+     *
+     *
+     * @example
+     * ```ts
+     * // Using fetch api directly
+     * const fetchAsync = useCallback<FetchAsyncFunc>(async (type,request)=>{
+     *    request.headers.append('Authorization',`Bearer ${token}`);
+     *    const response = await fetch(request,{headers:{'Authorization':`Bearer ${token}`}});
+     *    if(!response.ok) throw new Error('Failed to fetch data');
+     *    const data = await response.json();
+     *    return data;
+     * }),[])
+     * // Using ky
+     * const fetchAsync = useCallback<FetchAsyncFunc>(async (type,request)=>{
+     *    const data = await ky(request,{headers:{'Authorization':`Bearer ${token}`}}).json();
+     *    return data;
+     * }),[])
+     * // Using axios
+     * const fetchAsync = useCallback<FetchAsyncFunc>(async (type,request)=>{
+     *    const {data} = await axios({
+     *      url: request.url,
+     *      method: request.method,
+     *     headers: request.headers,
+     *     data: request.body,
+     *     withCredentials: request.credentials,
+     *    });
+     *    return data;
+     * }),[])
+     * ```
+     *
+     */
+    fetchAsync?: FetchAsyncFunc;
+}
 export {};

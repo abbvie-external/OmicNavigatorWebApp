@@ -1,5 +1,4 @@
-/// <reference types="react" />
-import { QuickViewsConfig, QuickView, View } from 'types';
+import { FetchAsyncFunc, IconColorConfig, IconConfig, QuickView, QuickViewsConfig, View } from './types';
 export interface QuickViewsProps {
     /**
      * A collection of views that are easily switched between. There are options to make them user-addable as well as remotely stored through a service and database. Setting this enables basic quick views. Quick Views work by changing the current setting of the grid to their view. They don't lock the grid to that view, however.
@@ -49,5 +48,8 @@ export interface QuickViewsProps {
      * A function to get the current view settings
      */
     getView?: () => View;
+    icons?: readonly IconConfig[];
+    colors?: readonly IconColorConfig[];
+    fetchAsync?: FetchAsyncFunc;
 }
-export declare function QuickViews(props: QuickViewsProps): JSX.Element | null;
+export declare function QuickViews({ icons, colors, ...props }: QuickViewsProps): import("react/jsx-runtime").JSX.Element | null;

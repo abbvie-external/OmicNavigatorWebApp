@@ -9,7 +9,7 @@
 .two-col-sticky {
   --frozen-first-column-width: 35px;
 
-  .table.QHGrid--body {
+  .qh-table {
     position: relative;
     border-collapse: separate;
     border-spacing: 0;
@@ -25,7 +25,9 @@
     .QHGrid--body {
       th:first-child,
       td:first-child {
-        transition: max-width 0.15s ease-out, width 0.15s ease-out;
+        transition:
+          max-width 0.15s ease-out,
+          width 0.15s ease-out;
         will-change: width, max-width;
       }
     }
