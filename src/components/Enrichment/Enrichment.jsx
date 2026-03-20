@@ -1,17 +1,17 @@
+import * as d3 from 'd3';
 import _, { filter, debounce } from 'lodash-es';
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
-import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
+import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Grid, Menu, Popup, Sidebar, Tab, Message } from 'semantic-ui-react';
+
 import networkIcon from '../../resources/networkIcon.png';
 import networkIconSelected from '../../resources/networkIconSelected.png';
 import tableIcon from '../../resources/tableIcon.png';
 import tableIconSelected from '../../resources/tableIconSelected.png';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
 import ButtonActions from '../Shared/ButtonActions';
-import PlotHelpers from '../Shared/Plots/PlotHelpers';
-import * as d3 from 'd3';
 import {
   isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
@@ -22,20 +22,28 @@ import {
   getModelsArg,
   isMultiModelMultiTest,
 } from '../Shared/helpers';
+import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
+
 import './Enrichment.scss';
-import NetworkGraphControls from './NetworkGraphControls';
+import EnrichmentOverlayBreadcrumbs from './EnrichmentOverlayBreadcrumbs';
 import EnrichmentSearch from './EnrichmentSearch';
+import NetworkGraphControls from './NetworkGraphControls';
 import SplitPanesContainer from './SplitPanesContainer';
+
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
+import {
+  normalizeGridColumns,
+  augmentGridRows,
+} from '../../utilities/gridColumnUtils';
+import { createExcelExportHandler } from '../../utilities/excelExport';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 import PlotsOverlay from '../Differential/PlotsOverlay';
-import EnrichmentOverlayBreadcrumbs from './EnrichmentOverlayBreadcrumbs';
 import { HEADER_OFFSET_PX } from '../Shared/constants';
 
 let cancelRequestEnrichmentGetPlot = () => {};
@@ -3344,6 +3352,11 @@ class Enrichment extends Component {
       networkDataError,
     } = this.state;
     let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedEnrichment}`;
+    const enrichmentGridColumns = normalizeGridColumns(enrichmentColumns);
+    const enrichmentGridData = augmentGridRows(
+      enrichmentResults,
+      enrichmentGridColumns,
+    );
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -3431,8 +3444,11 @@ class Enrichment extends Component {
                     <EZGrid
                       ref={this.EnrichmentGridRef}
                       uniqueCacheKey={enrichmentCacheKey}
-                      data={enrichmentResults}
-                      columnsConfig={enrichmentColumns}
+                      data={enrichmentGridData}
+                      columnsConfig={enrichmentGridColumns}
+                      onExcelExport={createExcelExportHandler(
+                        `${tab}-${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`
+                      )}
                       // totalRows={rows}
                       // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                       itemsPerPage={itemsPerPageEnrichmentTable}
@@ -3443,7 +3459,7 @@ class Enrichment extends Component {
                       }
                       // exportBaseName="Enrichment_Analysis"
                       // columnReorder={this.props.columnReorder}
-                      disableColumnReorder
+                      //disableColumnReorder
                       disableGrouping
                       disableColumnVisibilityToggle
                       min-height="75vh"

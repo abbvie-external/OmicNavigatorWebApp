@@ -73,6 +73,11 @@
     padding-right: 10px !important;
     padding-bottom: 10px !important;
     margin-bottom: 10px !important;
+
+    .qh-caption {
+      background-color: var(--color-white) !important;
+      border: none !important;
+    }
   }
 
   .QHGrid table thead:hover {

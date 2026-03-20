@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import Container from './Container';
 import * as serviceWorker from './serviceWorker';
+import './components/Shared/QHGrid/index.css';
 import './index.css';
 import 'semantic-ui-css/semantic.min.css';
 

@@ -1,36 +1,56 @@
-import React, { Ref, RefObject } from 'react';
-import { BaseGrouping, FilterValues, InnerColumnConfig, RowLevelPropsCalc } from './types';
-declare type rowLevelStyleCalc<T> = (item: T, index: number) => React.CSSProperties;
-declare type onRowClick<T> = (event: React.MouseEvent, itemData: T, index: number) => void;
-declare type fetchData = () => void;
-export interface QHGridRef<T> {
+import { ReactNode, Ref, RefObject } from 'react';
+import { BaseGrouping, FilterValues, InnerColumnConfig, ObjectLiteral, RowClickHandler, RowLevelPropsCalc, RowLevelStyleCalc, SharedQHGridProps } from './types';
+type fetchData = () => void;
+export interface QHGridRef<Data extends ObjectLiteral, ATI> {
+    /**
+     * A reference to the scroll-body div that wraps the table
+     */
     bodyRef: Ref<HTMLDivElement>;
-    data: T[];
-    sortedData: T[];
-    slicedData: T[];
+    /**
+     * The full data set, after sorting and filtering
+     *
+     * In a network grid, this will be the same as slicedData
+     */
+    data: Data[];
+    /**
+     * The current page's data
+     */
+    slicedData: Data[];
+    /**
+     * Exports the current data to an excel file with the given name
+     * @param name The name of the file
+     * @returns
+     */
     exportExcel: (name?: string) => Promise<void>;
-    props: QHGridProps<T, unknown>;
+    /**
+     * The props that were passed in to the grid
+     */
+    props: QHGridProps<Data, ATI>;
     /**
      * Returns sortedData
      * @deprecated
      */
-    getSortedData: () => T[];
+    getSortedData: () => Data[];
 }
-export interface QHGridProps<T, ATI> {
-    columns: InnerColumnConfig<T, ATI>[];
-    data: T[];
+export interface QHGridProps<Data extends ObjectLiteral, ATI> extends SharedQHGridProps<Data, ATI> {
+    /**
+     * class name to apply to the root element
+     */
+    className?: string;
+    columns: InnerColumnConfig<Data, ATI>[];
+    data: Data[];
     filters: FilterValues;
     /**
      * Called after the data is filtered with the new filteredData
      */
-    onFiltered?: (data: T[]) => void;
+    onFiltered?: (data: Data[]) => void;
     sortBy: string | null;
     sortOrder: 'asc' | 'desc' | null;
     onSort?: (colId: string) => void;
     /**
      * Called after the filtered data is sorted with the new sortedData
      */
-    onSorted?: (data: T[]) => void;
+    onSorted?: (data: Data[]) => void;
     grouping: BaseGrouping[];
     onGroupChange?: (grouping: BaseGrouping[]) => void;
     generalSearch: string;
@@ -39,42 +59,28 @@ export interface QHGridProps<T, ATI> {
     isPaginated?: boolean;
     totalRows?: number;
     loading?: boolean;
-    loadingMessage?: React.ReactNode;
+    loadingMessage?: ReactNode;
     additionalTemplateInfo: ATI;
-    rowLevelStyleCalc?: rowLevelStyleCalc<T>;
+    rowLevelStyleCalc?: RowLevelStyleCalc<Data>;
     /**
      * A function that allows you to take the item and index and return props that should be applied to the row
      */
-    rowLevelPropsCalc?: RowLevelPropsCalc<T>;
-    onRowClick?: onRowClick<T>;
+    rowLevelPropsCalc?: RowLevelPropsCalc<Data>;
+    onRowClick?: RowClickHandler<Data>;
     onReloadData?: fetchData;
-    exportBaseName?: string;
-    getExportData?: () => Promise<T[]> | T[];
-    emptyMessage?: string | React.ReactNode;
-    extraHeaderItem?: React.ReactNode;
-    columnsConfig: InnerColumnConfig<T, ATI>[];
+    getExportData?: () => Promise<Data[]> | Data[];
+    emptyMessage?: string | ReactNode;
+    extraHeaderItem?: ReactNode;
+    columnsConfig: InnerColumnConfig<Data, ATI>[];
     itemsPerPage: number;
     onItemsPerPageChange?: (itemsPerPage: number) => void;
     height?: string;
     activePage: number;
-    onPageChange?: (activePage: number) => void;
+    onPageChange: (activePage: number) => void;
     onColumnVisibilityToggle?: (colId: string) => void;
     onColumnReorder?: (curIdx: number, newIdx: number) => void;
     onFilterUpdate?: (field: string, type: any) => (value: any) => void;
-    qhGridRef?: RefObject<QHGridRef<T>>;
+    qhGridRef?: RefObject<QHGridRef<Data, ATI> | null>;
 }
-export interface QHGridHeaderProps<T, ATI> {
-    columns: InnerColumnConfig<T, ATI>[];
-    onColumnVisibilityToggle?: QHGridProps<T, ATI>['onColumnVisibilityToggle'];
-    grouping: BaseGrouping[];
-    onGroupChange?: QHGridProps<T, ATI>['onGroupChange'];
-    generalSearch: string;
-    generalSearchDebounceTime?: number;
-    onGeneralSearch?: QHGridProps<T, ATI>['onGeneralSearch'];
-    extraHeaderItem?: QHGridProps<T, ATI>['extraHeaderItem'];
-    loading?: boolean;
-    exportBaseName?: string;
-    onExportExcel: () => void;
-}
-export declare function QHGrid<T, ATI>({ loadingMessage, emptyMessage, height, generalSearchDebounceTime, grouping, ...props }: QHGridProps<T, ATI>): JSX.Element;
+export declare function QHGrid<Data extends ObjectLiteral, ATI>(allProps: QHGridProps<Data, ATI>): import("react/jsx-runtime").JSX.Element;
 export {};
