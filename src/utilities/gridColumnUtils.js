@@ -10,7 +10,7 @@ export const createSafeGridFieldKey = (field) => {
   }
 
   const encodedField = Array.from(field)
-    .map((char) => char.charCodeAt(0).toString(16).padStart(4, '0'))
+    .map((char) => char.codePointAt(0).toString(16).padStart(6, '0'))
     .join('');
 
   return `${SAFE_GRID_FIELD_PREFIX}${encodedField}`;

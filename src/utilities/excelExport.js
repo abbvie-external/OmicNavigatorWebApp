@@ -12,13 +12,10 @@ const sanitizeFileName = (fileName) => {
  * Creates an Excel export handler function that exports data to an Excel file.
  *
  * @param {string} fileName - The base name for the exported Excel file (without extension).
- * @returns {Function} An async function that accepts an object with data transformation methods.
  * @returns {Promise<void>} The returned function is async and handles the Excel export process.
  *
- * @param {Object} exporterObj - The object passed to the returned handler function.
- * @param {Function} exporterObj.toArrayOfArrays - A function that returns a 2D array of data to export.
- * @param {Function} exporterObj.toWsCols - A function that returns column configuration for the worksheet.
- *
+ * @param {string} fileName The base name for the exported Excel file (without extension).
+ * @returns {(exporter: ExcelExporter) => Promise<void>} Async handler that performs the export.
  */
 export const createExcelExportHandler = (fileName) => {
   return async ({ toArrayOfArrays, toWsCols }) => {

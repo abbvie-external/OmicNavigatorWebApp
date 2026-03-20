@@ -130,7 +130,7 @@ class DifferentialDetail extends Component {
       normalizedTableData: this._normalizedTableData,
     };
   }
-  abortcontroller = null;
+  abortController = null;
   events = ['dragstart', 'dragover', 'drop', 'dragenter'];
 
   componentDidMount() {
@@ -176,6 +176,10 @@ class DifferentialDetail extends Component {
     const firstHeader = document.querySelector(
       '.ResultsTableWrapper table.QHGrid--body thead tr th:nth-child(1)',
     );
+
+    if (!firstHeader) {
+      return;
+    }
 
     // If this is the same header we already wired, do nothing
     if (this._firstHeaderEl === firstHeader) {

@@ -22,7 +22,7 @@
       z-index: 3;
     }
 
-    .QHGrid--body {
+    &.QHGrid--body {
       th:first-child,
       td:first-child {
         transition:
