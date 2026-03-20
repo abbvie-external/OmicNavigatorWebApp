@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-declare type UseAutoControlledOptions<Value> = {
+type UseAutoControlledOptions<Value> = {
     defaultValue: Value | undefined;
     value: Value | undefined;
     initialValue?: Value;

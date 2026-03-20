@@ -1,11 +1,6 @@
-import React, { Component } from 'react';
 import _ from 'lodash-es';
-import CustomEmptyMessage from '../Shared/Templates';
-import { EZGrid } from '../Shared/QHGrid/index.module.js';
-import PlotsOverlay from './PlotsOverlay';
-import PlotsDynamic from './PlotsDynamic';
-import { scrollElement, getDifferenceTwoSets } from '../Shared/helpers';
-import ScatterPlotDiv from './ScatterPlotDiv';
+import React, { Component } from 'react';
+import SplitPane from 'react-split-pane-r17';
 import {
   Grid,
   Popup,
@@ -17,9 +12,22 @@ import {
   Form,
   Input,
 } from 'semantic-ui-react';
+
+import { createExcelExportHandler } from '../../utilities/excelExport';
+import {
+  normalizeGridColumns,
+  augmentGridRows,
+} from '../../utilities/gridColumnUtils';
 import ButtonActions from '../Shared/ButtonActions';
+import { scrollElement, getDifferenceTwoSets } from '../Shared/helpers';
+import { EZGrid } from '../Shared/QHGrid/index.module.js';
+import CustomEmptyMessage from '../Shared/Templates';
+
+import PlotsDynamic from './PlotsDynamic';
+import PlotsOverlay from './PlotsOverlay';
+import ScatterPlotDiv from './ScatterPlotDiv';
+
 import './DifferentialDetail.scss';
-import SplitPane from 'react-split-pane-r17';
 
 // Delay in ms to ignore outside clicks when closing multi-feature options popup
 const OVERLAY_CLOSE_DELAY_MS = 10;
@@ -93,7 +101,36 @@ class DifferentialDetail extends Component {
 
   volcanoPlotFilteredGridRef = React.createRef();
   _firstHeaderEl = null;
-  abortcontroller = null;
+
+  // Memoization fields to avoid creating new array references in render()
+  _lastTableData = null;
+  _lastColumns = null;
+  _normalizedColumns = null;
+  _normalizedTableData = null;
+
+  getNormalizedData() {
+    const { differentialColumns } = this.props;
+    const { differentialTableData } = this.state;
+
+    if (
+      differentialTableData !== this._lastTableData ||
+      differentialColumns !== this._lastColumns
+    ) {
+      this._lastTableData = differentialTableData;
+      this._lastColumns = differentialColumns;
+      this._normalizedColumns = normalizeGridColumns(differentialColumns);
+      this._normalizedTableData = augmentGridRows(
+        differentialTableData || [],
+        this._normalizedColumns,
+      );
+    }
+
+    return {
+      normalizedColumns: this._normalizedColumns,
+      normalizedTableData: this._normalizedTableData,
+    };
+  }
+  abortController = null;
   events = ['dragstart', 'dragover', 'drop', 'dragenter'];
 
   componentDidMount() {
@@ -139,6 +176,10 @@ class DifferentialDetail extends Component {
     const firstHeader = document.querySelector(
       '.ResultsTableWrapper table.QHGrid--body thead tr th:nth-child(1)',
     );
+
+    if (!firstHeader) {
+      return;
+    }
 
     // If this is the same header we already wired, do nothing
     if (this._firstHeaderEl === firstHeader) {
@@ -1965,6 +2006,11 @@ class DifferentialDetail extends Component {
       </div>
     );
 
+    const {
+      normalizedColumns: normalizedDifferentialColumns,
+      normalizedTableData: normalizedDifferentialTableData,
+    } = this.getNormalizedData();
+
     const table = (
       <EZGrid
         ref={this.volcanoPlotFilteredGridRef}
@@ -1974,9 +2020,12 @@ class DifferentialDetail extends Component {
         // height="auto"
         height={upperPlotsVisible ? 'auto' : '70vh'}
         // height="70vh"
-        data={differentialTableData || []}
+        data={normalizedDifferentialTableData}
         totalRows={differentialTableRows || 0}
-        columnsConfig={differentialColumns}
+        columnsConfig={normalizedDifferentialColumns}
+        onExcelExport={createExcelExportHandler(
+          `${tab}-${differentialStudy}-${differentialModel}-${differentialTest}`,
+        )}
         itemsPerPage={itemsPerPageVolcanoTable}
         onItemsPerPageChange={this.handleItemsPerPageChange}
         disableGeneralSearch

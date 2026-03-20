@@ -1,7 +1,8 @@
+import _ from 'lodash-es';
 import React, { Component } from 'react';
 import { Popup, Dimmer, Loader, Icon } from 'semantic-ui-react';
+
 import { omicNavigatorService } from '../../services/omicNavigator.service';
-import _ from 'lodash-es';
 import {
   isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
@@ -9,9 +10,13 @@ import {
   Linkout,
 } from '../Shared/helpers';
 import './FilteredDifferentialTable.scss';
-import CustomEmptyMessage from '../Shared/Templates';
-// eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
+import {
+  normalizeGridColumns,
+  augmentGridRows,
+} from '../../utilities/gridColumnUtils';
+import { createExcelExportHandler } from '../../utilities/excelExport';
+import CustomEmptyMessage from '../Shared/Templates';
 
 let cancelRequestFPTGetResultsTable = () => {};
 class FilteredDifferentialTable extends Component {
@@ -30,6 +35,10 @@ class FilteredDifferentialTable extends Component {
     rowClicked: false,
   };
   filteredDifferentialGridRef = React.createRef();
+
+  abortController = null;
+  _firstHeaderEl = null;
+  events = ['dragstart', 'dragover', 'drop', 'dragenter'];
 
   componentDidMount() {
     this.getFilteredTableConfigCols(this.props.barcodeSettings.barcodeData);
@@ -69,6 +78,62 @@ class FilteredDifferentialTable extends Component {
         this.pageToFeature(selectedProteinId);
       }
     }
+
+    if (
+      prevState.filteredTableData !== this.state.filteredTableData ||
+      prevState.filteredTableConfigCols !== this.state.filteredTableConfigCols
+    ) {
+      this.preventDropOnFirstColumn();
+    }
+  }
+
+  /**
+   * Prevents drag and drop operations on the first (checkbox) column of the filtered results table.
+   *
+   * @returns {void} No return value
+   */
+  preventDropOnFirstColumn = () => {
+    const firstHeader = document.querySelector(
+      '.FilteredDifferentialTableDiv table.QHGrid--body thead tr th:nth-child(1)',
+    );
+
+    if (!firstHeader) {
+      return;
+    }
+
+    // If this is the same header we already wired, do nothing
+    if (this._firstHeaderEl === firstHeader) {
+      return;
+    }
+
+    // If we already wired up a different header, remove listeners from it
+    if (this._firstHeaderEl && this._firstHeaderEl !== firstHeader) {
+      this.abortController?.abort();
+    }
+
+    this.abortController = new AbortController();
+    const { signal } = this.abortController;
+
+    const preventDrag = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.type === 'dragover') e.dataTransfer.dropEffect = 'none';
+      return false;
+    };
+
+    this.events.forEach((type) => {
+      firstHeader.addEventListener(type, preventDrag, {
+        capture: true,
+        signal,
+      });
+    });
+
+    this._firstHeaderEl = firstHeader;
+  };
+
+  componentWillUnmount() {
+    this.abortController?.abort();
+    this._firstHeaderEl = null;
   }
 
   pageToFeature = (featureToHighlight) => {
@@ -120,7 +185,10 @@ class FilteredDifferentialTable extends Component {
       );
     }
     this.setState({
-      filteredTableData: filteredDifferentialData,
+      filteredTableData: augmentGridRows(
+        filteredDifferentialData,
+        this.state.filteredTableConfigCols,
+      ),
     });
   };
 
@@ -132,8 +200,8 @@ class FilteredDifferentialTable extends Component {
       const name = key[0].trim() || '';
       cancelRequestFPTGetResultsTable();
       const controller = new AbortController();
-    const cancelToken = controller.signal;
-    cancelRequestFPTGetResultsTable = () => controller.abort();
+      const cancelToken = controller.signal;
+      cancelRequestFPTGetResultsTable = () => controller.abort();
       omicNavigatorService
         .getResultsTable(
           this.props.enrichmentStudy,
@@ -367,11 +435,16 @@ class FilteredDifferentialTable extends Component {
       .concat(filteredDifferentialAlphanumericColumnsMapped)
       .concat(filteredDifferentialNumericColumnsMapped);
 
-    this.setState({
-      filteredBarcodeData: data,
-      filteredTableConfigCols: configCols,
-    });
-    this.getTableData();
+    const normalizedConfigCols = normalizeGridColumns(configCols);
+    const normalizedData = augmentGridRows(data, normalizedConfigCols);
+
+    this.setState(
+      {
+        filteredBarcodeData: normalizedData,
+        filteredTableConfigCols: normalizedConfigCols,
+      },
+      this.getTableData,
+    );
   };
 
   rowLevelPropsCalc = (item) => {
@@ -379,7 +452,7 @@ class FilteredDifferentialTable extends Component {
     let id;
     const { HighlightedProteins = [], selectedProteinId } = this.props;
     const { filteredDifferentialFeatureIdKey } = this.props;
-    /* eslint-disable eqeqeq */
+
     const highlightedIds = HighlightedProteins.map((p) => p.featureID);
     const featureId = item[filteredDifferentialFeatureIdKey];
     if (highlightedIds.includes(featureId)) {
@@ -523,6 +596,9 @@ class FilteredDifferentialTable extends Component {
             ref={this.props.filteredDifferentialGridRef}
             data={filteredTableData}
             columnsConfig={filteredTableConfigCols}
+            onExcelExport={createExcelExportHandler(
+              `differential-${this.props.enrichmentStudy}-${this.props.enrichmentModel}-${(this.props.plotDataEnrichment.key !== '' && this.props.plotDataEnrichment.key != null ? this.props.plotDataEnrichment.key.split(':')[0] : '') || 'table'}`,
+            )}
             totalRows={15}
             // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageFilteredDifferentialTable}
@@ -533,7 +609,7 @@ class FilteredDifferentialTable extends Component {
             disableGrouping
             // disableSort
             disableColumnVisibilityToggle
-            disableColumnReorder
+            //disableColumnReorder
             // disableFilters={false}
             min-height="5vh"
             height="auto"

@@ -1,23 +1,27 @@
-import React, { ReactNode } from 'react';
-import { MFBaseProps, RMFBaseProps } from 'types';
-export declare function getAccessorValue(opt: string, accessor: MFBaseProps['accessor']): any;
-export interface MFProps<T> extends MFBaseProps {
-    selectedOpts?: string[];
-    data: T[];
-    field: string;
-    onChange: (opts?: string[]) => void;
+import { Paths } from 'type-fest';
+import { FilterValue } from './FilterTypeConfig';
+import { Combinations, Comparisons } from './filters/utils';
+import { FetchAsyncFunc, MFBaseProps, ObjectLiteral, RMFBaseProps } from './types';
+export interface MFProps<Data extends ObjectLiteral> extends MFBaseProps {
+    selectedOpts?: FilterValue[];
+    data: Data[];
+    field: Paths<Data>;
+    onChange: (opts?: FilterValue[]) => void;
     accessor: any;
-    trigger: ReactNode;
+    columnName?: string;
+    columnId?: string;
 }
-export declare function MultiFilterDropdown<T>({ selectedOpts, data, field, onChange, accessor, trigger, ...props }: MFProps<T>): JSX.Element;
-export interface RMFProps<T> extends RMFBaseProps {
-    selectedOpts?: string[];
-    data: T[];
-    field: string;
-    onChange: (opts?: string[]) => void;
-    trigger: ReactNode;
+export declare function MultiFilterDropdown<Data extends ObjectLiteral>({ selectedOpts, data, field, onChange, accessor, ...props }: MFProps<Data>): import("react/jsx-runtime").JSX.Element;
+export interface RMFProps<Data extends ObjectLiteral> extends RMFBaseProps {
+    selectedOpts?: FilterValue[];
+    data: Data[];
+    field: Paths<Data>;
+    onChange: (opts?: FilterValue[]) => void;
+    fetchAsync?: FetchAsyncFunc;
+    columnName?: string;
+    columnId?: string;
 }
-export declare function RemoteMultiFilterDropdown<T>({ selectedOpts, data, field, onChange, accessor, trigger, useLocal, ...props }: RMFProps<T>): JSX.Element;
+export declare function RemoteMultiFilterDropdown<Data extends ObjectLiteral>({ selectedOpts, data, field, onChange, accessor, useLocal, remotePreRequest, processData: configProcessData, ...props }: RMFProps<Data>): import("react/jsx-runtime").JSX.Element;
 export interface DateFilterOpts {
     startDate: string;
     endDate: string;
@@ -25,29 +29,10 @@ export interface DateFilterOpts {
 export interface DateFilterProps {
     onChange: (opts?: DateFilterOpts) => void;
     selectedOpts?: DateFilterOpts;
-    trigger?: Node;
+    columnName?: string;
+    columnId?: string;
 }
-export declare const DateFilterDropdown: React.FunctionComponent<DateFilterProps>;
-declare enum Comparisons {
-    equals = "=",
-    notEquals = "!=",
-    greaterOrEqual = ">=",
-    greater = ">",
-    lessOrEqual = "<=",
-    less = "<",
-    null = "null",
-    notNull = "!null",
-    contains = "contains",
-    notContains = "!contains",
-    starts = "starts",
-    ends = "ends",
-    empty = "empty",
-    notEmpty = "!empty"
-}
-declare enum Combinations {
-    and = "&&",
-    or = "||"
-}
+export declare function DateFilterDropdown(props: DateFilterProps): import("react/jsx-runtime").JSX.Element;
 export interface AlphanumericOpt {
     comparison: Comparisons;
     combination: Combinations;
@@ -56,8 +41,8 @@ export interface AlphanumericOpt {
 export interface AlphanumericFilterProps {
     onChange: (opts?: AlphanumericOpt[]) => void;
     selectedOpts: AlphanumericOpt[];
-    trigger: Node;
+    filterSubType: 'numeric' | 'alphanumeric';
+    columnName?: string;
+    columnId?: string;
 }
-export declare const NumericFilterPopup: React.NamedExoticComponent<AlphanumericFilterProps>;
-export declare const AlphanumericFilterPopup: React.FC<AlphanumericFilterProps>;
-export {};
+export declare function AlphanumericFilterPopup({ onChange, filterSubType, ...props }: AlphanumericFilterProps): import("react/jsx-runtime").JSX.Element;
