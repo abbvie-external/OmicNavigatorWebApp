@@ -36,6 +36,10 @@ class FilteredDifferentialTable extends Component {
   };
   filteredDifferentialGridRef = React.createRef();
 
+  abortController = null;
+  _firstHeaderEl = null;
+  events = ['dragstart', 'dragover', 'drop', 'dragenter'];
+
   componentDidMount() {
     this.getFilteredTableConfigCols(this.props.barcodeSettings.barcodeData);
   }
@@ -74,6 +78,62 @@ class FilteredDifferentialTable extends Component {
         this.pageToFeature(selectedProteinId);
       }
     }
+
+    if (
+      prevState.filteredTableData !== this.state.filteredTableData ||
+      prevState.filteredTableConfigCols !== this.state.filteredTableConfigCols
+    ) {
+      this.preventDropOnFirstColumn();
+    }
+  }
+
+  /**
+   * Prevents drag and drop operations on the first (checkbox) column of the filtered results table.
+   *
+   * @returns {void} No return value
+   */
+  preventDropOnFirstColumn = () => {
+    const firstHeader = document.querySelector(
+      '.FilteredDifferentialTableDiv table.QHGrid--body thead tr th:nth-child(1)',
+    );
+
+    if (!firstHeader) {
+      return;
+    }
+
+    // If this is the same header we already wired, do nothing
+    if (this._firstHeaderEl === firstHeader) {
+      return;
+    }
+
+    // If we already wired up a different header, remove listeners from it
+    if (this._firstHeaderEl && this._firstHeaderEl !== firstHeader) {
+      this.abortController?.abort();
+    }
+
+    this.abortController = new AbortController();
+    const { signal } = this.abortController;
+
+    const preventDrag = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.type === 'dragover') e.dataTransfer.dropEffect = 'none';
+      return false;
+    };
+
+    this.events.forEach((type) => {
+      firstHeader.addEventListener(type, preventDrag, {
+        capture: true,
+        signal,
+      });
+    });
+
+    this._firstHeaderEl = firstHeader;
+  };
+
+  componentWillUnmount() {
+    this.abortController?.abort();
+    this._firstHeaderEl = null;
   }
 
   pageToFeature = (featureToHighlight) => {
