@@ -66,7 +66,7 @@ export const augmentGridRows = (rows = [], columnsConfig = []) => {
         value: row[column.originalField],
         writable: true,
         configurable: true,
-        enumerable: false,
+        enumerable: true,
       });
     });
 

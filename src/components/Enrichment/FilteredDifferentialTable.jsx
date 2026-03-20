@@ -185,7 +185,10 @@ class FilteredDifferentialTable extends Component {
       );
     }
     this.setState({
-      filteredTableData: filteredDifferentialData,
+      filteredTableData: augmentGridRows(
+        filteredDifferentialData,
+        this.state.filteredTableConfigCols,
+      ),
     });
   };
 
