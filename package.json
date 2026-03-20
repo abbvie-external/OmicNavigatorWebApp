@@ -42,7 +42,7 @@
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.4",
     "styled-components": "^5.3.10",
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+    "xlsx": "file:lib/xlsx-0.20.3.tgz"
   },
   "homepage": ".",
   "lint-staged": {
