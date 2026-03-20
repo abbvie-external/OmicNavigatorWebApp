@@ -37,6 +37,11 @@ import SplitPanesContainer from './SplitPanesContainer';
 import CustomEmptyMessage from '../Shared/Templates';
 // eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
+import {
+  normalizeGridColumns,
+  augmentGridRows,
+} from '../../utilities/gridColumnUtils';
+import { createExcelExportHandler } from '../../utilities/excelExport';
 import ErrorBoundary from '../Shared/ErrorBoundary';
 import PlotsOverlay from '../Differential/PlotsOverlay';
 import { HEADER_OFFSET_PX } from '../Shared/constants';
@@ -3347,6 +3352,11 @@ class Enrichment extends Component {
       networkDataError,
     } = this.state;
     let enrichmentCacheKey = `${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}-${multisetQueriedEnrichment}`;
+    const enrichmentGridColumns = normalizeGridColumns(enrichmentColumns);
+    const enrichmentGridData = augmentGridRows(
+      enrichmentResults,
+      enrichmentGridColumns,
+    );
     const TableValuePopupStyle = {
       backgroundColor: '2E2E2E',
       borderBottom: '2px solid var(--color-primary)',
@@ -3434,8 +3444,11 @@ class Enrichment extends Component {
                     <EZGrid
                       ref={this.EnrichmentGridRef}
                       uniqueCacheKey={enrichmentCacheKey}
-                      data={enrichmentResults}
-                      columnsConfig={enrichmentColumns}
+                      data={enrichmentGridData}
+                      columnsConfig={enrichmentGridColumns}
+                      onExcelExport={createExcelExportHandler(
+                        `${tab}-${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`
+                      )}
                       // totalRows={rows}
                       // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
                       itemsPerPage={itemsPerPageEnrichmentTable}

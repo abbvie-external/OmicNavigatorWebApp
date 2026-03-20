@@ -12,6 +12,11 @@ import { omicNavigatorService } from '../../services/omicNavigator.service';
 // import { CancelToken } from 'axios';
 // eslint-disable-next-line no-unused-vars
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
+import {
+  normalizeGridColumns,
+  augmentGridRows,
+} from '../../utilities/gridColumnUtils';
+import { createExcelExportHandler } from '../../utilities/excelExport';
 
 class MetafeaturesTableDynamic extends Component {
   state = {
@@ -181,9 +186,12 @@ class MetafeaturesTableDynamic extends Component {
       configCols = metafeaturesAlphanumericColumnsMapped.concat(
         metafeaturesNumericColumnsMapped,
       );
+      const normalizedConfigCols = normalizeGridColumns(configCols);
+      const normalizedData = augmentGridRows(data, normalizedConfigCols);
+
       this.setState({
-        metafeaturesTableConfigCols: configCols,
-        metafeaturesTableData: data,
+        metafeaturesTableConfigCols: normalizedConfigCols,
+        metafeaturesTableData: normalizedData,
         metafeaturesLoaded: true,
       });
     }
@@ -220,6 +228,7 @@ class MetafeaturesTableDynamic extends Component {
           // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
           itemsPerPage={itemsPerPageMetafeaturesTable}
           onItemsPerPageChange={this.handleItemsPerPageChange}
+          onExcelExport={createExcelExportHandler('Feature Data')}
           // exportBaseName="Feature Data"
           // quickViews={quickViews}
           // disableGeneralSearch

@@ -11,6 +11,11 @@ import {
 } from '../Shared/helpers';
 import './FilteredDifferentialTable.scss';
 import { EZGrid } from '../Shared/QHGrid/index.module.js';
+import {
+  normalizeGridColumns,
+  augmentGridRows,
+} from '../../utilities/gridColumnUtils';
+import { createExcelExportHandler } from '../../utilities/excelExport';
 import CustomEmptyMessage from '../Shared/Templates';
 
 let cancelRequestFPTGetResultsTable = () => {};
@@ -367,11 +372,16 @@ class FilteredDifferentialTable extends Component {
       .concat(filteredDifferentialAlphanumericColumnsMapped)
       .concat(filteredDifferentialNumericColumnsMapped);
 
-    this.setState({
-      filteredBarcodeData: data,
-      filteredTableConfigCols: configCols,
-    });
-    this.getTableData();
+    const normalizedConfigCols = normalizeGridColumns(configCols);
+    const normalizedData = augmentGridRows(data, normalizedConfigCols);
+
+    this.setState(
+      {
+        filteredBarcodeData: normalizedData,
+        filteredTableConfigCols: normalizedConfigCols,
+      },
+      this.getTableData,
+    );
   };
 
   rowLevelPropsCalc = (item) => {
@@ -523,6 +533,9 @@ class FilteredDifferentialTable extends Component {
             ref={this.props.filteredDifferentialGridRef}
             data={filteredTableData}
             columnsConfig={filteredTableConfigCols}
+            onExcelExport={createExcelExportHandler(
+              `differential-${this.props.enrichmentStudy}-${this.props.enrichmentModel}-${(this.props.plotDataEnrichment.key !== '' && this.props.plotDataEnrichment.key != null ? this.props.plotDataEnrichment.key.split(':')[0] : '') || 'table'}`,
+            )}
             totalRows={15}
             // use "differentialRows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster
             itemsPerPage={itemsPerPageFilteredDifferentialTable}
