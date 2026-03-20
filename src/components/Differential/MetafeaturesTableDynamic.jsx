@@ -215,7 +215,6 @@ class MetafeaturesTableDynamic extends Component {
     const ratioVh = ratio * 100;
     const ratioVhRound = Math.round(ratioVh) - 20;
     const ratioVhString = `${ratioVhRound}vh`;
-    console.log(ratioVhString);
     // const { metaFeaturesData } = this.props;
     return (
       <div className="MetafeaturesTableDiv" id="MetafeaturesTableDynamicDiv">

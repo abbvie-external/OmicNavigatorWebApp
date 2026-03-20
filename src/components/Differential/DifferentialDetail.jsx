@@ -125,9 +125,6 @@ class DifferentialDetail extends Component {
       );
     }
 
-    console.log('Normalized data calculated');
-    console.log('Normalized Columns:', this._normalizedColumns);
-    console.log('Normalized Table Data:', this._normalizedTableData);
     return {
       normalizedColumns: this._normalizedColumns,
       normalizedTableData: this._normalizedTableData,
