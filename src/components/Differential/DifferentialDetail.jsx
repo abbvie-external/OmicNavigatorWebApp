@@ -231,18 +231,25 @@ class DifferentialDetail extends Component {
       // needed to handle cached data that won't reset the search/data
       this.resetSearchAndData();
     }
-    if (
+    const unfilteredChanged =
       prevProps.differentialResultsUnfiltered !==
-      this.props.differentialResultsUnfiltered
-    ) {
+      differentialResultsUnfiltered;
+    const filteredChanged =
+      prevProps.differentialResults !== differentialResults;
+
+    if (unfilteredChanged) {
       this.setState({
         allDataInScatterView: differentialResultsUnfiltered,
         multiFeaturesNotFound: [],
       });
     }
-    if (prevProps.differentialResults !== differentialResults) {
-      // take new data (possibly only from set analysis), do not reset search
-      this.setRelevantData();
+    if (filteredChanged) {
+      // React 18 batches state updates: when both props change in the same
+      // render the setState above hasn't committed yet, so pass the fresh
+      // allDataInScatterView directly to avoid reading stale state.
+      this.setRelevantData(
+        unfilteredChanged ? differentialResultsUnfiltered : undefined,
+      );
     }
 
     // Update the preventDropOnFirstColumn only if differentialTableData has changed
@@ -268,14 +275,19 @@ class DifferentialDetail extends Component {
     }
   }
 
-  setRelevantData = () => {
+  setRelevantData = (allDataInScatterViewOverride) => {
     const { differentialResults, differentialAlphanumericFields } = this.props;
     const {
       multiFeaturesSearched,
       singleFeatureSearched,
-      allDataInScatterView,
+      allDataInScatterView: allDataInScatterViewFromState,
       multiFeaturesFilteredOut,
     } = this.state;
+    // Use the override when provided (React 18 batching: state may be stale)
+    const allDataInScatterView =
+      allDataInScatterViewOverride !== undefined
+        ? allDataInScatterViewOverride
+        : allDataInScatterViewFromState;
     // GOAL: set the new state for differentialTableData (consumed by EZGrid)
     // which will update itself (filters) and fire 'handleTableChanged'
     // which sets new state for volcanoPlotSelectedDataArr (consumed by scatter plot)

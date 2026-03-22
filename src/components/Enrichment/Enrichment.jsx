@@ -522,6 +522,10 @@ class Enrichment extends Component {
         cancelToken,
       )
       .then((barcodeDataResponse) => {
+        if (barcodeDataResponse == null) {
+          this.setState({ displayViolinPlot: false });
+          return;
+        }
         if (barcodeDataResponse?.data?.length > 0) {
           const logFoldChangeArr = barcodeDataResponse.data.map(
             (b) => b.logFoldChange,
@@ -1852,6 +1856,10 @@ class Enrichment extends Component {
           cancelToken,
         )
         .then((getEnrichmentNetworkResponseData) => {
+          if (getEnrichmentNetworkResponseData == null) {
+            this.handleGetEnrichmentNetworkError();
+            return;
+          }
           cacheGetEnrichmentsNetwork[cacheKey] =
             getEnrichmentNetworkResponseData;
           if (
@@ -2634,6 +2642,10 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then((barcodeDataResponse) => {
+        if (barcodeDataResponse == null) {
+          this.setState({ displayViolinPlot: false });
+          return;
+        }
         if (barcodeDataResponse?.data?.length > 0) {
           const logFoldChangeArr = barcodeDataResponse.data.map(
             (b) => b.logFoldChange,
