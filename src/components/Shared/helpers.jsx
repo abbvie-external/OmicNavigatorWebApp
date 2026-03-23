@@ -42,6 +42,7 @@ export const Linkout = React.memo(
     if (linkouts.length > 1) {
       for (const val of linkouts) {
         const domainRaw = findDomain(`${val}`);
+        if (domainRaw == null) continue;
         const domainRawWww = domainRaw.includes('www')
           ? domainRaw
           : `www.${domainRaw}`;
