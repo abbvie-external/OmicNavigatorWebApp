@@ -522,6 +522,9 @@ class Enrichment extends Component {
         cancelToken,
       )
       .then((barcodeDataResponse) => {
+        if (barcodeDataResponse == null) {
+          return;
+        }
         if (barcodeDataResponse?.data?.length > 0) {
           const logFoldChangeArr = barcodeDataResponse.data.map(
             (b) => b.logFoldChange,
@@ -635,7 +638,11 @@ class Enrichment extends Component {
     //   this.handleColumnReorder(searchResults);
     // }
     let columns = this.state.enrichmentColumnsUnfiltered || [];
-    if (searchResults?.length && !this.enrichmentColumnsConfigured) {
+    if (
+      searchResults?.length &&
+      (!this.enrichmentColumnsConfigured ||
+        this.state.enrichmentColumns.length === 0)
+    ) {
       columns = this.getConfigCols(searchResults);
       this.setState({
         enrichmentColumnsUnfiltered: columns,
@@ -676,6 +683,8 @@ class Enrichment extends Component {
       multisetTestsFilteredOut: [],
       enrichmentColumnsUnfiltered: [],
       enrichmentColumns: [],
+      enrichmentResults: [],
+      isEnrichmentTableLoading: false,
     });
   };
 
@@ -1549,17 +1558,22 @@ class Enrichment extends Component {
           template: (value, item) => {
             if (f === alphanumericTrigger) {
               let linkoutWithIcon = null;
-              const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
+              const currentLinkouts = this.state.enrichmentsLinkouts;
+              const currentFavicons = this.state.enrichmentsFavicons;
+              if (currentLinkouts == null) return null;
+              const linkoutsIsArray = Array.isArray(currentLinkouts);
               const linkouts = linkoutsIsArray
-                ? enrichmentsLinkouts
-                : [enrichmentsLinkouts];
+                ? currentLinkouts
+                : [currentLinkouts];
               let favicons = [];
               if (linkouts.length > 0) {
-                const columnFaviconsIsArray =
-                  Array.isArray(enrichmentsFavicons);
-                favicons = columnFaviconsIsArray
-                  ? enrichmentsFavicons
-                  : [enrichmentsFavicons];
+                if (currentFavicons != null) {
+                  const columnFaviconsIsArray =
+                    Array.isArray(currentFavicons);
+                  favicons = columnFaviconsIsArray
+                    ? currentFavicons
+                    : [currentFavicons];
+                }
                 const itemValue = item[f];
                 linkoutWithIcon = (
                   <Linkout {...{ itemValue, linkouts, favicons }} />
@@ -1614,18 +1628,22 @@ class Enrichment extends Component {
         filterable: { type: 'numericFilter' },
         exportTemplate: (value) => (value ? `${value}` : 'N/A'),
         template: (value, item, addParams) => {
+          const currentHasAnnotationTerms = this.state.hasAnnotationTerms;
+          const currentStudy = this.props.enrichmentStudy;
+          const currentModel = this.props.enrichmentModel;
+          const currentAnnotation = this.props.enrichmentAnnotation;
           return (
             <div>
               <Popup
                 trigger={
                   <span
-                    className={hasAnnotationTerms ? 'TableCellLink' : ''}
+                    className={currentHasAnnotationTerms ? 'TableCellLink' : ''}
                     onClick={
-                      hasAnnotationTerms
+                      currentHasAnnotationTerms
                         ? addParams.barcodeData(
-                            enrichmentStudy,
-                            enrichmentModel,
-                            enrichmentAnnotation,
+                            currentStudy,
+                            currentModel,
+                            currentAnnotation,
                             item,
                             c,
                           )
@@ -1635,10 +1653,12 @@ class Enrichment extends Component {
                     {formatNumberForDisplay(value)}
                   </span>
                 }
-                style={hasAnnotationTerms ? TableValuePopupStyle : undefined}
-                className={hasAnnotationTerms ? 'TablePopupValue' : ''}
+                style={
+                  currentHasAnnotationTerms ? TableValuePopupStyle : undefined
+                }
+                className={currentHasAnnotationTerms ? 'TablePopupValue' : ''}
                 content={
-                  hasAnnotationTerms
+                  currentHasAnnotationTerms
                     ? 'View Interactive Barcode Plot'
                     : 'No Annotation Terms Available'
                 }
@@ -1852,6 +1872,9 @@ class Enrichment extends Component {
           cancelToken,
         )
         .then((getEnrichmentNetworkResponseData) => {
+          if (getEnrichmentNetworkResponseData == null) {
+            return;
+          }
           cacheGetEnrichmentsNetwork[cacheKey] =
             getEnrichmentNetworkResponseData;
           if (
@@ -2634,6 +2657,9 @@ class Enrichment extends Component {
         this.handleGetBarcodeDataError,
       )
       .then((barcodeDataResponse) => {
+        if (barcodeDataResponse == null) {
+          return;
+        }
         if (barcodeDataResponse?.data?.length > 0) {
           const logFoldChangeArr = barcodeDataResponse.data.map(
             (b) => b.logFoldChange,
@@ -3208,7 +3234,6 @@ class Enrichment extends Component {
       }));
 
       const featureIdKey = 'featureID';
-
       overlayView = (
         <PlotsOverlay
           onBackToTable={this.backToSplitPanesEnrichment}
@@ -3256,7 +3281,7 @@ class Enrichment extends Component {
           <div
             className={
               showOverlay
-                ? 'EnrichmentSplitPanes EnrichmentSplitPanesHidden'
+                ? 'EnrichmentSplitPanes hidden'
                 : 'EnrichmentSplitPanes'
             }
             aria-hidden={showOverlay}
@@ -3447,7 +3472,7 @@ class Enrichment extends Component {
                       data={enrichmentGridData}
                       columnsConfig={enrichmentGridColumns}
                       onExcelExport={createExcelExportHandler(
-                        `${tab}-${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`
+                        `${tab}-${enrichmentStudy}-${enrichmentModel}-${enrichmentAnnotation}`,
                       )}
                       // totalRows={rows}
                       // use "rows" for itemsPerPage if you want all results. For dev, keep it lower so rendering is faster

@@ -873,7 +873,13 @@ class BarcodePlot extends Component {
           const selection = event?.selection || null;
           self.currentBrushSelectionPx = selection;
           if (selection != null) {
-            const brushedData = self.props.barcodeSettings.brushedData || [];
+            // Use lastBrushedData as fallback because on initial brush the
+            // parent setState from the "brush" event may not have propagated
+            // back as props yet, leaving barcodeSettings.brushedData stale ([]).
+            const brushedData =
+              (self.props.barcodeSettings.brushedData?.length
+                ? self.props.barcodeSettings.brushedData
+                : self.lastBrushedData) || [];
             const brushedIds = new Set(brushedData.map((d) => d.featureID));
 
             const HighlightedProteins = self.props.HighlightedProteins || [];

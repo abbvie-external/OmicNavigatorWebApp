@@ -1,3 +1,5 @@
+import ndjsonStream from 'can-ndjson-stream';
+import _ from 'lodash-es';
 import React, { Component, Fragment } from 'react';
 import {
   Form,
@@ -9,12 +11,12 @@ import {
   Transition,
   Button,
 } from 'semantic-ui-react';
-import _ from 'lodash-es';
-import ndjsonStream from 'can-ndjson-stream';
+
 import '../Shared/Search.scss';
 import { omicNavigatorService } from '../../services/omicNavigator.service';
-import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 import { getDynamicSize } from '../Shared/helpers';
+
+import EnrichmentMultisetFilters from './EnrichmentMultisetFilters';
 
 let cancelRequestGetReportLinkEnrichment = () => {};
 // let cancelGetEnrichmentsTable = () => {};
@@ -229,7 +231,9 @@ class EnrichmentSearch extends Component {
       onSearchChangeEnrichment,
       onSearchTransitionEnrichment,
       onGetEnrichmentsLinkouts,
+      onHandleEnrichmentColumnsConfigured,
     } = this.props;
+    onHandleEnrichmentColumnsConfigured(false);
     let models = [];
     let enrichmentModelIds = {};
     let annotations = [];
@@ -251,6 +255,7 @@ class EnrichmentSearch extends Component {
         });
         this.getReportLink(enrichmentStudy, enrichmentModel);
         if (enrichmentAnnotation !== '') {
+          this.props.onAnnotationChange();
           onSearchTransitionEnrichment(true);
           this.props.onSetHasAnnotationTerms(
             enrichmentStudy,
