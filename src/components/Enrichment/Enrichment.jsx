@@ -523,7 +523,6 @@ class Enrichment extends Component {
       )
       .then((barcodeDataResponse) => {
         if (barcodeDataResponse == null) {
-          this.setState({ displayViolinPlot: false });
           return;
         }
         if (barcodeDataResponse?.data?.length > 0) {
@@ -1561,17 +1560,20 @@ class Enrichment extends Component {
               let linkoutWithIcon = null;
               const currentLinkouts = this.state.enrichmentsLinkouts;
               const currentFavicons = this.state.enrichmentsFavicons;
-              const linkoutsIsArray = Array.isArray(enrichmentsLinkouts);
+              if (currentLinkouts == null) return null;
+              const linkoutsIsArray = Array.isArray(currentLinkouts);
               const linkouts = linkoutsIsArray
                 ? currentLinkouts
                 : [currentLinkouts];
               let favicons = [];
               if (linkouts.length > 0) {
-                const columnFaviconsIsArray =
-                  Array.isArray(enrichmentsFavicons);
-                favicons = columnFaviconsIsArray
-                  ? currentFavicons
-                  : [currentFavicons];
+                if (currentFavicons != null) {
+                  const columnFaviconsIsArray =
+                    Array.isArray(currentFavicons);
+                  favicons = columnFaviconsIsArray
+                    ? currentFavicons
+                    : [currentFavicons];
+                }
                 const itemValue = item[f];
                 linkoutWithIcon = (
                   <Linkout {...{ itemValue, linkouts, favicons }} />
@@ -1637,7 +1639,7 @@ class Enrichment extends Component {
                   <span
                     className={currentHasAnnotationTerms ? 'TableCellLink' : ''}
                     onClick={
-                      hasAnnotationTerms
+                      currentHasAnnotationTerms
                         ? addParams.barcodeData(
                             currentStudy,
                             currentModel,
@@ -1871,7 +1873,6 @@ class Enrichment extends Component {
         )
         .then((getEnrichmentNetworkResponseData) => {
           if (getEnrichmentNetworkResponseData == null) {
-            this.handleGetEnrichmentNetworkError();
             return;
           }
           cacheGetEnrichmentsNetwork[cacheKey] =
@@ -2657,7 +2658,6 @@ class Enrichment extends Component {
       )
       .then((barcodeDataResponse) => {
         if (barcodeDataResponse == null) {
-          this.setState({ displayViolinPlot: false });
           return;
         }
         if (barcodeDataResponse?.data?.length > 0) {
@@ -3234,7 +3234,6 @@ class Enrichment extends Component {
       }));
 
       const featureIdKey = 'featureID';
-
       overlayView = (
         <PlotsOverlay
           onBackToTable={this.backToSplitPanesEnrichment}
@@ -3282,7 +3281,7 @@ class Enrichment extends Component {
           <div
             className={
               showOverlay
-                ? 'EnrichmentSplitPanes EnrichmentSplitPanesHidden'
+                ? 'EnrichmentSplitPanes hidden'
                 : 'EnrichmentSplitPanes'
             }
             aria-hidden={showOverlay}
