@@ -134,11 +134,17 @@
 .VolcanoPlotToggle {
   position: absolute !important;
   cursor: pointer !important;
-  z-index: 4 !important;
+  z-index: 12 !important;
+  pointer-events: auto !important;
   border: none !important;
   border-radius: 0px !important;
   bottom: 20px !important;
   margin-left: -15px !important;
+}
+
+.DifferentialPlots .SingleFeaturePlotPane .ui.active.dimmer,
+.DifferentialPlots .MultiFeaturePlotPane .ui.active.dimmer {
+  z-index: 8 !important;
 }
 #VolcanoPlotToggle {
   margin-left: 0px !important;

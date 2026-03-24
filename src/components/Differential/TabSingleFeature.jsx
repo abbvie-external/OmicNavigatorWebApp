@@ -184,6 +184,12 @@ class TabSingleFeature extends Component {
     } else {
       // if the activeTabIndex is the same as the singleFeaturePlotTypes length, it indicates app should display the Metafeatures tab
       if (modelSpecificMetaFeaturesExist !== false) {
+        // MetafeaturesTableDynamic does not depend on plot dimensions;
+        // signal render-ready immediately so dimension-only changes
+        // (e.g., toggling the scatter plot) don't leave the loader stuck.
+        if (typeof this.props.onActivePlotRenderReady === 'function') {
+          this.props.onActivePlotRenderReady(cacheStringArg);
+        }
         let metafeaturesTab = [
           {
             menuItem: 'Feature Data',

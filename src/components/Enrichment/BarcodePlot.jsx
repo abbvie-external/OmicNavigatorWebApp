@@ -346,28 +346,26 @@ class BarcodePlot extends Component {
     }
 
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
-      if (!this.state.initialLoad) {
-        d3.selectAll(`.HighlightedLine`)
-          .attr('y1', this.state.settings.margin.selected)
-          .attr('style', 'stroke:#838383;strokeWidth: 1.5;opacity: 0.5')
-          .classed('HighlightedLine', false);
-        d3.selectAll(`.selected`)
-          .attr('y1', this.state.settings.margin.selected)
-          .attr('style', 'stroke:#2c3b78;strokeWidth: 2.5;opacity: 1');
-        if (this.props.HighlightedProteins.length > 0) {
-          const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
-          HighlightedProteinsCopy.forEach((element) => {
-            const lineId = `${element.featureID}`;
-            const OtherHighlighted = d3.select(
-              `line[id='barcode-line-${lineId}']`,
-            );
-            if (!OtherHighlighted.empty()) {
-              OtherHighlighted.classed('HighlightedLine', true)
-                .attr('y1', this.state.settings.margin.highlighted)
-                .attr('style', 'stroke:#ff7e38;stroke-width:3;opacity:1');
-            }
-          });
-        }
+      d3.selectAll(`.HighlightedLine`)
+        .attr('y1', this.state.settings.margin.selected)
+        .attr('style', 'stroke:#838383;strokeWidth: 1.5;opacity: 0.5')
+        .classed('HighlightedLine', false);
+      d3.selectAll(`.selected`)
+        .attr('y1', this.state.settings.margin.selected)
+        .attr('style', 'stroke:#2c3b78;strokeWidth: 2.5;opacity: 1');
+      if (this.props.HighlightedProteins.length > 0) {
+        const HighlightedProteinsCopy = [...this.props.HighlightedProteins];
+        HighlightedProteinsCopy.forEach((element) => {
+          const lineId = `${element.featureID}`;
+          const OtherHighlighted = d3.select(
+            `line[id='barcode-line-${lineId}']`,
+          );
+          if (!OtherHighlighted.empty()) {
+            OtherHighlighted.classed('HighlightedLine', true)
+              .attr('y1', this.state.settings.margin.highlighted)
+              .attr('style', 'stroke:#ff7e38;stroke-width:3;opacity:1');
+          }
+        });
       }
 
       this.setState({
