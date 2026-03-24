@@ -57,6 +57,14 @@ class MetafeaturesTableDynamic extends Component {
   // }
 
   async getMetafeaturesDataDynamic() {
+    // Reset to a clean loading state so we never show stale data
+    // when changing features or when a request fails.
+    this.setState({
+      metafeaturesTableConfigCols: [],
+      metafeaturesTableData: [],
+      metafeaturesLoaded: false,
+    });
+
     const cachedMetafeaturesData = JSON.parse(
       sessionStorage.getItem(
         `MetafeaturesData-${this.props.plotSingleFeatureData.key}`,
@@ -77,7 +85,18 @@ class MetafeaturesTableDynamic extends Component {
         );
         this.getMetafeaturesTableConfigCols(metaFeaturesDataVolcano);
       } catch (error) {
-        throw error;
+        this.setState(
+          {
+            metafeaturesTableConfigCols: [],
+            metafeaturesTableData: [],
+            metafeaturesLoaded: true,
+          },
+          () => {
+            if (typeof this.props.onRenderReady === 'function') {
+              this.props.onRenderReady();
+            }
+          },
+        );
       }
     } else {
       this.getMetafeaturesTableConfigCols(cachedMetafeaturesData);
@@ -189,11 +208,32 @@ class MetafeaturesTableDynamic extends Component {
       const normalizedConfigCols = normalizeGridColumns(configCols);
       const normalizedData = augmentGridRows(data, normalizedConfigCols);
 
-      this.setState({
-        metafeaturesTableConfigCols: normalizedConfigCols,
-        metafeaturesTableData: normalizedData,
-        metafeaturesLoaded: true,
-      });
+      this.setState(
+        {
+          metafeaturesTableConfigCols: normalizedConfigCols,
+          metafeaturesTableData: normalizedData,
+          metafeaturesLoaded: true,
+        },
+        () => {
+          if (typeof this.props.onRenderReady === 'function') {
+            this.props.onRenderReady();
+          }
+        },
+      );
+    } else {
+      // No data: clear any previous content and stop showing the loader.
+      this.setState(
+        {
+          metafeaturesTableConfigCols: [],
+          metafeaturesTableData: [],
+          metafeaturesLoaded: true,
+        },
+        () => {
+          if (typeof this.props.onRenderReady === 'function') {
+            this.props.onRenderReady();
+          }
+        },
+      );
     }
   };
 
