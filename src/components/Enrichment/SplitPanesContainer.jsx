@@ -185,28 +185,22 @@ class SplitPanesContainer extends Component {
     const currSelected = this.props.selectedProteinId;
 
     const canChangeTabs = this.props.enableSvgTabChangeOnSelection !== false;
+    const selectedProteinChanged =
+      !!currSelected && currSelected !== prevSelected;
+    const highlightedCountBecameMulti =
+      currCount >= 2 && currCount !== prevCount && hasMultiFeature;
+    const highlightedCountDroppedFromMulti =
+      activeSvgTabIndexEnrichment === 1 && currCount < 2 && prevCount >= 2;
 
     if (
       canChangeTabs &&
-      currSelected &&
-      currSelected !== prevSelected &&
+      selectedProteinChanged &&
       activeSvgTabIndexEnrichment !== 0
     ) {
       this.handleSVGTabChange(0);
-    }
-
-    if (currCount >= 2 && currCount !== prevCount && hasMultiFeature) {
-      if (canChangeTabs) {
-        this.handleSVGTabChange(1);
-      }
-    }
-
-    if (
-      canChangeTabs &&
-      activeSvgTabIndexEnrichment === 1 &&
-      currCount < 2 &&
-      prevCount >= 2
-    ) {
+    } else if (canChangeTabs && highlightedCountBecameMulti) {
+      this.handleSVGTabChange(1);
+    } else if (canChangeTabs && highlightedCountDroppedFromMulti) {
       this.handleSVGTabChange(0);
     }
   }

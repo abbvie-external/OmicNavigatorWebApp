@@ -330,6 +330,20 @@ class BarcodePlot extends Component {
 
     const HighlightedProteins = this.props.HighlightedProteins || [];
     const selectedProteinId = this.props.selectedProteinId;
+    const prevPlotKey = prevProps.plotDataEnrichment?.key || '';
+    const currPlotKey = this.props.plotDataEnrichment?.key || '';
+
+    if (currPlotKey !== prevPlotKey) {
+      this.setState({
+        autoMaxAssigned: false,
+        initialLoad: true,
+        hoveredLineId: null,
+        hoveredLineName: null,
+        highlightedLineName: null,
+        tooltipPositionMax: null,
+        tooltipTextAnchorMax: null,
+      });
+    }
 
     if (this.props.HighlightedProteins !== prevProps.HighlightedProteins) {
       if (!this.state.initialLoad) {
@@ -362,9 +376,8 @@ class BarcodePlot extends Component {
         highlightedLineName: null,
         tooltipPositionMax: null,
         tooltipTextAnchorMax: null,
+        initialLoad: false,
       });
-
-      this.setState({ initialLoad: false });
 
       // Multi changed, but single might still be active → re-apply single style on top
       if (selectedProteinId) {
@@ -942,6 +955,11 @@ class BarcodePlot extends Component {
                 self.setState({
                   autoMaxAssigned: true,
                 });
+              } else if (self.props.selectedProteinId) {
+                self.applySingleSelectedStyle(
+                  self.props.selectedProteinId,
+                  self.props.HighlightedProteins || [],
+                );
               }
             } else {
               if (self.props.onHandleProteinSelected) {
