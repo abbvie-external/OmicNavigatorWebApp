@@ -19,6 +19,10 @@ import {
 import { createExcelExportHandler } from '../../utilities/excelExport';
 
 class MetafeaturesTableDynamic extends Component {
+  _isMounted = false;
+
+  metafeaturesRequestSeq = 0;
+
   state = {
     metafeaturesTableConfigCols: [],
     metafeaturesTableData: [],
@@ -29,6 +33,8 @@ class MetafeaturesTableDynamic extends Component {
   };
 
   componentDidMount() {
+    this._isMounted = true;
+
     const isMultifeaturePlot =
       this.props.plotSingleFeatureData.key?.includes('features') || false;
     if (
@@ -48,43 +54,116 @@ class MetafeaturesTableDynamic extends Component {
     }
   }
 
-  // componentWillUnmount() {
-  //   this.setState({
-  //     metafeaturesTableConfigCols: [],
-  //     metafeaturesTableData: [],
-  //     metafeaturesLoaded: false,
-  //   });
-  // }
+  componentWillUnmount() {
+    this._isMounted = false;
+    this.metafeaturesRequestSeq += 1;
+  }
+
+  safeParseCachedMetafeaturesData = (cacheKey) => {
+    const cachedValue = sessionStorage.getItem(cacheKey);
+
+    if (!cachedValue) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(cachedValue);
+    } catch (error) {
+      sessionStorage.removeItem(cacheKey);
+      return null;
+    }
+  };
+
+  isActiveMetafeaturesRequest = (requestId, requestedKey) => {
+    return (
+      this._isMounted &&
+      requestId === this.metafeaturesRequestSeq &&
+      requestedKey === this.props.plotSingleFeatureData?.key
+    );
+  };
 
   async getMetafeaturesDataDynamic() {
-    const cachedMetafeaturesData = JSON.parse(
-      sessionStorage.getItem(
-        `MetafeaturesData-${this.props.plotSingleFeatureData.key}`,
-      ),
-    );
-    if (!cachedMetafeaturesData && this.props.plotSingleFeatureData?.key) {
+    const requestedKey = this.props.plotSingleFeatureData?.key;
+
+    if (!requestedKey) {
+      this.setState({
+        metafeaturesTableConfigCols: [],
+        metafeaturesTableData: [],
+        metafeaturesLoaded: true,
+      });
+      return;
+    }
+
+    const requestId = ++this.metafeaturesRequestSeq;
+    const cacheKey = `MetafeaturesData-${requestedKey}`;
+
+    // Reset to a clean loading state so we never show stale data
+    // when changing features or when a request fails.
+    this.setState({
+      metafeaturesTableConfigCols: [],
+      metafeaturesTableData: [],
+      metafeaturesLoaded: false,
+    });
+
+    const cachedMetafeaturesData = this.safeParseCachedMetafeaturesData(cacheKey);
+    if (!cachedMetafeaturesData) {
       try {
         const data = await omicNavigatorService.getMetaFeaturesTable(
           this.props.differentialStudy,
           this.props.differentialModel,
-          this.props.plotSingleFeatureData.key,
+          requestedKey,
           null,
         );
-        let metaFeaturesDataVolcano = data != null ? data : [];
+
+        if (!this.isActiveMetafeaturesRequest(requestId, requestedKey)) {
+          return;
+        }
+
+        const metaFeaturesDataVolcano = data != null ? data : [];
         sessionStorage.setItem(
-          `MetafeaturesData-${this.props.plotSingleFeatureData.key}`,
+          cacheKey,
           JSON.stringify(metaFeaturesDataVolcano),
         );
-        this.getMetafeaturesTableConfigCols(metaFeaturesDataVolcano);
+        this.getMetafeaturesTableConfigCols(
+          metaFeaturesDataVolcano,
+          requestId,
+          requestedKey,
+        );
       } catch (error) {
-        throw error;
+        if (!this.isActiveMetafeaturesRequest(requestId, requestedKey)) {
+          return;
+        }
+
+        this.setState(
+          {
+            metafeaturesTableConfigCols: [],
+            metafeaturesTableData: [],
+            metafeaturesLoaded: true,
+          },
+          () => {
+            if (
+              this.isActiveMetafeaturesRequest(requestId, requestedKey) &&
+              typeof this.props.onRenderReady === 'function'
+            ) {
+              this.props.onRenderReady();
+            }
+          },
+        );
       }
     } else {
-      this.getMetafeaturesTableConfigCols(cachedMetafeaturesData);
+      this.getMetafeaturesTableConfigCols(
+        cachedMetafeaturesData,
+        requestId,
+        requestedKey,
+      );
     }
   }
 
-  getMetafeaturesTableConfigCols = (data) => {
+  getMetafeaturesTableConfigCols = (data, requestId, requestedKey) => {
+    if (!this.isActiveMetafeaturesRequest(requestId, requestedKey)) {
+      return;
+    }
+
     let configCols = [];
     if (data?.length > 0) {
       const TableValuePopupStyle = {
@@ -189,11 +268,38 @@ class MetafeaturesTableDynamic extends Component {
       const normalizedConfigCols = normalizeGridColumns(configCols);
       const normalizedData = augmentGridRows(data, normalizedConfigCols);
 
-      this.setState({
-        metafeaturesTableConfigCols: normalizedConfigCols,
-        metafeaturesTableData: normalizedData,
-        metafeaturesLoaded: true,
-      });
+      this.setState(
+        {
+          metafeaturesTableConfigCols: normalizedConfigCols,
+          metafeaturesTableData: normalizedData,
+          metafeaturesLoaded: true,
+        },
+        () => {
+          if (
+            this.isActiveMetafeaturesRequest(requestId, requestedKey) &&
+            typeof this.props.onRenderReady === 'function'
+          ) {
+            this.props.onRenderReady();
+          }
+        },
+      );
+    } else {
+      // No data: clear any previous content and stop showing the loader.
+      this.setState(
+        {
+          metafeaturesTableConfigCols: [],
+          metafeaturesTableData: [],
+          metafeaturesLoaded: true,
+        },
+        () => {
+          if (
+            this.isActiveMetafeaturesRequest(requestId, requestedKey) &&
+            typeof this.props.onRenderReady === 'function'
+          ) {
+            this.props.onRenderReady();
+          }
+        },
+      );
     }
   };
 

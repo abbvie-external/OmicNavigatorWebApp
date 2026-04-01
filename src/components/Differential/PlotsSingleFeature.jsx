@@ -8,8 +8,11 @@ import {
   Dropdown,
   Popup,
 } from 'semantic-ui-react';
+
 import ButtonActions from '../Shared/ButtonActions';
+
 import TabSingleFeature from './TabSingleFeature';
+
 import './PlotsDynamic.scss';
 import { isObjectEmpty } from '../Shared/helpers';
 
@@ -106,7 +109,6 @@ class PlotsSingleFeature extends Component {
     );
   };
 
-
   handleActivePlotRenderStart = (renderKey) => {
     // Called when the active plot pane is about to render (e.g., new feature/tab/size).
     // Keep loader visible until the render completion callback fires for the same key.
@@ -120,9 +122,9 @@ class PlotsSingleFeature extends Component {
   handleActivePlotRenderReady = (renderKey) => {
     // Only accept readiness signal for the current renderKey to avoid races.
     if (renderKey && this.activePlotRenderKeySync !== renderKey) return;
-    if (!this.state.activePlotRenderReady) {
-      this.setState({ activePlotRenderReady: true });
-    }
+    this.setState((prevState) =>
+      prevState.activePlotRenderReady ? null : { activePlotRenderReady: true },
+    );
   };
 
   render() {
@@ -210,11 +212,13 @@ class PlotsSingleFeature extends Component {
                 : null;
           }
         }
-        const loader = plotSingleFeatureDataLoaded && this.state.activePlotRenderReady ? null : (
-          <Dimmer active inverted>
-            <Loader size="large">Loading Single-Feature Plots</Loader>
-          </Dimmer>
-        );
+        const loader =
+          plotSingleFeatureDataLoaded &&
+          this.state.activePlotRenderReady ? null : (
+            <Dimmer active inverted>
+              <Loader size="large">Loading Single-Feature Plots</Loader>
+            </Dimmer>
+          );
 
         const exportInTabHeader = !!this.props.exportInTabHeader;
         const exportPortalNode = this.props.exportPortalNode || null;
@@ -274,9 +278,7 @@ class PlotsSingleFeature extends Component {
                           options[activeTabIndexPlotsSingleFeatureVar]?.value ||
                           options[0]?.value
                         }
-                        onChange={
-                          this.handlePlotDropdownChangeSingleFeature
-                        }
+                        onChange={this.handlePlotDropdownChangeSingleFeature}
                         className={DropdownClass}
                         id={
                           isMultifeaturePlot
@@ -292,9 +294,7 @@ class PlotsSingleFeature extends Component {
                     closeOnEscape
                     hideOnScroll
                   >
-                    <Popup.Content>
-                      {differentialPlotDescription}
-                    </Popup.Content>
+                    <Popup.Content>{differentialPlotDescription}</Popup.Content>
                   </Popup>
                 ) : (
                   <Dropdown
@@ -320,9 +320,7 @@ class PlotsSingleFeature extends Component {
                 {showFullScreenButton && (
                   <span
                     className={divWidth < 450 ? 'Hide' : 'Show'}
-                    id={
-                      divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'
-                    }
+                    id={divWidth >= 625 ? 'FullScreenButton' : 'FullScreenIcon'}
                   >
                     <Button
                       size="mini"

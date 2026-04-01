@@ -1568,8 +1568,7 @@ class Enrichment extends Component {
               let favicons = [];
               if (linkouts.length > 0) {
                 if (currentFavicons != null) {
-                  const columnFaviconsIsArray =
-                    Array.isArray(currentFavicons);
+                  const columnFaviconsIsArray = Array.isArray(currentFavicons);
                   favicons = columnFaviconsIsArray
                     ? currentFavicons
                     : [currentFavicons];
@@ -2646,6 +2645,17 @@ class Enrichment extends Component {
       enrichmentDataItem: dataItem,
       enrichmentTerm: term,
       enrichmentTest: test,
+      HighlightedProteins: [],
+      selectedProteinId: '',
+      SVGPlotLoading: true,
+      SVGPlotLoaded: false,
+      isViolinPlotLoaded: false,
+      isTestDataLoaded: false,
+      barcodeSettings: {
+        ...this.state.barcodeSettings,
+        barcodeData: [],
+        brushedData: [],
+      },
     });
     omicNavigatorService
       .getBarcodeData(
