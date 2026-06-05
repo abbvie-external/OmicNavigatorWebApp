@@ -736,6 +736,14 @@ export function getModelsArg(
   }
 }
 
+// Fix SVG url(#id) references broken by HashRouter.
+// When the page URL contains a #fragment, browsers resolve url(#id) against the
+// full URL, failing to find inline SVG defs. Rewriting to absolute URLs fixes this.
+export function svgPreProcessor(code) {
+  const base = window.location.href.split('#')[0];
+  return code.replaceAll('url(#', `url(${base}#`);
+}
+
 // helper function to get the difference between two sets
 export function getDifferenceTwoSets(setA, setB) {
   return new Set([...setA].filter((element) => !setB.has(element)));

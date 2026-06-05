@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { roundToPrecision, isMultiModelMultiTest } from '../Shared/helpers';
+import { roundToPrecision, isMultiModelMultiTest, svgPreProcessor } from '../Shared/helpers';
 import PlotlyMultiFeature from './PlotlyMultiFeature';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
@@ -148,6 +148,7 @@ class TabMultiFeature extends Component {
                       title={`${s.plotType.plotDisplay}`}
                       uniqueHash={`b2g9e2-${cacheStringArg}`}
                       uniquifyIDs={true}
+                      preProcessor={svgPreProcessor}
                       onLoad={() => {
                         if (typeof this.props.onActivePlotRenderReady === 'function') {
                           this.props.onActivePlotRenderReady(cacheStringArg);

@@ -21,6 +21,7 @@ import {
   getTestsArg,
   getModelsArg,
   isMultiModelMultiTest,
+  svgPreProcessor,
 } from '../Shared/helpers';
 import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import '../Shared/Table.scss';
@@ -3780,6 +3781,7 @@ class Enrichment extends Component {
               src={srcUrl}
               uniqueHash="d4i1g4"
               uniquifyIDs={true}
+              preProcessor={svgPreProcessor}
               id="enrichmentMultisetAnalysisSVG"
             />
           ) : (
