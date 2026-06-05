@@ -11,7 +11,7 @@ import {
   Dropdown,
 } from 'semantic-ui-react';
 import SVG from 'react-inlinesvg';
-import { roundToPrecision, loadingDimmer } from '../Shared/helpers';
+import { roundToPrecision, loadingDimmer, svgPreProcessor } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import PlotlyEnrichment from './PlotlyEnrichment';
 import './EnrichmentSVGPlot.scss';
@@ -116,6 +116,7 @@ class EnrichmentSVGPlot extends PureComponent {
                     src={srcUrl}
                     uniqueHash="e5j2h5"
                     uniquifyIDs={true}
+                    preProcessor={svgPreProcessor}
                     id="EnrichmentPlotSVG"
                   />
                 ) : (

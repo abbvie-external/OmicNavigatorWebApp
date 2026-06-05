@@ -12,6 +12,7 @@ import {
   Linkout,
   roundToPrecision,
   limitValues,
+  svgPreProcessor,
 } from '../Shared/helpers';
 import ButtonActions from '../Shared/ButtonActions';
 import DifferentialSearch from './DifferentialSearch';
@@ -2012,6 +2013,7 @@ class Differential extends Component {
               src={srcUrl}
               uniqueHash="b2g9e2"
               uniquifyIDs={true}
+              preProcessor={svgPreProcessor}
               id="differentialMultisetAnalysisSVG"
             />
           ) : null}

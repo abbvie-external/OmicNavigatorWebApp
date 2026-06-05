@@ -9,9 +9,11 @@ import {
   Button,
   Header,
 } from 'semantic-ui-react';
-import { omicNavigatorService } from '../services/omicNavigator.service';
-import Differential from './Differential/Differential';
+
 import omicNavigatorIcon from '../resources/icon.png';
+import { omicNavigatorService } from '../services/omicNavigator.service';
+
+import Differential from './Differential/Differential';
 import Enrichment from './Enrichment/Enrichment';
 import { updateUrl } from './Shared/UrlControl';
 class Tabs extends Component {
@@ -63,7 +65,7 @@ class Tabs extends Component {
       differentialFeatureIdKey: '',
       filteredDifferentialFeatureIdKey: '',
       // when updating the app version, change one line in 4 files: package.json, package-lock.json, public/manifest.json and Tabs.jsx
-      appVersion: '2.3.3',
+      appVersion: '2.3.4',
       packageVersion: '',
       infoOpen: false,
       screenWidth: window.innerWidth,
