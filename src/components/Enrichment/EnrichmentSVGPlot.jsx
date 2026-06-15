@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import SVG from 'react-inlinesvg';
 import {
   Loader,
   Dimmer,
@@ -10,10 +11,16 @@ import {
   // Label,
   Dropdown,
 } from 'semantic-ui-react';
-import SVG from 'react-inlinesvg';
-import { roundToPrecision, loadingDimmer, svgPreProcessor } from '../Shared/helpers';
+
 import ButtonActions from '../Shared/ButtonActions';
+import {
+  roundToPrecision,
+  loadingDimmer,
+  svgPreProcessor,
+} from '../Shared/helpers';
+
 import PlotlyEnrichment from './PlotlyEnrichment';
+
 import './EnrichmentSVGPlot.scss';
 import { isObjectEmpty } from '../Shared/helpers';
 
@@ -114,8 +121,7 @@ class EnrichmentSVGPlot extends PureComponent {
                   <SVG
                     cacheRequests={true}
                     src={srcUrl}
-                    uniqueHash="e5j2h5"
-                    uniquifyIDs={true}
+                    uniquifyIDs={false}
                     preProcessor={svgPreProcessor}
                     id="EnrichmentPlotSVG"
                   />

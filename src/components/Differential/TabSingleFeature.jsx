@@ -2,7 +2,11 @@ import React, { Component } from 'react';
 import SVG from 'react-inlinesvg';
 import { Tab } from 'semantic-ui-react';
 
-import { roundToPrecision, isMultiModelMultiTest, svgPreProcessor } from '../Shared/helpers';
+import {
+  roundToPrecision,
+  isMultiModelMultiTest,
+  svgPreProcessor,
+} from '../Shared/helpers';
 
 import MetafeaturesTableDynamic from './MetafeaturesTableDynamic';
 import PlotlySingleFeature from './PlotlySingleFeature';
@@ -145,8 +149,7 @@ class TabSingleFeature extends Component {
                     cacheRequests={true}
                     src={srcUrl}
                     title={`${s.plotType.plotDisplay}`}
-                    uniqueHash={`a1f8d1-${cacheStringArg}`}
-                    uniquifyIDs={true}
+                    uniquifyIDs={false}
                     preProcessor={svgPreProcessor}
                     onLoad={() => {
                       if (

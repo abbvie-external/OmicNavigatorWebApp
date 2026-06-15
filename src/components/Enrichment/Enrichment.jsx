@@ -3779,8 +3779,7 @@ class Enrichment extends Component {
             <SVG
               cacheRequests={true}
               src={srcUrl}
-              uniqueHash="d4i1g4"
-              uniquifyIDs={true}
+              uniquifyIDs={false}
               preProcessor={svgPreProcessor}
               id="enrichmentMultisetAnalysisSVG"
             />
