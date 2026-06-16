@@ -198,10 +198,13 @@ class PlotHelpers {
     }
 
     try {
-      let updated = xml.replace(/id="/g, `id="${idBase}-${svgIndex}-`);
+      const prefix = `${idBase}-${svgIndex}-`;
+      let updated = xml.replace(/id="/g, `id="${prefix}`);
 
-      updated = updated.replace(/#glyph/g, `#${idBase}-${svgIndex}-glyph`);
-      updated = updated.replace(/#clip/g, `#${idBase}-${svgIndex}-clip`);
+      // Update ALL url(#...) references to use the prefixed IDs
+      updated = updated.replace(/url\(#/g, `url(#${prefix}`);
+      // Update ALL xlink:href="#..." and href="#..." references
+      updated = updated.replace(/href="#/g, `href="#${prefix}`);
 
       const svgId = multiFeature
         ? `currentSVG-multifeatures-${svgIndex}`
@@ -215,7 +218,7 @@ class PlotHelpers {
       const restrictExternalUseHref = function (node) {
         if (node.hasAttribute('xlink:href')) {
           const href = node.getAttribute('xlink:href');
-          if (!href.match(/^#/)) {
+          if (!href.match(/^(#|data:)/)) {
             node.remove();
           }
         }
