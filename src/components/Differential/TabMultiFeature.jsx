@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Tab } from 'semantic-ui-react';
-import SVG from 'react-inlinesvg';
+
 import { roundToPrecision, isMultiModelMultiTest } from '../Shared/helpers';
+
 import PlotlyMultiFeature from './PlotlyMultiFeature';
+import StaticSvgRenderer from './StaticSvgRenderer';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
 
@@ -105,7 +107,10 @@ class TabMultiFeature extends Component {
           }
           // ${s.plotType.plotDisplay} is not available for this combination of features`;
           const willRenderErrorPane = !!errorMessagePlotlyMultiFeature;
-          if (willRenderErrorPane && typeof this.props.onActivePlotRenderReady === 'function') {
+          if (
+            willRenderErrorPane &&
+            typeof this.props.onActivePlotRenderReady === 'function'
+          ) {
             this.props.onActivePlotRenderReady(cacheStringArg);
           }
           const svgPanes = {
@@ -142,19 +147,23 @@ class TabMultiFeature extends Component {
                       }}
                     />
                   ) : s.svg && !errorMessagePlotlyMultiFeature ? (
-                    <SVG
-                      cacheRequests={true}
+                    <StaticSvgRenderer
                       src={srcUrl}
                       title={`${s.plotType.plotDisplay}`}
                       uniqueHash={`b2g9e2-${cacheStringArg}`}
-                      uniquifyIDs={true}
                       onLoad={() => {
-                        if (typeof this.props.onActivePlotRenderReady === 'function') {
+                        if (
+                          typeof this.props.onActivePlotRenderReady ===
+                          'function'
+                        ) {
                           this.props.onActivePlotRenderReady(cacheStringArg);
                         }
                       }}
                       onError={() => {
-                        if (typeof this.props.onActivePlotRenderReady === 'function') {
+                        if (
+                          typeof this.props.onActivePlotRenderReady ===
+                          'function'
+                        ) {
                           this.props.onActivePlotRenderReady(cacheStringArg);
                         }
                       }}

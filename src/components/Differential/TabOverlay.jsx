@@ -4,8 +4,11 @@ import {
   // Loader,
   // Dimmer
 } from 'semantic-ui-react';
+
 import MetafeaturesTable from './MetafeaturesTable';
 import PlotlyOverlay from './PlotlyOverlay';
+import StaticSvgRenderer from './StaticSvgRenderer';
+
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
 import { isMultiModelMultiTest } from '../Shared/helpers';
@@ -20,7 +23,18 @@ class TabOverlay extends Component {
     // This fixes cases where TabOverlay mounts *after* the parent overlay becomes loaded,
     // and no subsequent state/prop change happens (so componentDidUpdate wouldn't run).
     this.refreshPanes();
+
+    // Listen for window resize to update overlay dimensions
+    window.addEventListener('resize', this.handleResize);
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize = () => {
+    this.refreshPanes();
+  };
 
   componentDidUpdate() {
     this.refreshPanes();
@@ -51,11 +65,14 @@ class TabOverlay extends Component {
       featuresLength > 1 ? multiFeaturePlotTypes : singleFeaturePlotTypes;
     const plotId = overlayPlotTypes?.[activeTabIndexPlotsOverlay]?.plotID;
 
-    const cacheStringArg = `overlayPanes_${activeTabIndexPlotsOverlay}_${divHeight}_${divWidth}_${divHeight}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
+    // Include actual container dimensions in cache to invalidate on resize
+    const actualWidth = this.getWidth();
+    const actualHeight = this.getHeight();
+
+    const cacheStringArg = `overlayPanes_${activeTabIndexPlotsOverlay}_${actualHeight}_${actualWidth}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
 
     this.getSVGPanesOverlay(cacheStringArg, featuresLength, overlayPlotTypes);
   };
-
 
   getWidth = () => {
     if (this.props.differentialPlotsOverlayRefFwd?.current !== null) {
@@ -157,11 +174,11 @@ class TabOverlay extends Component {
                       errorMessagePlotlyOverlay={errorMessagePlotlyOverlay}
                     />
                   ) : s.svg && !errorMessagePlotlyOverlay ? (
-                    <div
-                      id="PlotsOverlayContainer"
-                      className="svgSpan"
-                      dangerouslySetInnerHTML={{ __html: s.svg }}
-                    ></div>
+                    <StaticSvgRenderer
+                      src={`data:image/svg+xml;utf8,${encodeURIComponent(s.svg)}`}
+                      title={`${s.plotType.plotDisplay}`}
+                      uniqueHash={`o3k7x9-${cacheStringArg}`}
+                    />
                   ) : (
                     <div className="PlotInstructions">
                       <h4 className="PlotInstructionsText NoSelect">

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import SVG from 'react-inlinesvg';
 import { Tab } from 'semantic-ui-react';
 
 import { roundToPrecision, isMultiModelMultiTest } from '../Shared/helpers';
 
 import MetafeaturesTableDynamic from './MetafeaturesTableDynamic';
 import PlotlySingleFeature from './PlotlySingleFeature';
+import StaticSvgRenderer from './StaticSvgRenderer';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
 
@@ -141,12 +141,10 @@ class TabSingleFeature extends Component {
                     }}
                   />
                 ) : s.svg && !errorMessagePlotlySingleFeature ? (
-                  <SVG
-                    cacheRequests={true}
+                  <StaticSvgRenderer
                     src={srcUrl}
                     title={`${s.plotType.plotDisplay}`}
                     uniqueHash={`a1f8d1-${cacheStringArg}`}
-                    uniquifyIDs={true}
                     onLoad={() => {
                       if (
                         typeof this.props.onActivePlotRenderReady === 'function'
