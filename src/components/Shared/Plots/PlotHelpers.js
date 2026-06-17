@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify';
+
 import {
   isMultiModelMultiTest,
   getTestsArg,
@@ -198,10 +199,13 @@ class PlotHelpers {
     }
 
     try {
-      let updated = xml.replace(/id="/g, `id="${idBase}-${svgIndex}-`);
+      const prefix = `${idBase}-${svgIndex}-`;
+      let updated = xml.replace(/id="/g, `id="${prefix}`);
 
-      updated = updated.replace(/#glyph/g, `#${idBase}-${svgIndex}-glyph`);
-      updated = updated.replace(/#clip/g, `#${idBase}-${svgIndex}-clip`);
+      // Update ALL url(#...) references to use the prefixed IDs
+      updated = updated.replace(/url\(#/g, `url(#${prefix}`);
+      // Update ALL xlink:href="#..." and href="#..." references
+      updated = updated.replace(/href="#/g, `href="#${prefix}`);
 
       const svgId = multiFeature
         ? `currentSVG-multifeatures-${svgIndex}`
@@ -212,10 +216,21 @@ class PlotHelpers {
         `<svg preserveAspectRatio="xMinYMin meet" class="currentSVG" id="${svgId}"`,
       );
 
+      // Ensure namespace attributes exist for cross-browser SVG support.
+      updated = updated.replace(/<svg([^>]*)>/, (match, attrs) => {
+        const hasXmlns = /\sxmlns=/.test(attrs);
+        const hasXlink = /\sxmlns:xlink=/.test(attrs);
+        const xmlns = hasXmlns ? '' : ' xmlns="http://www.w3.org/2000/svg"';
+        const xlink = hasXlink
+          ? ''
+          : ' xmlns:xlink="http://www.w3.org/1999/xlink"';
+        return `<svg${attrs}${xmlns}${xlink}>`;
+      });
+
       const restrictExternalUseHref = function (node) {
         if (node.hasAttribute('xlink:href')) {
           const href = node.getAttribute('xlink:href');
-          if (!href.match(/^#/)) {
+          if (!href.match(/^(#|data:)/)) {
             node.remove();
           }
         }

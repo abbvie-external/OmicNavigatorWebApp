@@ -1,10 +1,17 @@
-import React, { Component } from 'react';
-import { Grid, Popup, Sidebar, Icon } from 'semantic-ui-react';
-import _ from 'lodash-es';
 import DOMPurify from 'dompurify';
-import { withRouter } from 'react-router-dom';
+import _ from 'lodash-es';
+import React, { Component } from 'react';
 import SVG from 'react-inlinesvg';
+import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Grid, Popup, Sidebar, Icon } from 'semantic-ui-react';
+
+import { omicNavigatorService } from '../../services/omicNavigator.service';
+import ButtonActions from '../Shared/ButtonActions';
+import './Differential.scss';
+import '../Shared/Table.scss';
+import { HEADER_OFFSET_PX } from '../Shared/constants';
+import ErrorBoundary from '../Shared/ErrorBoundary';
 import {
   isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
@@ -12,18 +19,14 @@ import {
   Linkout,
   roundToPrecision,
   limitValues,
+  svgPreProcessor,
 } from '../Shared/helpers';
-import ButtonActions from '../Shared/ButtonActions';
-import DifferentialSearch from './DifferentialSearch';
-import DifferentialDetail from './DifferentialDetail';
-import ErrorBoundary from '../Shared/ErrorBoundary';
-import { omicNavigatorService } from '../../services/omicNavigator.service';
+import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
-import PlotHelpers from '../Shared/Plots/PlotHelpers';
-import './Differential.scss';
-import '../Shared/Table.scss';
-import { HEADER_OFFSET_PX } from '../Shared/constants';
+
+import DifferentialDetail from './DifferentialDetail';
+import DifferentialSearch from './DifferentialSearch';
 
 let cancelRequestGetMapping = () => {};
 class Differential extends Component {
@@ -807,8 +810,8 @@ class Differential extends Component {
     const cancelTokenKey = multifeaturePlot
       ? 'multiPlot'
       : view === 'Overlay'
-      ? 'overlay'
-      : 'singlePlot';
+        ? 'overlay'
+        : 'singlePlot';
 
     const cancelToken = PlotHelpers.createAbortSignal(cancelTokenKey);
 
@@ -2010,8 +2013,8 @@ class Differential extends Component {
             <SVG
               cacheRequests={true}
               src={srcUrl}
-              uniqueHash="b2g9e2"
-              uniquifyIDs={true}
+              uniquifyIDs={false}
+              preProcessor={svgPreProcessor}
               id="differentialMultisetAnalysisSVG"
             />
           ) : null}

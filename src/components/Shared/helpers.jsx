@@ -736,6 +736,41 @@ export function getModelsArg(
   }
 }
 
+// Uniquify all SVG IDs and update every reference (url(#id), xlink:href="#id",
+// href="#id", mask, filter, clip-path). react-inlinesvg's uniquifyIDs misses
+// mask, filter, and xlink:href inside <feImage>/<use> in <defs>, which breaks
+// Cairo compositing SVGs. We handle it fully here and disable uniquifyIDs.
+let svgPreProcessorCounter = 0;
+export function svgPreProcessor(code) {
+  const prefix = `__svg${svgPreProcessorCounter++}__`;
+  // Collect all IDs defined in the SVG
+  const idRegex = /\bid="([^"]+)"/g;
+  const ids = new Set();
+  let match;
+  while ((match = idRegex.exec(code)) !== null) {
+    ids.add(match[1]);
+  }
+  if (ids.size === 0) return code;
+  // Replace each ID and all its references
+  let result = code;
+  for (const id of ids) {
+    const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Replace id definition
+    result = result.replaceAll(`id="${id}"`, `id="${prefix}${id}"`);
+    // Replace url(#id) references (in fill, clip-path, mask, filter, style, etc.)
+    result = result.replaceAll(`url(#${id})`, `url(#${prefix}${id})`);
+    // Replace xlink:href="#id" references
+    result = result.replaceAll(
+      `xlink:href="#${id}"`,
+      `xlink:href="#${prefix}${id}"`,
+    );
+    // Replace href="#id" references (SVG2)
+    const hrefRegex = new RegExp(`href="#${escapedId}"(?![^<]*xlink)`, 'g');
+    result = result.replace(hrefRegex, `href="#${prefix}${id}"`);
+  }
+  return result;
+}
+
 // helper function to get the difference between two sets
 export function getDifferenceTwoSets(setA, setB) {
   return new Set([...setA].filter((element) => !setB.has(element)));
