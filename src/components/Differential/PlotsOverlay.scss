@@ -24,6 +24,19 @@
 }
 #PlotsOverlayContainer {
   width: 100% !important;
+  position: relative;
+  overflow: hidden;
+
+  /* Some static SVGs can include absolute positioning on the root element.
+     Force in-flow positioning in overlay/fullscreen to prevent header overlap. */
+  > svg,
+  .currentSVG {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    display: block;
+  }
+
   svg {
     height: 100% !important;
     max-height: 70vh !important;

@@ -4,8 +4,10 @@ import {
   // Loader,
   // Dimmer
 } from 'semantic-ui-react';
+
 import MetafeaturesTable from './MetafeaturesTable';
 import PlotlyOverlay from './PlotlyOverlay';
+
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
 import { isMultiModelMultiTest } from '../Shared/helpers';
@@ -55,7 +57,6 @@ class TabOverlay extends Component {
 
     this.getSVGPanesOverlay(cacheStringArg, featuresLength, overlayPlotTypes);
   };
-
 
   getWidth = () => {
     if (this.props.differentialPlotsOverlayRefFwd?.current !== null) {
@@ -158,7 +159,6 @@ class TabOverlay extends Component {
                     />
                   ) : s.svg && !errorMessagePlotlyOverlay ? (
                     <div
-                      id="PlotsOverlayContainer"
                       className="svgSpan"
                       dangerouslySetInnerHTML={{ __html: s.svg }}
                     ></div>
