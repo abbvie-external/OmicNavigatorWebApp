@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify';
+
 import {
   isMultiModelMultiTest,
   getTestsArg,
@@ -214,6 +215,17 @@ class PlotHelpers {
         /<svg/g,
         `<svg preserveAspectRatio="xMinYMin meet" class="currentSVG" id="${svgId}"`,
       );
+
+      // Ensure namespace attributes exist for cross-browser SVG support.
+      updated = updated.replace(/<svg([^>]*)>/, (match, attrs) => {
+        const hasXmlns = /\sxmlns=/.test(attrs);
+        const hasXlink = /\sxmlns:xlink=/.test(attrs);
+        const xmlns = hasXmlns ? '' : ' xmlns="http://www.w3.org/2000/svg"';
+        const xlink = hasXlink
+          ? ''
+          : ' xmlns:xlink="http://www.w3.org/1999/xlink"';
+        return `<svg${attrs}${xmlns}${xlink}>`;
+      });
 
       const restrictExternalUseHref = function (node) {
         if (node.hasAttribute('xlink:href')) {
