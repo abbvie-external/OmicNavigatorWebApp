@@ -148,8 +148,12 @@ class ButtonActions extends Component {
 
   exportSVG = (svgEl, name) => {
     if (svgEl != null) {
-      svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      const svgData = svgEl.outerHTML;
+      const svgClone = svgEl.cloneNode(true);
+      svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      svgClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+      const serializer = new XMLSerializer();
+      const svgData = serializer.serializeToString(svgClone);
       const preface = '<?xml version="1.0" standalone="no"?>\r\n';
       const svgBlob = new Blob([preface, svgData], {
         type: 'image/svg+xml;charset=utf-8',
