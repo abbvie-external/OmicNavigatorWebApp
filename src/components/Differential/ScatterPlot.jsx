@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import _ from 'lodash-es';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
+import _ from 'lodash-es';
+import React, { Component } from 'react';
+
 import { loadingDimmerGeneric, getMaxAndMin } from '../Shared/helpers';
 import './ScatterPlot.scss';
 
@@ -1622,7 +1623,7 @@ class ScatterPlot extends Component {
           return JSON.parse(a.attributes.data.value);
         });
         const total = [...brushedBins, ...brushedDataArr];
-        if (!!total.length) {
+        if (total.length) {
           if (
             // SHIFT BOX-SELECT FOR MULTI-FEATURE PLOTS
             event.sourceEvent?.shiftKey
