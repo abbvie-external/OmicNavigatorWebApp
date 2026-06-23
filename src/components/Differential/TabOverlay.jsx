@@ -24,12 +24,24 @@ class TabOverlay extends Component {
     window.addEventListener('resize', this.handleResize);
   }
 
+  _resizeTimer = null;
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
+    if (this._resizeTimer) {
+      clearTimeout(this._resizeTimer);
+    }
   }
 
   handleResize = () => {
-    this.refreshPanes();
+    if (this._resizeTimer) {
+      clearTimeout(this._resizeTimer);
+    }
+    this._resizeTimer = setTimeout(() => {
+      this._resizeTimer = null;
+      this.cacheString = null;
+      this.refreshPanes();
+    }, 300);
   };
 
   componentDidUpdate() {
