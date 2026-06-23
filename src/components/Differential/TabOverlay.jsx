@@ -11,7 +11,7 @@ import StaticSvgRenderer from './StaticSvgRenderer';
 
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
-import { isMultiModelMultiTest } from '../Shared/helpers';
+import { isMultiModelMultiTest, roundToPrecision } from '../Shared/helpers';
 
 class TabOverlay extends Component {
   state = {
@@ -121,6 +121,8 @@ class TabOverlay extends Component {
       modelSpecificMetaFeaturesExist,
       differentialTest,
       differentialTestIdsCommon,
+      pxToPtRatio,
+      pointSize,
     } = this.props;
     // since this call is in render, index determines the one tab to display (svg, plotly or feature data)
     let panes = [];
@@ -130,6 +132,23 @@ class TabOverlay extends Component {
         if (s) {
           const svgContainerWidth = this.getWidth();
           const svgContainerHeight = this.getHeight();
+          let dimensions = '';
+          if (svgContainerWidth && svgContainerHeight && pxToPtRatio) {
+            const divWidthPadding = svgContainerWidth * 0.95;
+            const divHeightPadding = svgContainerHeight * 0.95 - 38;
+            const divWidthPt = roundToPrecision(
+              divWidthPadding / pxToPtRatio,
+              1,
+            );
+            const divHeightPt = roundToPrecision(
+              divHeightPadding / pxToPtRatio,
+              1,
+            );
+            const divWidthPtString = `width=${divWidthPt}`;
+            const divHeightPtString = `&height=${divHeightPt}`;
+            const pointSizeString = `&pointsize=${pointSize}`;
+            dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+          }
           const isPlotlyPlot = s.plotType.plotType.includes('plotly');
           const isMultiModelMultiTestVar = isMultiModelMultiTest(
             s.plotType.plotType,
@@ -175,7 +194,7 @@ class TabOverlay extends Component {
                     />
                   ) : s.svg && !errorMessagePlotlyOverlay ? (
                     <StaticSvgRenderer
-                      src={`data:image/svg+xml;utf8,${encodeURIComponent(s.svg)}`}
+                      src={`${s.svg}${dimensions}`}
                       title={`${s.plotType.plotDisplay}`}
                       uniqueHash={`o3k7x9-${cacheStringArg}`}
                     />

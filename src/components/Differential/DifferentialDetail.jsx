@@ -232,8 +232,7 @@ class DifferentialDetail extends Component {
       this.resetSearchAndData();
     }
     const unfilteredChanged =
-      prevProps.differentialResultsUnfiltered !==
-      differentialResultsUnfiltered;
+      prevProps.differentialResultsUnfiltered !== differentialResultsUnfiltered;
     const filteredChanged =
       prevProps.differentialResults !== differentialResults;
 
@@ -1636,6 +1635,8 @@ class DifferentialDetail extends Component {
               differentialPlotDescriptions={
                 this.props.differentialPlotDescriptions
               }
+              pxToPtRatio={105}
+              pointSize={12}
             ></PlotsOverlay>
           </Sidebar>
         );

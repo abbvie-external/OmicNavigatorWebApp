@@ -14,7 +14,7 @@ class TabSingleFeature extends Component {
     svgPanesSingleFeature: [],
   };
 
-  componentDidUpdate() {
+  buildCacheStringArg = () => {
     const {
       activeTabIndexPlotsSingleFeature,
       divHeight,
@@ -25,6 +25,7 @@ class TabSingleFeature extends Component {
       plotSingleFeatureData,
       singleFeaturePlotTypes,
     } = this.props;
+
     const plotKey = plotSingleFeatureData.key;
     const plotLength = plotSingleFeatureData?.svg.length;
     const plotId =
@@ -33,8 +34,16 @@ class TabSingleFeature extends Component {
       activeTabIndexPlotsSingleFeature < singleFeaturePlotTypes.length
         ? false
         : true;
-    const cacheStringArg = `singleFeaturePanes_${activeTabIndexPlotsSingleFeature}_${divHeight}_${divWidth}_${plotId}_${isMetaFeatureTab}_${plotKey}_${plotLength}_${plotId}_${differentialStudy}_${differentialModel}_${differentialTest}`;
-    this.getSVGPanesSingleFeature(cacheStringArg);
+
+    return `singleFeaturePanes_${activeTabIndexPlotsSingleFeature}_${divHeight}_${divWidth}_${plotId}_${isMetaFeatureTab}_${plotKey}_${plotLength}_${plotId}_${differentialStudy}_${differentialModel}_${differentialTest}`;
+  };
+
+  componentDidMount() {
+    this.getSVGPanesSingleFeature(this.buildCacheStringArg());
+  }
+
+  componentDidUpdate() {
+    this.getSVGPanesSingleFeature(this.buildCacheStringArg());
   }
 
   getSVGPanesSingleFeature = (cacheStringArg) => {
