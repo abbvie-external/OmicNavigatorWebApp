@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import _ from 'lodash-es';
 import * as d3 from 'd3';
 import * as hexbin from 'd3-hexbin';
+import _ from 'lodash-es';
+import React, { Component } from 'react';
+
 import { loadingDimmerGeneric, getMaxAndMin } from '../Shared/helpers';
 import './ScatterPlot.scss';
 
@@ -1245,8 +1246,8 @@ class ScatterPlot extends Component {
             .attr('id', 'tooltip')
             .attr('class', 'NoSelect')
             .append('rect')
-            .attr('width', '100%')
-            .attr('height', '100%')
+            .attr('width', 200)
+            .attr('height', 75)
             .attr('fill', '#ff4400')
             .attr('rx', '5')
             .attr('ry', '5');
@@ -1254,8 +1255,8 @@ class ScatterPlot extends Component {
 
         d3.select('#tooltip')
           .append('rect')
-          .attr('width', '100%')
-          .attr('height', '96%')
+          .attr('width', 200)
+          .attr('height', 72)
           .attr('fill', '#2e2e2e')
           .attr('stroke', '#000')
           .attr('rx', '3')
@@ -1330,8 +1331,8 @@ class ScatterPlot extends Component {
             .attr('id', 'tooltip')
             .attr('class', 'NoSelect')
             .append('rect')
-            .attr('width', '100%')
-            .attr('height', '100%')
+            .attr('width', 200)
+            .attr('height', 75)
             .attr('fill', '#ff4400')
             .attr('rx', '5')
             .attr('ry', '5');
@@ -1339,8 +1340,8 @@ class ScatterPlot extends Component {
 
         d3.select('#tooltip')
           .append('rect')
-          .attr('width', '100%')
-          .attr('height', '96%')
+          .attr('width', 200)
+          .attr('height', 72)
           .attr('fill', '#2e2e2e')
           .attr('stroke', '#000')
           .attr('rx', '3')
@@ -1622,7 +1623,7 @@ class ScatterPlot extends Component {
           return JSON.parse(a.attributes.data.value);
         });
         const total = [...brushedBins, ...brushedDataArr];
-        if (!!total.length) {
+        if (total.length) {
           if (
             // SHIFT BOX-SELECT FOR MULTI-FEATURE PLOTS
             event.sourceEvent?.shiftKey
