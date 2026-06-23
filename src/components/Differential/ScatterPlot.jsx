@@ -1245,8 +1245,8 @@ class ScatterPlot extends Component {
             .attr('id', 'tooltip')
             .attr('class', 'NoSelect')
             .append('rect')
-            .attr('width', '100%')
-            .attr('height', '100%')
+            .attr('width', 200)
+            .attr('height', 75)
             .attr('fill', '#ff4400')
             .attr('rx', '5')
             .attr('ry', '5');
@@ -1254,8 +1254,8 @@ class ScatterPlot extends Component {
 
         d3.select('#tooltip')
           .append('rect')
-          .attr('width', '100%')
-          .attr('height', '96%')
+          .attr('width', 200)
+          .attr('height', 72)
           .attr('fill', '#2e2e2e')
           .attr('stroke', '#000')
           .attr('rx', '3')
@@ -1330,8 +1330,8 @@ class ScatterPlot extends Component {
             .attr('id', 'tooltip')
             .attr('class', 'NoSelect')
             .append('rect')
-            .attr('width', '100%')
-            .attr('height', '100%')
+            .attr('width', 200)
+            .attr('height', 75)
             .attr('fill', '#ff4400')
             .attr('rx', '5')
             .attr('ry', '5');
@@ -1339,8 +1339,8 @@ class ScatterPlot extends Component {
 
         d3.select('#tooltip')
           .append('rect')
-          .attr('width', '100%')
-          .attr('height', '96%')
+          .attr('width', 200)
+          .attr('height', 72)
           .attr('fill', '#2e2e2e')
           .attr('stroke', '#000')
           .attr('rx', '3')
