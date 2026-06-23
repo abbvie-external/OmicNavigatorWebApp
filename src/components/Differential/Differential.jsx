@@ -1,4 +1,3 @@
-import DOMPurify from 'dompurify';
 import _ from 'lodash-es';
 import React, { Component } from 'react';
 import SVG from 'react-inlinesvg';

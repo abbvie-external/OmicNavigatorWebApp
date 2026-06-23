@@ -22,7 +22,6 @@ import {
   getModelsArg,
   isMultiModelMultiTest,
 } from '../Shared/helpers';
-import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import TransitionActive from '../Transitions/TransitionActive';

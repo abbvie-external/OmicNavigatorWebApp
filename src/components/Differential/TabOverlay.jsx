@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-import {
-  Tab,
-  // Loader,
-  // Dimmer
-} from 'semantic-ui-react';
+import { Tab } from 'semantic-ui-react';
 
 import MetafeaturesTable from './MetafeaturesTable';
 import PlotlyOverlay from './PlotlyOverlay';
@@ -90,31 +86,9 @@ class TabOverlay extends Component {
     return 700;
   };
 
-  //     if (activeTabIndexPlotsOverlay < overlayPlotsTypes.length) {
-  //       const plotId =
-  //         overlayPlotsTypes[activeTabIndexPlotsOverlay].plotType.plotID;
-  //       const plotKey = plotOverlayData.key;
-  //       // const cacheKey = `overlayFeaturePanes_${differentialStudy}_${differentialModel}_${differentialTest}_${plotKey}_${plotId}_${activeTabIndexPlotsOverlay}`;
-  //       // if (this[cacheKey] != null) {
-  //       //   return this[cacheKey];
-  //       // } else {
-  //       const s = plotOverlayData?.svg[activeTabIndexPlotsOverlay];
-  //       const featuresLength = this.props.differentialHighlightedFeaturesData
-  //         .length;
-
   getSVGPanesOverlay = (cacheStringArg, featuresLength, overlayPlotTypes) => {
     if (this.cacheString === cacheStringArg) return;
     this.cacheString = cacheStringArg;
-    // if (!this.props.plotOverlayLoaded) {
-    //   return (
-    // <LoaderActivePlots />
-    //     <div className="PlotsMetafeaturesDimmer">
-    //       <Dimmer active inverted>
-    //         <Loader size="large">Loading...</Loader>
-    //       </Dimmer>
-    //     </div>
-    //   );
-    // } else {
     const {
       activeTabIndexPlotsOverlay,
       plotOverlayData,
@@ -243,7 +217,6 @@ class TabOverlay extends Component {
     this.setState({
       svgPanesOverlay: panes,
     });
-    // }
   };
 
   render() {
