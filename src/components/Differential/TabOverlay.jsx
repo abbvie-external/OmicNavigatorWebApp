@@ -84,16 +84,16 @@ class TabOverlay extends Component {
 
   getWidth = () => {
     if (this.props.differentialPlotsOverlayRefFwd?.current !== null) {
-      return this.props.differentialPlotsOverlayRefFwd.current.offsetParent
-        .offsetWidth;
+      return this.props.differentialPlotsOverlayRefFwd.current.clientWidth;
     }
     return 1200;
   };
 
   getHeight = () => {
     if (this.props.differentialPlotsOverlayRefFwd?.current !== null) {
-      return this.props.differentialPlotsOverlayRefFwd.current.offsetParent
-        .offsetHeight;
+      const rect =
+        this.props.differentialPlotsOverlayRefFwd.current.getBoundingClientRect();
+      return window.innerHeight - rect.top;
     }
     return 700;
   };
