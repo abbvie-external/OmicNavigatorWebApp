@@ -1,5 +1,5 @@
-import $ from 'jquery';
 import axios from 'axios';
+import $ from 'jquery';
 import { toast } from 'react-toastify';
 import('opencpu.js/opencpu-0.5.js');
 
@@ -136,42 +136,6 @@ class OmicNavigatorService {
     }
   }
 
-  async ocpuPlotCall(method, obj, handleError, signal) {
-    const self = this;
-    return new Promise(function (resolve, reject) {
-      window.ocpu
-        .call(method, obj, function (session) {
-          const sessionUrls = session.output || null;
-          if (!sessionUrls) resolve([]);
-          const graphicsUrl = sessionUrls.filter((u) => u.includes('graphics'));
-          // graphics = ["/ocpu/tmp/tempid/graphics/1"]
-          if (!graphicsUrl.length) resolve([]);
-          const url = `${self.baseUrl}${graphicsUrl}/svg`;
-          axios
-            .get(url, {
-              responseType: 'text', // needed for SVG
-              signal,
-              timeout: self.timeoutLength,
-            })
-            .then((response) => resolve(response))
-            .catch(function (thrown) {
-              if (!isCanceledError(thrown)) {
-                if (handleError != null) {
-                  handleError(false);
-                }
-                return `Error: ${getErrorMessage(thrown)}`;
-              }
-            });
-        })
-        .catch((error) => {
-          if (handleError != null) {
-            handleError(false);
-          }
-          return `Error: ${getErrorMessage(error)}`;
-        });
-    });
-  }
-
   async plotStudyReturnSvgUrl(
     study,
     modelID,
@@ -213,7 +177,7 @@ class OmicNavigatorService {
     }
   }
 
-  async plotStudyReturnSvg(
+  async plotStudyReturnSvgUrlWithTimeoutResolver(
     study,
     modelID,
     featureID,
@@ -224,52 +188,17 @@ class OmicNavigatorService {
     signal,
   ) {
     this.setUrl();
-    const obj = {
+    const cacheKey = `plotStudyMultifeatureUrl_${study}_${modelID}_${testID}_${featureID}_${plotID}`;
+    if (this[cacheKey] != null) {
+      return this[cacheKey];
+    }
+    const promise = this.plotStudyReturnSvgUrl(
       study,
       modelID,
       featureID,
       plotID,
+      plotType,
       testID,
-    };
-    if (plotType.includes('plotly')) {
-      const data = await this.axiosPostPlotly(
-        'plotStudy',
-        obj,
-        null,
-        errorCb,
-        signal,
-      );
-      return data;
-    } else {
-      const promise = this.ocpuPlotCall('plotStudy', obj, errorCb, signal);
-      const dataFromPromise = await promise;
-      return dataFromPromise;
-    }
-  }
-
-  async plotStudyReturnSvgWithTimeoutResolver(
-    study,
-    modelID,
-    featureID,
-    plotID,
-    testID,
-    errorCb,
-    signal,
-  ) {
-    this.setUrl();
-    const cacheKey = `plotStudyMultifeature_${study}_${modelID}_${testID}_${featureID}_${plotID}`;
-    if (this[cacheKey] != null) {
-      return this[cacheKey];
-    }
-    const promise = this.ocpuPlotCall(
-      'plotStudy',
-      {
-        study,
-        modelID,
-        featureID,
-        plotID,
-        testID,
-      },
       errorCb,
       signal,
     );
@@ -286,7 +215,6 @@ class OmicNavigatorService {
       return promise;
     } catch (err) {
       return `Error: ${getErrorMessage(err)}`;
-      // return err;
     }
   }
 

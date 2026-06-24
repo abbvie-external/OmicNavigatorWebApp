@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import {
-  Tab,
-  // Loader,
-  // Dimmer
-} from 'semantic-ui-react';
+import { Tab } from 'semantic-ui-react';
+
 import MetafeaturesTable from './MetafeaturesTable';
 import PlotlyOverlay from './PlotlyOverlay';
+import StaticSvgRenderer from './StaticSvgRenderer';
+
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
-import { isMultiModelMultiTest } from '../Shared/helpers';
+import { isMultiModelMultiTest, roundToPrecision } from '../Shared/helpers';
 
 class TabOverlay extends Component {
   state = {
@@ -20,7 +19,30 @@ class TabOverlay extends Component {
     // This fixes cases where TabOverlay mounts *after* the parent overlay becomes loaded,
     // and no subsequent state/prop change happens (so componentDidUpdate wouldn't run).
     this.refreshPanes();
+
+    // Listen for window resize to update overlay dimensions
+    window.addEventListener('resize', this.handleResize);
   }
+
+  _resizeTimer = null;
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+    if (this._resizeTimer) {
+      clearTimeout(this._resizeTimer);
+    }
+  }
+
+  handleResize = () => {
+    if (this._resizeTimer) {
+      clearTimeout(this._resizeTimer);
+    }
+    this._resizeTimer = setTimeout(() => {
+      this._resizeTimer = null;
+      this.cacheString = null;
+      this.refreshPanes();
+    }, 300);
+  };
 
   componentDidUpdate() {
     this.refreshPanes();
@@ -51,59 +73,42 @@ class TabOverlay extends Component {
       featuresLength > 1 ? multiFeaturePlotTypes : singleFeaturePlotTypes;
     const plotId = overlayPlotTypes?.[activeTabIndexPlotsOverlay]?.plotID;
 
-    const cacheStringArg = `overlayPanes_${activeTabIndexPlotsOverlay}_${divHeight}_${divWidth}_${divHeight}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
+    // Include actual container dimensions in cache to invalidate on resize
+    const actualWidth = this.getWidth();
+    const actualHeight = this.getHeight();
+
+    const cacheStringArg = `overlayPanes_${activeTabIndexPlotsOverlay}_${actualHeight}_${actualWidth}_${plotId}_${plotKey}_${plotLength}_${featuresLength}_${featureIdsString}_${differentialStudy}_${differentialModel}_${differentialTest}`;
 
     this.getSVGPanesOverlay(cacheStringArg, featuresLength, overlayPlotTypes);
   };
 
-
   getWidth = () => {
     if (this.props.differentialPlotsOverlayRefFwd?.current !== null) {
-      return this.props.differentialPlotsOverlayRefFwd.current.offsetParent
-        .offsetWidth;
+      return this.props.differentialPlotsOverlayRefFwd.current.clientWidth;
     }
     return 1200;
   };
 
   getHeight = () => {
     if (this.props.differentialPlotsOverlayRefFwd?.current !== null) {
-      return this.props.differentialPlotsOverlayRefFwd.current.offsetParent
-        .offsetHeight;
+      const rect =
+        this.props.differentialPlotsOverlayRefFwd.current.getBoundingClientRect();
+      return window.innerHeight - rect.top;
     }
     return 700;
   };
 
-  //     if (activeTabIndexPlotsOverlay < overlayPlotsTypes.length) {
-  //       const plotId =
-  //         overlayPlotsTypes[activeTabIndexPlotsOverlay].plotType.plotID;
-  //       const plotKey = plotOverlayData.key;
-  //       // const cacheKey = `overlayFeaturePanes_${differentialStudy}_${differentialModel}_${differentialTest}_${plotKey}_${plotId}_${activeTabIndexPlotsOverlay}`;
-  //       // if (this[cacheKey] != null) {
-  //       //   return this[cacheKey];
-  //       // } else {
-  //       const s = plotOverlayData?.svg[activeTabIndexPlotsOverlay];
-  //       const featuresLength = this.props.differentialHighlightedFeaturesData
-  //         .length;
-
   getSVGPanesOverlay = (cacheStringArg, featuresLength, overlayPlotTypes) => {
     if (this.cacheString === cacheStringArg) return;
     this.cacheString = cacheStringArg;
-    // if (!this.props.plotOverlayLoaded) {
-    //   return (
-    // <LoaderActivePlots />
-    //     <div className="PlotsMetafeaturesDimmer">
-    //       <Dimmer active inverted>
-    //         <Loader size="large">Loading...</Loader>
-    //       </Dimmer>
-    //     </div>
-    //   );
-    // } else {
     const {
       activeTabIndexPlotsOverlay,
       plotOverlayData,
       modelSpecificMetaFeaturesExist,
       differentialTest,
       differentialTestIdsCommon,
+      pxToPtRatio,
+      pointSize,
     } = this.props;
     // since this call is in render, index determines the one tab to display (svg, plotly or feature data)
     let panes = [];
@@ -113,6 +118,23 @@ class TabOverlay extends Component {
         if (s) {
           const svgContainerWidth = this.getWidth();
           const svgContainerHeight = this.getHeight();
+          let dimensions = '';
+          if (svgContainerWidth && svgContainerHeight && pxToPtRatio) {
+            const divWidthPadding = svgContainerWidth * 0.95;
+            const divHeightPadding = svgContainerHeight * 0.95 - 38;
+            const divWidthPt = roundToPrecision(
+              divWidthPadding / pxToPtRatio,
+              1,
+            );
+            const divHeightPt = roundToPrecision(
+              divHeightPadding / pxToPtRatio,
+              1,
+            );
+            const divWidthPtString = `width=${divWidthPt}`;
+            const divHeightPtString = `&height=${divHeightPt}`;
+            const pointSizeString = `&pointsize=${pointSize}`;
+            dimensions = `?${divWidthPtString}${divHeightPtString}${pointSizeString}`;
+          }
           const isPlotlyPlot = s.plotType.plotType.includes('plotly');
           const isMultiModelMultiTestVar = isMultiModelMultiTest(
             s.plotType.plotType,
@@ -157,11 +179,11 @@ class TabOverlay extends Component {
                       errorMessagePlotlyOverlay={errorMessagePlotlyOverlay}
                     />
                   ) : s.svg && !errorMessagePlotlyOverlay ? (
-                    <div
-                      id="PlotsOverlayContainer"
-                      className="svgSpan"
-                      dangerouslySetInnerHTML={{ __html: s.svg }}
-                    ></div>
+                    <StaticSvgRenderer
+                      src={`${s.svg}${dimensions}`}
+                      title={`${s.plotType.plotDisplay}`}
+                      uniqueHash={`o3k7x9-${cacheStringArg}`}
+                    />
                   ) : (
                     <div className="PlotInstructions">
                       <h4 className="PlotInstructionsText NoSelect">
@@ -207,7 +229,6 @@ class TabOverlay extends Component {
     this.setState({
       svgPanesOverlay: panes,
     });
-    // }
   };
 
   render() {

@@ -1,21 +1,31 @@
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Grid, Dimmer, Loader, Dropdown, Popup } from 'semantic-ui-react';
-import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
+
 import ButtonActions from '../Shared/ButtonActions';
+
+import DifferentialBreadcrumbs from './DifferentialBreadcrumbs';
 import TabOverlay from './TabOverlay';
+
 import '../Enrichment/SplitPanesContainer.scss';
 import './PlotsDynamic.scss';
 import './PlotsOverlay.scss';
 import { isObjectEmpty } from '../Shared/helpers';
+
+let lastOverlaySelection = { key: null, index: 0 };
 
 class PlotsOverlay extends PureComponent {
   constructor(props) {
     super(props);
     // this.resizeListener = this.resizeListener.bind(this);
     // this.debouncedResizeListener = _.debounce(this.resizeListener, 100);
+    const currentOverlayKey = props.plotOverlayData?.key || null;
+    const initialActiveIndex =
+      lastOverlaySelection.key === currentOverlayKey
+        ? lastOverlaySelection.index
+        : 0;
     this.state = {
-      activeTabIndexPlotsOverlay: 0,
+      activeTabIndexPlotsOverlay: initialActiveIndex,
       excelFlag: true,
       pngFlag: true,
       pdfFlag: false,
@@ -36,7 +46,40 @@ class PlotsOverlay extends PureComponent {
 
   componentDidUpdate(prevProps, prevState) {
     const { activeTabIndexPlotsOverlay } = this.state;
+    const prevOverlayKey = prevProps.plotOverlayData?.key || null;
+    const currentOverlayKey = this.props.plotOverlayData?.key || null;
+    const isMultifeaturePlot = this.getIsMultiFeature();
+    const plotCount = isMultifeaturePlot
+      ? this.props.multiFeaturePlotTypes?.length || 0
+      : this.props.singleFeaturePlotTypes?.length || 0;
+    const hasMetaFeatureTab =
+      this.props.modelSpecificMetaFeaturesExist !== false &&
+      !isMultifeaturePlot;
+    const maxValidIndex = hasMetaFeatureTab ? plotCount : plotCount - 1;
+
+    if (prevOverlayKey !== currentOverlayKey) {
+      // Reset selection for a new overlay payload and persist for future remounts.
+      if (activeTabIndexPlotsOverlay !== 0) {
+        this.setState({ activeTabIndexPlotsOverlay: 0 });
+      }
+      lastOverlaySelection = { key: currentOverlayKey, index: 0 };
+      return;
+    }
+
+    if (maxValidIndex >= 0 && activeTabIndexPlotsOverlay > maxValidIndex) {
+      const clampedIndex = Math.max(0, maxValidIndex);
+      if (clampedIndex !== activeTabIndexPlotsOverlay) {
+        this.setState({ activeTabIndexPlotsOverlay: clampedIndex });
+      }
+      lastOverlaySelection = { key: currentOverlayKey, index: clampedIndex };
+      return;
+    }
+
     if (prevState.activeTabIndexPlotsOverlay !== activeTabIndexPlotsOverlay) {
+      lastOverlaySelection = {
+        key: currentOverlayKey,
+        index: activeTabIndexPlotsOverlay,
+      };
       this.setButtonVisibility(activeTabIndexPlotsOverlay);
     }
   }
@@ -78,6 +121,8 @@ class PlotsOverlay extends PureComponent {
   };
 
   handlePlotDropdownChange = (e, { value }) => {
+    const currentOverlayKey = this.props.plotOverlayData?.key || null;
+    lastOverlaySelection = { key: currentOverlayKey, index: value };
     this.setState({
       activeTabIndexPlotsOverlay: value,
     });
@@ -176,8 +221,10 @@ class PlotsOverlay extends PureComponent {
         let differentialPlotDescription = null;
         let currentDifferentialPlotDescriptions =
           differentialPlotDescriptions || {};
-        const currentPlotText =
-          options?.[activeTabIndexPlotsOverlayVar]?.text || null;
+        const activeOption = options.find(
+          (opt) => opt.value === activeTabIndexPlotsOverlayVar,
+        );
+        const currentPlotText = activeOption?.text || null;
         if (!isObjectEmpty(currentDifferentialPlotDescriptions)) {
           const DescriptionsAsArray = Object.entries(
             currentDifferentialPlotDescriptions,
@@ -252,10 +299,7 @@ class PlotsOverlay extends PureComponent {
                               selection
                               compact
                               options={options}
-                              value={
-                                options[activeTabIndexPlotsOverlayVar]?.value ||
-                                0
-                              }
+                              value={activeTabIndexPlotsOverlayVar}
                               onChange={this.handlePlotDropdownChange}
                             />
                           }
@@ -308,9 +352,7 @@ class PlotsOverlay extends PureComponent {
                           selection
                           compact
                           options={options}
-                          value={
-                            options[activeTabIndexPlotsOverlayVar]?.value || 0
-                          }
+                          value={activeTabIndexPlotsOverlayVar}
                           onChange={this.handlePlotDropdownChange}
                         />
                         <TabOverlay

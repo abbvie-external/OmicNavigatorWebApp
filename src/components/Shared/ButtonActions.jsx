@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Button, Dropdown } from 'semantic-ui-react';
 import * as saveSvgAsPng from 'save-svg-as-png';
+import { Button, Dropdown } from 'semantic-ui-react';
+
+import { pdfService } from '../../services/pdf.service';
 import { toTabDelimitedText } from '../../utilities/textExport';
 // import { excelService } from '../../services/excel.service';
-import { pdfService } from '../../services/pdf.service';
+
 import './ButtonActions.scss';
 import { toast } from 'react-toastify';
 
@@ -148,8 +150,12 @@ class ButtonActions extends Component {
 
   exportSVG = (svgEl, name) => {
     if (svgEl != null) {
-      svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-      const svgData = svgEl.outerHTML;
+      // Serialize a clone to avoid mutating the live plot node during export.
+      const exportSvg = svgEl.cloneNode(true);
+      exportSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      exportSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      const serializer = new XMLSerializer();
+      const svgData = serializer.serializeToString(exportSvg);
       const preface = '<?xml version="1.0" standalone="no"?>\r\n';
       const svgBlob = new Blob([preface, svgData], {
         type: 'image/svg+xml;charset=utf-8',

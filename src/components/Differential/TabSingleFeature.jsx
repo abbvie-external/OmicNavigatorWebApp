@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import SVG from 'react-inlinesvg';
 import { Tab } from 'semantic-ui-react';
 
 import { roundToPrecision, isMultiModelMultiTest } from '../Shared/helpers';
 
 import MetafeaturesTableDynamic from './MetafeaturesTableDynamic';
 import PlotlySingleFeature from './PlotlySingleFeature';
+import StaticSvgRenderer from './StaticSvgRenderer';
 import './PlotsDynamic.scss';
 import '../Shared/PlotlyOverrides.scss';
 
@@ -14,7 +14,7 @@ class TabSingleFeature extends Component {
     svgPanesSingleFeature: [],
   };
 
-  componentDidUpdate() {
+  buildCacheStringArg = () => {
     const {
       activeTabIndexPlotsSingleFeature,
       divHeight,
@@ -25,6 +25,7 @@ class TabSingleFeature extends Component {
       plotSingleFeatureData,
       singleFeaturePlotTypes,
     } = this.props;
+
     const plotKey = plotSingleFeatureData.key;
     const plotLength = plotSingleFeatureData?.svg.length;
     const plotId =
@@ -33,8 +34,16 @@ class TabSingleFeature extends Component {
       activeTabIndexPlotsSingleFeature < singleFeaturePlotTypes.length
         ? false
         : true;
-    const cacheStringArg = `singleFeaturePanes_${activeTabIndexPlotsSingleFeature}_${divHeight}_${divWidth}_${plotId}_${isMetaFeatureTab}_${plotKey}_${plotLength}_${plotId}_${differentialStudy}_${differentialModel}_${differentialTest}`;
-    this.getSVGPanesSingleFeature(cacheStringArg);
+
+    return `singleFeaturePanes_${activeTabIndexPlotsSingleFeature}_${divHeight}_${divWidth}_${plotId}_${isMetaFeatureTab}_${plotKey}_${plotLength}_${plotId}_${differentialStudy}_${differentialModel}_${differentialTest}`;
+  };
+
+  componentDidMount() {
+    this.getSVGPanesSingleFeature(this.buildCacheStringArg());
+  }
+
+  componentDidUpdate() {
+    this.getSVGPanesSingleFeature(this.buildCacheStringArg());
   }
 
   getSVGPanesSingleFeature = (cacheStringArg) => {
@@ -141,12 +150,10 @@ class TabSingleFeature extends Component {
                     }}
                   />
                 ) : s.svg && !errorMessagePlotlySingleFeature ? (
-                  <SVG
-                    cacheRequests={true}
+                  <StaticSvgRenderer
                     src={srcUrl}
                     title={`${s.plotType.plotDisplay}`}
                     uniqueHash={`a1f8d1-${cacheStringArg}`}
-                    uniquifyIDs={true}
                     onLoad={() => {
                       if (
                         typeof this.props.onActivePlotRenderReady === 'function'

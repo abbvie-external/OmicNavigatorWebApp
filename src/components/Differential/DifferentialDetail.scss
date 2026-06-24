@@ -54,10 +54,11 @@
 #PlotsSingleFeatureContainer,
 #PlotsMultiFeatureContainer {
   padding-right: 0px !important;
+  overflow: hidden;
 
-  svg {
-    width: inherit !important;
-    height: -webkit-fill-available !important;
+  > svg {
+    width: 100% !important;
+    height: auto !important;
   }
 }
 
@@ -193,7 +194,9 @@
   margin-top: 5px !important;
   margin-left: 255px !important;
   cursor: pointer !important;
-  box-shadow: 0 1px 0px rgba(0, 0, 0, 0.12), 0 1px 0px rgba(0, 0, 0, 0.24) !important;
+  box-shadow:
+    0 1px 0px rgba(0, 0, 0, 0.12),
+    0 1px 0px rgba(0, 0, 0, 0.24) !important;
   z-index: 2 !important;
 }
 

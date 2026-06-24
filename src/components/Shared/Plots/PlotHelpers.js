@@ -1,4 +1,3 @@
-import DOMPurify from 'dompurify';
 import {
   isMultiModelMultiTest,
   getTestsArg,
@@ -182,59 +181,6 @@ class PlotHelpers {
       idArg,
       modelIdsOverride: differentialModelIdsOverride,
     };
-  }
-
-  // =====================================================
-  // SVG SANITIZATION
-  // =====================================================
-
-  /**
-   * Sanitize and rewrite an SVG string for safe rendering.
-   */
-  static sanitizeStaticSvg(xml, { idBase, svgIndex, multiFeature = false }) {
-    if (!xml || typeof xml !== 'string' || xml.length === 0) {
-      console.warn('sanitizeStaticSvg: Invalid or empty XML');
-      return '';
-    }
-
-    try {
-      let updated = xml.replace(/id="/g, `id="${idBase}-${svgIndex}-`);
-
-      updated = updated.replace(/#glyph/g, `#${idBase}-${svgIndex}-glyph`);
-      updated = updated.replace(/#clip/g, `#${idBase}-${svgIndex}-clip`);
-
-      const svgId = multiFeature
-        ? `currentSVG-multifeatures-${svgIndex}`
-        : `currentSVG-${idBase}-${svgIndex}`;
-
-      updated = updated.replace(
-        /<svg/g,
-        `<svg preserveAspectRatio="xMinYMin meet" class="currentSVG" id="${svgId}"`,
-      );
-
-      const restrictExternalUseHref = function (node) {
-        if (node.hasAttribute('xlink:href')) {
-          const href = node.getAttribute('xlink:href');
-          if (!href.match(/^#/)) {
-            node.remove();
-          }
-        }
-      };
-
-      DOMPurify.addHook('afterSanitizeAttributes', restrictExternalUseHref);
-
-      try {
-        return DOMPurify.sanitize(updated, {
-          ADD_TAGS: ['use'],
-          ADD_ATTR: ['xlink:href'],
-        });
-      } finally {
-        DOMPurify.removeHook('afterSanitizeAttributes');
-      }
-    } catch (error) {
-      console.error('Error sanitizing SVG:', error);
-      return '';
-    }
   }
 
   // =====================================================

@@ -1,10 +1,16 @@
-import React, { Component } from 'react';
-import { Grid, Popup, Sidebar, Icon } from 'semantic-ui-react';
 import _ from 'lodash-es';
-import DOMPurify from 'dompurify';
-import { withRouter } from 'react-router-dom';
+import React, { Component } from 'react';
 import SVG from 'react-inlinesvg';
+import { withRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Grid, Popup, Sidebar, Icon } from 'semantic-ui-react';
+
+import { omicNavigatorService } from '../../services/omicNavigator.service';
+import ButtonActions from '../Shared/ButtonActions';
+import './Differential.scss';
+import '../Shared/Table.scss';
+import { HEADER_OFFSET_PX } from '../Shared/constants';
+import ErrorBoundary from '../Shared/ErrorBoundary';
 import {
   isNotNANullUndefinedEmptyStringInf,
   formatNumberForDisplay,
@@ -13,17 +19,12 @@ import {
   roundToPrecision,
   limitValues,
 } from '../Shared/helpers';
-import ButtonActions from '../Shared/ButtonActions';
-import DifferentialSearch from './DifferentialSearch';
-import DifferentialDetail from './DifferentialDetail';
-import ErrorBoundary from '../Shared/ErrorBoundary';
-import { omicNavigatorService } from '../../services/omicNavigator.service';
+import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import TransitionActive from '../Transitions/TransitionActive';
 import TransitionStill from '../Transitions/TransitionStill';
-import PlotHelpers from '../Shared/Plots/PlotHelpers';
-import './Differential.scss';
-import '../Shared/Table.scss';
-import { HEADER_OFFSET_PX } from '../Shared/constants';
+
+import DifferentialDetail from './DifferentialDetail';
+import DifferentialSearch from './DifferentialSearch';
 
 let cancelRequestGetMapping = () => {};
 class Differential extends Component {
@@ -807,8 +808,8 @@ class Differential extends Component {
     const cancelTokenKey = multifeaturePlot
       ? 'multiPlot'
       : view === 'Overlay'
-      ? 'overlay'
-      : 'singlePlot';
+        ? 'overlay'
+        : 'singlePlot';
 
     const cancelToken = PlotHelpers.createAbortSignal(cancelTokenKey);
 
@@ -860,12 +861,12 @@ class Differential extends Component {
               }
             });
         } else {
-          // Static SVG: fetch + sanitize
+          // Static SVG: URL (same as Plotly)
           omicNavigatorService
-            .plotStudyReturnSvg(
+            .plotStudyReturnSvgUrl(
               differentialStudy,
               modelsArg,
-              id,
+              idArg,
               plot.plotID,
               plot.plotType,
               testsArg,
@@ -873,24 +874,16 @@ class Differential extends Component {
               cancelToken,
             )
             .then((svg) => {
-              const xml = svg?.data || null;
-              if (xml && xml.length > 0) {
-                const sanitizedSVG = PlotHelpers.sanitizeStaticSvg(xml, {
-                  idBase: Array.isArray(id) ? 'multifeatures' : id,
-                  svgIndex: i,
-                  multiFeature: !!multifeaturePlot,
-                });
-
-                if (sanitizedSVG) {
-                  const svgInfo = { plotType: plot, svg: sanitizedSVG };
-                  plotDataVar.svg.push(svgInfo);
-                  self.handleSVG(view, plotDataVar);
-                }
-              }
+              const svgInfo = { plotType: plot, svg };
+              plotDataVar.svg.push(svgInfo);
+              self.handleSVG(view, plotDataVar);
             })
             .catch((error) => {
               if (!error.__CANCEL__) {
-                console.error(`Error fetching SVG for ${plot.plotID}:`, error);
+                console.error(
+                  `Error fetching Static SVG URL for ${plot.plotID}:`,
+                  error,
+                );
               }
             });
         }
@@ -1103,33 +1096,31 @@ class Differential extends Component {
           plotDataVar.svg.push(svgInfo);
           self.handleSVG('Overlay', plotDataVar);
         } else {
-          // Static SVG with timeout
-          const result =
-            await omicNavigatorService.plotStudyReturnSvgWithTimeoutResolver(
+          // Static SVG: URL with timeout
+          const svg =
+            await omicNavigatorService.plotStudyReturnSvgUrlWithTimeoutResolver(
               differentialStudy,
               modelsArg,
               featureids,
               plot.plotID,
+              plot.plotType,
               testsArg,
               null,
               cancelToken,
             );
 
-          if (result === true) {
+          if (svg && !svg.includes('Error:')) {
+            const svgInfo = { plotType: plot, svg };
+            plotDataVar.svg.push(svgInfo);
+            self.handleSVG('Overlay', plotDataVar);
+          } else if (
+            svg &&
+            svg.includes('Error:') &&
+            svg.includes('timed out')
+          ) {
+            // Timeout: redirect to new tab
             PlotHelpers.abortRequest('multiPlot');
             this.getMultifeaturePlotTransition(featureids, true, 0);
-          } else if (result && result.data) {
-            const sanitizedSVG = PlotHelpers.sanitizeStaticSvg(result.data, {
-              idBase: 'multifeatures',
-              svgIndex: 0,
-              multiFeature: true,
-            });
-
-            if (sanitizedSVG) {
-              const svgInfo = { plotType: plot, svg: sanitizedSVG };
-              plotDataVar.svg.push(svgInfo);
-              self.handleSVG('Overlay', plotDataVar);
-            }
           } else {
             console.warn('No SVG data returned for multi-feature plot');
             self.handleItemSelected(false);
@@ -1177,7 +1168,7 @@ class Differential extends Component {
           });
       } else {
         omicNavigatorService
-          .plotStudyReturnSvg(
+          .plotStudyReturnSvgUrl(
             differentialStudy,
             modelsArg,
             featureids,
@@ -1188,26 +1179,16 @@ class Differential extends Component {
             cancelToken,
           )
           .then((svg) => {
-            if (!svg || !svg.data) return;
-
-            const xml = svg.data;
-            if (xml && xml.length > 0) {
-              const sanitizedSVG = PlotHelpers.sanitizeStaticSvg(xml, {
-                idBase: 'multifeatures',
-                svgIndex: i,
-                multiFeature: true,
-              });
-
-              if (sanitizedSVG) {
-                const svgInfo = { plotType: plot, svg: sanitizedSVG };
-                plotDataVar.svg.push(svgInfo);
-                self.handleSVG('Overlay', plotDataVar);
-              }
-            }
+            const svgInfo = { plotType: plot, svg };
+            plotDataVar.svg.push(svgInfo);
+            self.handleSVG('Overlay', plotDataVar);
           })
           .catch((error) => {
             if (!error.__CANCEL__) {
-              console.error(`Error fetching SVG for ${plot.plotID}:`, error);
+              console.error(
+                `Error fetching Static SVG URL for ${plot.plotID}:`,
+                error,
+              );
             }
           });
       }
@@ -1344,7 +1325,7 @@ class Differential extends Component {
     });
 
     try {
-      const svg = await omicNavigatorService.plotStudyReturnSvg(
+      const svg = await omicNavigatorService.plotStudyReturnSvgUrl(
         differentialStudy,
         modelsArg,
         featureids,
@@ -1355,7 +1336,7 @@ class Differential extends Component {
         cancelToken,
       );
 
-      if (!svg || svg === true) {
+      if (!svg) {
         return null;
       }
 

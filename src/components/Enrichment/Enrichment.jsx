@@ -22,7 +22,6 @@ import {
   getModelsArg,
   isMultiModelMultiTest,
 } from '../Shared/helpers';
-import PlotHelpers from '../Shared/Plots/PlotHelpers';
 import '../Shared/Table.scss';
 import SearchingAlt from '../Transitions/SearchingAlt';
 import TransitionActive from '../Transitions/TransitionActive';
@@ -1221,8 +1220,8 @@ class Enrichment extends Component {
   };
 
   /**
-   * Fetch plot data for the overlay view using plotStudyReturnSvg.
-   * TabOverlay expects raw SVG markup (not URLs) for dangerouslySetInnerHTML.
+   * Fetch plot data for the overlay view using plotStudyReturnSvgUrl.
+   * Unified with Differential rendering path: URL-based fetching via StaticSvgRenderer.
    */
   getPlotOverlay = (featureId) => {
     const {
@@ -1293,9 +1292,9 @@ class Enrichment extends Component {
         enrichmentAnnotationIdsCommon,
       );
 
-      // Use plotStudyReturnSvg to get raw SVG content (not URL)
+      // Use plotStudyReturnSvgUrl (URL-based rendering)
       return omicNavigatorService
-        .plotStudyReturnSvg(
+        .plotStudyReturnSvgUrl(
           enrichmentStudy,
           modelsArg,
           id,
@@ -1305,17 +1304,7 @@ class Enrichment extends Component {
           null,
           cancelToken,
         )
-        .then((svgResponse) => {
-          // plotStudyReturnSvg returns { data: '<svg>...</svg>' } or raw string
-          const raw = svgResponse?.data || svgResponse || '';
-          const isPlotlyPlot = plot.plotType.includes('plotly');
-          const svg = isPlotlyPlot
-            ? raw
-            : PlotHelpers.sanitizeStaticSvg(raw, {
-                idBase: 'enrichment-overlay-single',
-                svgIndex: index,
-                multiFeature: false,
-              });
+        .then((svg) => {
           return { svg, plotType: plot };
         })
         .catch((error) => {
@@ -1416,40 +1405,19 @@ class Enrichment extends Component {
 
           const idArg = ids; // backend expects an array of feature IDs for multi-feature
 
-          const isPlotlyPlot = plot.plotType.includes('plotly');
-
-          const request = isPlotlyPlot
-            ? omicNavigatorService.plotStudyReturnSvgUrl(
-                enrichmentStudy,
-                modelsArg,
-                idArg,
-                plot.plotID,
-                plot.plotType,
-                testsArg,
-                null,
-                cancelToken,
-              )
-            : omicNavigatorService.plotStudyReturnSvg(
-                enrichmentStudy,
-                modelsArg,
-                idArg,
-                plot.plotID,
-                plot.plotType,
-                testsArg,
-                null,
-                cancelToken,
-              );
-
-          return request
-            .then((res) => {
-              const raw = res?.data || res || '';
-              const svg = isPlotlyPlot
-                ? raw
-                : PlotHelpers.sanitizeStaticSvg(raw, {
-                    idBase: 'enrichment-overlay-multifeature',
-                    svgIndex: index,
-                    multiFeature: true,
-                  });
+          // Use plotStudyReturnSvgUrl for both Plotly and static SVG (unified URL-based)
+          return omicNavigatorService
+            .plotStudyReturnSvgUrl(
+              enrichmentStudy,
+              modelsArg,
+              idArg,
+              plot.plotID,
+              plot.plotType,
+              testsArg,
+              null,
+              cancelToken,
+            )
+            .then((svg) => {
               return { svg, plotType: plot };
             })
             .catch((error) => {
@@ -3272,6 +3240,8 @@ class Enrichment extends Component {
           BreadcrumbsComponent={EnrichmentOverlayBreadcrumbs}
           breadcrumbsProps={{ backLabel: 'Back to Plots' }}
           isMultiFeature={isMulti}
+          pxToPtRatio={105}
+          pointSize={12}
         />
       );
     }
