@@ -1,6 +1,6 @@
 {
   "name": "omicnavigatorwebapp",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "private": true,
   "dependencies": {
     "@floating-ui/react": "^0.27.16",
@@ -94,7 +94,7 @@
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
   },
-   "overrides": {
+  "overrides": {
     "react-split-pane-r17": {
       "react": "$react",
       "react-dom": "$react-dom"
